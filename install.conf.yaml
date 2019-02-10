@@ -1,10 +1,15 @@
 - defaults:
-  link:
-    relink: true
+    link:
+      relink: true
 
 - clean: ['~']
 
 - link:
-  ~/.vim: ~
-  ~/.vimrc: ~
-  ~/.zshrc: ~
+    ~/.vim:
+    ~/.vimrc:
+    ~/.zshrc:
+    ~/.ghci:
+    ~/.aliases:
+    ~/.config/:
+      glob: true
+      path: config/*

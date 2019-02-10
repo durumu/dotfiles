@@ -1,0 +1,12 @@
+# programming
+#alias py="python3"
+alias R="R --quiet"
+alias py2="python2"
+
+# utility
+alias pacman="sudo pacman"
+alias yao="yaourt -S"
+alias pip="sudo pip"
+alias vi="vim"
+alias pbcopy="xsel --clipboard --input"
+alias pbpaste="xsel --clipboard --output"
