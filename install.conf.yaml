@@ -13,3 +13,6 @@
     ~/.config/:
       glob: true
       path: config/*
+    ~/.oh-my-zsh/themes/agnoster2.zsh-theme:
+      path: agnoster2.zsh-theme
+    ~/.latex:

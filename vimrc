@@ -31,11 +31,6 @@ set backspace=indent,eol,start " make backspace work as expected
 
 set autowrite
 
-
-"LaTeX-suite
-set grepprg=grep\ -nH\ $*
-let g:tex_flavor = "latex"
-let g:Tex_AutoFolding = 0
  
 """""""""""""""""""""""""""""
 " Searching
@@ -58,9 +53,9 @@ set wrap
 set expandtab
 set shiftwidth=2 
 set softtabstop=2
-" except for Python and LaTeX
+
+" except for Python
 autocmd FileType python :set shiftwidth=4 softtabstop=4
-autocmd FileType tex :set shiftwidth=4 softtabstop=4
 
 """""""""""""""""""""""""""""
 " Display
@@ -70,6 +65,9 @@ syntax on
 set number
 set ruler
 set scrolloff=7
+
+" italic comments!
+highlight comment cterm=italic
 
 " Match brackets
 set showmatch
@@ -91,7 +89,17 @@ let g:airline#extensions#tabline#enabled=1
 let g:airline_powerline_fonts=1
 let g:airline_theme='solarized'
 
-highlight comment cterm=italic
+"""""""""""""""""""""""""""""
+" LaTeX-Suite
+"""""""""""""""""""""""""""""
+set grepprg=grep\ -nH\ $*
+let g:tex_flavor = "latex"
+
+
+" Undo horrible LaTeX-Suite macros
+let g:Tex_SmartKeyBS = 0
+let g:Tex_SmartKeyQuote = 0
+let g:Tex_SmartKeyDot = 0
 
 """""""""""""""""""""""""""""
 " Mappings
