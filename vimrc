@@ -13,7 +13,7 @@ filetype off
 
 " Vundle init begin
 set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
+call vundle#begin("~/.vundle-plugins/")
 Plugin 'VundleVim/Vundle.vim'
 
 " Aesthetics 
