@@ -55,6 +55,8 @@ set noerrorbells
 
 set backspace=indent,eol,start " make backspace work as expected
 
+let g:tex_flavor="latex" " fix default behavior for .tex
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Searching
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -62,7 +64,7 @@ set backspace=indent,eol,start " make backspace work as expected
 set smartcase " search is case sensitive if there are uppercase letters
 set hlsearch
 set incsearch
-set nomagic " ., *, etc work as expected -- use \m to do a 'regex'
+" set nomagic " ., *, etc work as expected -- use \m to do a 'regex'
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Indent
@@ -119,6 +121,7 @@ let g:airline_theme='solarized'
 " Trigger configuration. 
 " Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
 let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsListSnippets="<s-tab>"
 let g:UltiSnipsJumpForwardTrigger="<c-b>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
