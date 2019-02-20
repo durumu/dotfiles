@@ -66,8 +66,6 @@ set number
 set ruler
 set scrolloff=7
 
-" italic comments!
-highlight comment cterm=italic
 
 " Match brackets
 set showmatch
@@ -83,6 +81,8 @@ let g:solarized_termtrans=1 " if screen transparent
 "set t_Co=256               " if screen not transparent
 "let g:solarized_termcolors=256
 colorscheme solarized
+" italic comments!
+highlight comment cterm=italic
 
 " Airline
 let g:airline#extensions#tabline#enabled=1

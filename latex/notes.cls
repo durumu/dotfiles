@@ -8,12 +8,27 @@
     % Code highlighting
     \RequirePackage{listings}
     \RequirePackage{color}
+    \RequirePackage{courier}
 
     % Math 
     \RequirePackage{amsmath}
     \RequirePackage{amssymb}
     \RequirePackage{amsfonts}
     \RequirePackage{mathtools}
+
+% Style
+    \renewcommand\section{\@startsection {section}{1}{\z@}%
+                                       {-3.5ex \@plus -1ex \@minus -.2ex}%
+                                       {2.3ex \@plus.2ex}%
+                                       {\normalfont\Large\scshape}}
+    \renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                                         {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                         {1.5ex \@plus .2ex}%
+                                         {\normalfont\large\scshape}}
+    \renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                                         {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                         {1.5ex \@plus .2ex}%
+                                         {\normalfont\normalsize\scshape}}
 
 % Listings
     \definecolor{dkgreen}{rgb}{0,0.6,0}
@@ -29,7 +44,7 @@
       showstringspaces=false,
       columns=flexible,
       basicstyle={\small\ttfamily},
-      numbers=none,
+      numbers=none, % line numbers -- change to "left" if you want them
       numberstyle=\tiny\color{gray},
       keywordstyle=\bfseries\color{blue},
       commentstyle=\itshape\color{dkgreen},
@@ -43,7 +58,8 @@
     \lstnewenvironment{cpp} {
       \lstset{
         language=[ISO]C++,
-        tabsize=2
+        tabsize=2,
+        morekeywords={mutex, semaphore}
       }
     } {}
 
@@ -81,3 +97,11 @@
   }\mathcode`,="8000 #1%
   \endgroup
 }
+
+% centered asterisks
+\lst@CCPutMacro
+  \lst@ProcessOther {"2A}{%
+    \lst@ttfamily 
+       {\raisebox{2pt}{*}}% used with ttfamily
+       \textasteriskcentered}% used with other fonts
+  \@empty\z@\@empty
