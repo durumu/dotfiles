@@ -5,10 +5,11 @@
 - clean: ['~']
 
 - link:
-    ~/.vim:
     ~/.vimrc:
     ~/.zshrc:
+    ~/.xinitrc:
     ~/.ghci:
+    ~/.vim:
     ~/.aliases:
     ~/.config/:
       glob: true

@@ -90,16 +90,17 @@ let g:airline_powerline_fonts=1
 let g:airline_theme='solarized'
 
 """""""""""""""""""""""""""""
-" LaTeX-Suite
+" UltiSnips
 """""""""""""""""""""""""""""
-set grepprg=grep\ -nH\ $*
-let g:tex_flavor = "latex"
 
+" Trigger configuration. 
+" Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
-" Undo horrible LaTeX-Suite macros
-let g:Tex_SmartKeyBS = 0
-let g:Tex_SmartKeyQuote = 0
-let g:Tex_SmartKeyDot = 0
+" If you want :UltiSnipsEdit to split your window.
+let g:UltiSnipsEditSplit="vertical"
 
 """""""""""""""""""""""""""""
 " Mappings
