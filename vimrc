@@ -21,11 +21,14 @@ Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'altercation/vim-colors-solarized'
 
-" Functionality
+" Movements
 Plugin 'tpope/vim-commentary' " gc movement
 Plugin 'tpope/vim-surround'   " ys, cs, ds
 Plugin 'SirVer/ultisnips'     " tab-complete snippets
 Plugin 'honza/vim-snippets'   " snippet repo for UltiSnips
+
+" Functionality
+Plugin 'ludovicchabant/vim-gutentags' " tag manager
 
 " Miscellaneous
 Plugin 'lervag/vimtex'        " TeX support
