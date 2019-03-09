@@ -11,3 +11,6 @@ alias pip="sudo pip"
 alias vi="vim"
 alias pbcopy="xsel --clipboard --input"
 alias pbpaste="xsel --clipboard --output"
+
+#eclimd
+alias eclimd="~/.eclipse/org.eclipse.platform_4.10.0_155965261_linux_gtk_x86_64/eclimd"

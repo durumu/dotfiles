@@ -5,12 +5,12 @@
 - clean: ['~']
 
 - link:
+    ~/.profile:        
     ~/.vimrc:
     ~/.zshrc:
-    ~/.xinitrc:
+    ~/.aliases:
     ~/.ghci:
     ~/.vim:
-    ~/.aliases:
     ~/.config/:
       glob: true
       path: config/*

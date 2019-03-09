@@ -35,6 +35,7 @@ Plugin 'google/vim-glaive'   " prereq for codefmt
 
 " Functionality
 Plugin 'ludovicchabant/vim-gutentags' " tag manager
+Plugin 'dansomething/vim-eclim'       " eclipse + vim
 
 " Miscellaneous
 Plugin 'lervag/vimtex'        " TeX support
@@ -98,11 +99,13 @@ set wrap
 
 " 1 tab = 2 spaces
 set expandtab
-set shiftwidth=2 
 set softtabstop=2
+set shiftwidth=0 " make < and > do the same thing as tab
 
 " except for Python
-autocmd FileType python :set shiftwidth=4 softtabstop=4
+autocmd FileType python :set softtabstop=4
+" also java
+autocmd FileType java :set noexpandtab tabstop=4
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Display
@@ -117,7 +120,6 @@ set scrolloff=7
 " Match brackets
 set showmatch
 set matchtime=2
-set matchpairs+=<:>
 " reduce lag caused by that
 
 let g:matchparen_timeout=20
