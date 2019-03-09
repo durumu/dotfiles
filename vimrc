@@ -20,12 +20,18 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'altercation/vim-colors-solarized'
+Plugin 'octol/vim-cpp-enhanced-highlight'
 
 " Movements
 Plugin 'tpope/vim-commentary' " gc movement
 Plugin 'tpope/vim-surround'   " ys, cs, ds
+
+" Formatting
 Plugin 'SirVer/ultisnips'     " tab-complete snippets
 Plugin 'honza/vim-snippets'   " snippet repo for UltiSnips
+Plugin 'google/vim-maktaba'   " prereq for codefmt
+Plugin 'google/vim-codefmt'   " prereq for codefmt
+Plugin 'google/vim-glaive'   " prereq for codefmt
 
 " Functionality
 Plugin 'ludovicchabant/vim-gutentags' " tag manager
@@ -36,6 +42,10 @@ Plugin 'lervag/vimtex'        " TeX support
 " Vundle init complete
 call vundle#end()
 filetype plugin indent on
+
+" Glaive init
+call glaive#Install()
+Glaive codefmt plugin[mappings]
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Editor Settings
@@ -58,7 +68,16 @@ set noerrorbells
 
 set backspace=indent,eol,start " make backspace work as expected
 
+" doesn't work yet.
+let g:gutentags_ctags_tagfile=".git/tags"
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" TeX
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 let g:tex_flavor="latex" " fix default behavior for .tex
+
+let g:vimtex_view_method="zathura"
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Searching
@@ -104,10 +123,11 @@ set matchpairs+=<:>
 let g:matchparen_timeout=20
 let g:matchparen_insert_timeout=20
 
+" set t_Co=256                " if screen not transparent
+" let g:solarized_termcolors=256
+" set background=light
 set background=dark
-let g:solarized_termtrans=1 " if screen transparent
-"set t_Co=256               " if screen not transparent
-"let g:solarized_termcolors=256
+let g:solarized_termtrans=1 " disable this for no transparency
 colorscheme solarized
 " italic comments!
 highlight comment cterm=italic
@@ -124,12 +144,15 @@ let g:airline_theme='solarized'
 " Trigger configuration. 
 " Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
 let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsListSnippets="<s-tab>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
+"let g:UltiSnipsListSnippets="<s-space>"
+let g:UltiSnipsJumpForwardTrigger="<s-tab>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 " If you want :UltiSnipsEdit to split your window.
 let g:UltiSnipsEditSplit="vertical"
+
+" Set docstring style to Google 
+let g:ultisnips_python_style="google"
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Mappings

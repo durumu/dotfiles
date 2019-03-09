@@ -84,6 +84,7 @@
 \newcommand{\Q}{\mathbb{Q}}
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\F}{\mathbb{F}}
+\newcommand{\Var}{\text{Var}}
 
 % type \ceil{x} or \floor{y}
 \DeclarePairedDelimiter\ceil{\lceil}{\rceil}
