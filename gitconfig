@@ -1,0 +1,55 @@
+[user]
+	name = Jordan Eldredge
+	email = jordan@jordaneldredge.com
+
+[color]
+	ui = auto
+
+[diff]
+	renames = copies
+
+[merge]
+	stat = true
+
+[core]
+	excludesfile = ~/.gitignore
+
+[advice]
+	statusHints = false
+
+[help]
+	autocorrect = 1
+
+[alias]
+	ap = add -p
+	br = branch
+	ch = checkout
+	cm = commit -m
+	co = commit
+	pr = pull-request
+	dc = diff --cached
+	rb = !git fetch upstream && git rebase upstream/master
+	save = commit -m "Work in progress"
+	update = push -f origin
+	lg = !"git lg1"
+	lg1 = log --graph --all --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(bold white)— %an%C(reset)%C(bold yellow)%d%C(reset)' --abbrev-commit --date=relative
+	ls = ls-files
+	st = status
+	recent = "!r() { cur=$(git rev-parse --abbrev-ref HEAD); git for-each-ref --sort=-committerdate refs/heads/ --format='%(color:yellow)%(refname:short)|%(color:bold               green)%(committerdate:relative)|%(color:blue)%(subject)|%(color:magenta)%(authorname)%(color:reset)' | sed \"s/m${cur}|/m* ${cur}|/\" | column -ts'|'; }; r"
+
+	# Show files ignored by git:
+	ign = ls-files -o -i --exclude-standard
+	# Backup the working directory without a commit
+	snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
+
+	# Create a new branch from upstream master
+	bru = "!git fetch upstream && sh -c \"git checkout -b $1 upstream/master\" -"
+
+[include]
+	path = ~/.gitconfig.local
+
+[github]
+	user = Durumu
+
+[push]
+  default = current

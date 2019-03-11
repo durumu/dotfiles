@@ -5,15 +5,17 @@
 - clean: ['~']
 
 - link:
-    ~/.profile:        
-    ~/.vimrc:
-    ~/.zshrc:
-    ~/.aliases:
-    ~/.ghci:
-    ~/.vim:
     ~/.config/:
       glob: true
       path: config/*
+    ~/.profile:        
+    ~/.zshrc:
     ~/.oh-my-zsh/themes/agnoster2.zsh-theme:
       path: agnoster2.zsh-theme
+    ~/.aliases:
+    ~/.vimrc:
+      path: config/nvim/init.vim
+    ~/.gitconfig:
+    ~/.gitignore:
+    ~/.ghci:
     ~/.latex:
