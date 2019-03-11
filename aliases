@@ -1,16 +1,21 @@
 # programming
-#alias py="python3"
 alias R="R --quiet"
 alias py2="python2"
 alias py="python3"
+
+# vim
+alias v="nvim"
+alias vi="nvim"
+alias vim="nvim"
+alias nv="nvim"
 
 # utility
 alias pacman="sudo pacman"
 alias yao="yaourt -S"
 alias pip="sudo pip"
-alias vi="vim"
 alias pbcopy="xsel --clipboard --input"
 alias pbpaste="xsel --clipboard --output"
+alias pa="pulseaudio"
 
 #eclimd
 alias eclimd="~/.eclipse/org.eclipse.platform_4.10.0_155965261_linux_gtk_x86_64/eclimd"
