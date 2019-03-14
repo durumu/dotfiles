@@ -16,8 +16,7 @@ call plug#begin('~/.local/share/nvim/plugins')
 " ----------------------------------------------------------------------------
 
 " status line
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
+Plug 'itchyny/lightline.vim'
 
 " solarized colorscheme (:colo solarized)
 Plug 'altercation/vim-colors-solarized'
@@ -78,6 +77,9 @@ Plug 'SirVer/ultisnips'
 
 " snippet repo for ultisnips
 Plug 'honza/vim-snippets'
+
+" asynchronous lint engine
+Plug 'w0rp/ale'
 
 " ----------------------------------------------------------------------------
 "   miscellaneous

@@ -24,9 +24,17 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 let g:ultisnips_python_style="google" " for honza/vim-snippets
 
 " airline
-let g:airline#extensions#tabline#enabled=1
-let g:airline_powerline_fonts=1
-let g:airline_theme='solarized'
+" let g:airline#extensions#tabline#enabled=1
+" let g:airline_powerline_fonts=1
+" let g:airline_theme='solarized'
+
+" ---------------------------------------------------------------------------"
+"   lightline                                                                  "
+" ---------------------------------------------------------------------------"
+
+let g:lightline = {
+      \ 'colorscheme': 'solarized',
+      \ }
 
 " ---------------------------------------------------------------------------"
 "   generic                                                                  "
@@ -67,6 +75,7 @@ set wrap
 set linebreak         " break in middle of words
 set textwidth=79      " break to 79 chars wide
 set noerrorbells
+set noshowmode
 
 " buffers & windows
 set splitbelow        " :sp goes below
@@ -90,17 +99,10 @@ highlight comment cterm=italic
 " ---------------------------------------------------------------------------"
 
 " edit commonly-accessed files
-nmap <silent> <leader>ev :vsplit $HOME/.config/nvim/init.vim<cr>
-nmap <silent> <leader>ep :vsplit $HOME/.config/nvim/plug.vim<cr>
-nmap <silent> <leader>ez :vsplit $HOME/.zshrc<cr>
+nmap <silent> <leader>ev :split $HOME/.config/nvim/init.vim<cr>
+nmap <silent> <leader>ep :split $HOME/.config/nvim/plug.vim<cr>
+nmap <silent> <leader>ez :split $HOME/.zshrc<cr>
 nmap <silent> <leader>sv :source $HOME/.config/nvim/init.vim<cr>
-nmap <silent> <leader>sp :source $HOME/.config/nvim/plug.vim<cr>
-
-" move windows around
-nmap <silent> <leader>h :wincmd H<cr>
-nmap <silent> <leader>j :wincmd J<cr>
-nmap <silent> <leader>k :wincmd K<cr>
-nmap <silent> <leader>l :wincmd L<cr>
 
 " clear highlighting
 nnoremap <silent> <leader><space> :nohlsearch<cr>
@@ -122,20 +124,27 @@ nnoremap j gj
 nnoremap k gk
 
 " move focus with arrow keys
-nnoremap <silent> <left>:wincmd h<cr> 
-nnoremap <silent> <down>:wincmd j<cr>
-nnoremap <silent> <up>:wincmd k<cr>
-nnoremap <silent> <right>:wincmd l<cr> 
+nnoremap <silent> <left> <C-w>h
+nnoremap <silent> <down> <C-w>j
+nnoremap <silent> <up> <C-w>k
+nnoremap <silent> <right> <C-w>l
+
+" shift-arrow keys move windows
+nnoremap <silent> <S-left> <C-w>H
+nnoremap <silent> <S-down> <C-w>J
+nnoremap <silent> <S-up> <C-w>K
+nnoremap <silent> <S-right> <C-w>L
+
 inoremap <left> <nop>
 inoremap <down> <nop>
 inoremap <up> <nop>
 inoremap <right> <nop>
 
+" fat fingers
 command! Bd bd
 command! BD bd
 command! Q q
 command! W w
-command! X x
 command! Cn cn
 command! Cp cp
 
