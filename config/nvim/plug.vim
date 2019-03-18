@@ -21,6 +21,9 @@ Plug 'itchyny/lightline.vim'
 " solarized colorscheme (:colo solarized)
 Plug 'altercation/vim-colors-solarized'
 
+" wal colorscheme (:colo wal)
+Plug 'dylanaraps/wal.vim'
+
 " ----------------------------------------------------------------------------
 "   file system
 " ----------------------------------------------------------------------------

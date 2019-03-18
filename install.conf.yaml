@@ -10,8 +10,6 @@
       path: config/*
     ~/.profile:        
     ~/.zshrc:
-    ~/.oh-my-zsh/themes/agnoster2.zsh-theme:
-      path: agnoster2.zsh-theme
     ~/.aliases:
     ~/.vimrc:
       path: config/nvim/init.vim

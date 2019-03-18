@@ -10,7 +10,7 @@ export TERM="termite"
 export XAUTHORITY="/home/julia/.Xauthority"
 export PATH="$PATH:/home/julia/.gem/ruby/2.6.0/bin"
 
-ZSH_THEME="agnoster2"
+ZSH_THEME="theunraveler"
 
 CASE_SENSITIVE="true"
 ENABLE_CORRECTION="true"

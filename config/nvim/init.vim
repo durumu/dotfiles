@@ -23,17 +23,12 @@ let g:UltiSnipsJumpForwardTrigger="<s-tab>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 let g:ultisnips_python_style="google" " for honza/vim-snippets
 
-" airline
-" let g:airline#extensions#tabline#enabled=1
-" let g:airline_powerline_fonts=1
-" let g:airline_theme='solarized'
-
 " ---------------------------------------------------------------------------"
 "   lightline                                                                  "
 " ---------------------------------------------------------------------------"
 
 let g:lightline = {
-      \ 'colorscheme': 'solarized',
+      \ 'colorscheme': 'wal',
       \ }
 
 " ---------------------------------------------------------------------------"
@@ -43,6 +38,7 @@ let g:lightline = {
 set fileformats=unix
 
 let mapleader="\<space>"
+let maplocalleader="\<space>"
 
 " search isn't case sensitive
 set ignorecase
@@ -88,11 +84,17 @@ let g:matchparen_timeout=20
 let g:matchparen_insert_timeout=20
 
 let g:solarized_termtrans=1 " disable this for no transparency
+colorscheme solarized " wal
+set bg=dark
 
-colorscheme solarized
+" replace tildes with whitespace
+set fcs=eob:\ 
 
 " italicize comments
 highlight comment cterm=italic
+
+" partial search
+set inccommand=nosplit
 
 " ---------------------------------------------------------------------------"
 "   leader mappings                                                          "
@@ -150,3 +152,5 @@ command! Cp cp
 
 " why is this a command
 nnoremap Q <nop>
+
+nnoremap <silent> <enter> <C-]>
