@@ -51,7 +51,7 @@ fi
 export EDITOR=/usr/bin/nvim 
 export BROWSER=/usr/bin/firefox 
 
-# swap caps lock and escape
-setxkbmap -option caps:swapescape
+# map caps to escape
+setxkbmap -option caps:escape
 
-i3
+exec i3

@@ -8,12 +8,16 @@
     ~/.config/:
       glob: true
       path: config/*
-    ~/.profile:        
+    ~/.xinitrc:        
     ~/.zshrc:
     ~/.aliases:
     ~/.vimrc:
       path: config/nvim/init.vim
+    ~/.zprofile:
     ~/.gitconfig:
     ~/.gitignore:
     ~/.ghci:
     ~/.latex:
+    /usr/local/bin/:
+      glob: true
+      path: bin/*
