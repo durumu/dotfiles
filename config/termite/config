@@ -1,7 +1,6 @@
 [options]
 clickable_url = true
-#font = Ubuntu Mono 12
-font = Droid Sans Mono Slashed for Powerline 12
+font = mono 12
 scrollback_lines = 10000
 urgent_on_bell = true
 hyperlinks = true

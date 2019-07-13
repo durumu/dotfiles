@@ -1,21 +1,20 @@
 # programming
-alias R="R --quiet"
-alias py2="python2"
-alias py="python3"
+alias R='R --quiet'
+alias py2='python2'
+alias py='python3'
 
 # vim
-alias v="nvim"
-alias vi="nvim"
-alias vim="nvim"
-alias nv="nvim"
+alias vim='nvim'
+alias nv='nvim'
 
 # utility
-alias pacman="sudo pacman"
-alias yao="yaourt -S"
-alias pip="sudo pip"
-alias pbcopy="xsel --clipboard --input"
-alias pbpaste="xsel --clipboard --output"
-alias pa="pulseaudio"
+alias pbcopy='xsel --clipboard --input'
+alias pbpaste='xsel --clipboard --output'
 
-#eclimd
-alias eclimd="~/.eclipse/org.eclipse.platform_4.10.0_155965261_linux_gtk_x86_64/eclimd"
+# colors
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias diff='diff --color=auto'
+
+# eclimd
+alias eclimd='~/.eclipse/org.eclipse.platform_4.10.0_155965261_linux_gtk_x86_64/eclimd'

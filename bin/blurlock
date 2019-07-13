@@ -1,0 +1,17 @@
+#!/usr/bin/bash
+
+TMPBG="/tmp/screen.png"
+
+# take screenshot
+scrot $TMPBG --silent
+
+# downscale, blur, come back up
+convert $TMPBG -filter Gaussian -resize 10% -resize 1000% $TMPBG
+
+# lock the screen
+i3lock -i $TMPBG
+
+# sleep 1 adds a small delay to prevent possible race conditions with suspend
+sleep 1
+
+exit 0
