@@ -1,19 +1,23 @@
+# vim:ft=dosini
+
 [options]
-clickable_url = true
-font = mono 12
+font = Inconsolata 13
+
 scrollback_lines = 10000
 urgent_on_bell = true
+
 hyperlinks = true
+clickable_url = true
 browser = firefox
+
 cursor_blink = off
 cursor_shape = block
+
 scrollbar = off
-allow_bold = false
+allow_bold = true
 
 [colors]
-
-background = rgba(00, 43, 54, 0.8)
-foreground = #93a1a1
+background = #2a4247
 cursor = #93a1a1
 
 # colors from color0 to color254 can be set
@@ -33,16 +37,3 @@ color12 = #839496
 color13 = #6c71c4
 color14 = #93a1a1
 color15 = #fdf6e3
-
-[hints]
-#font = Monospace 12
-#foreground = #dcdccc
-#background = #3f3f3f
-#active_foreground = #e68080
-#active_background = #3f3f3f
-#padding = 2
-#border = #3f3f3f
-#border_width = 0.5
-#roundness = 2.0
-
-vim: ft=dosini cms=#%s

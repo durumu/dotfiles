@@ -49,7 +49,9 @@ if [ -d /etc/X11/xinit/xinitrc.d ] ; then
 fi
 
 export EDITOR=/usr/bin/nvim 
-export BROWSER=/usr/bin/firefox 
+export BROWSER=/usr/bin/google-chrome-stable
+export VISUAL="$EDITOR"
+export TERM=/usr/bin/termite
 
 # map caps to escape
 setxkbmap -option caps:escape

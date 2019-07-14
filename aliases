@@ -2,6 +2,7 @@
 alias R='R --quiet'
 alias py2='python2'
 alias py='python3'
+alias chrome='google-chrome-stable'
 
 # vim
 alias vim='nvim'
@@ -15,6 +16,7 @@ alias pbpaste='xsel --clipboard --output'
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 alias diff='diff --color=auto'
+alias pacman='pacman --color=auto'
 
 # eclimd
 alias eclimd='~/.eclipse/org.eclipse.platform_4.10.0_155965261_linux_gtk_x86_64/eclimd'

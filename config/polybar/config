@@ -1,0 +1,168 @@
+#; vim:ft=dosini
+[colors]
+background          = #2a4247
+foreground          = #dfdfdf
+border              = #436b73
+line                = #268bd2
+alert               = #cb4b16
+inactive            = #586e75
+yellow              = #b58900
+green               = #859900
+cyan                = #2aa198
+violet              = #6c71c4
+magenta             = #d33682
+orange              = #cb4b16
+
+[bar/default]
+monitor             = ${env:MONITOR:}
+width               = 100%
+height              = 26
+radius              = 13.0
+font-0              = Ubuntu Mono:pixelsize=13;2
+font-1              = UbuntuMono Nerd Font:pixelsize=13;3
+font-2              = Weather Icons:size=12;3
+background          = ${colors.background}
+foreground          = ${colors.foreground}
+border-top-size     = 10
+border-left-size    = 10
+border-right-size   = 10
+border-color        = ${colors.border}
+line-size           = 3
+padding-left        = 2
+padding-right       = 2
+module-margin       = 1
+modules-left        = i3
+modules-center      = spotifytitle
+modules-right       = weather wired-network wireless-network backlight volume battery date
+scroll-up           = i3wm-wsnext
+scroll-down         = i3wm-wsprev
+
+[module/i3]
+type                        = internal/i3
+pin-workspaces              = true
+index-sort                  = true
+enable-click                = true
+enable-scroll               = true
+wrapping-scroll             = true
+reverse-scroll              = true
+fuzzy-match                 = false
+format                      = <label-state> <label-mode>
+label-mode                  = %mode%
+label-focused               = %name%
+label-focused-foreground    = ${colors.foreground}
+label-focused-background    = ${colors.background}
+label-focused-underline     = ${colors.line}
+label-focused-padding       = 1
+label-unfocused             = %name%
+label-unfocused-padding     = 1
+label-visible               = %name%
+label-visible-underline     = ${colors.inactive}
+label-visible-padding       = 1
+label-urgent                = %name%
+label-urgent-foreground     = ${colors.alert}
+label-urgent-underline      = ${colors.alert}
+label-urgent-padding        = 1
+
+[module/spotifytitle]
+type                        = custom/script
+exec                        = $HOME/.config/polybar/modules/spotify.sh
+exec-if                     = pgrep -x spotify
+label                       = %output%
+label-foreground            = ${colors.yellow}
+tail                        = true
+interval                    = 5
+
+[module/weather]
+type                        = custom/script
+exec                        = $HOME/.config/polybar/modules/weather.sh
+interval                    = 600
+label-font                  = 3
+
+[module/lte-network]
+type                        = internal/network
+interface                   = wwp0s20u4i6
+interval                    = 3
+unknown-as-up               = false
+format-connected            = <label-connected>
+label-connected             = 
+
+[module/wired-network]
+type                        = internal/network
+interface                   = enp0s31f6
+interval                    = 3
+unknown-as-up               = false
+format-connected            = <label-connected>
+label-connected             = 
+
+[module/wireless-network]
+type                        = internal/network
+interface                   = wlp4s0
+interval                    = 3
+ping-interval               = 3
+unknown-as-up               = false
+format-connected            = <label-connected>
+label-connected             = 
+
+[module/backlight]
+type = internal/xbacklight
+output = LVDS-1
+enable-scroll = false
+format = <ramp>
+ramp-0 = 
+ramp-1 = 
+ramp-2 = 
+ramp-3 = 
+ramp-4 = 
+
+[module/volume]
+type                        = internal/volume
+format-volume               = <ramp-volume>
+label-muted                 = 
+label-muted-foreground      = ${colors.inactive}
+ramp-volume-0               = 
+ramp-volume-1               = 
+ramp-volume-2               = 
+
+[module/battery]
+type                        = internal/battery
+battery                     = BAT0
+adapter                     = AC
+full-at                     = 98
+poll-interval               = 5
+time-format                 = %H:%M left
+format-charging             = <animation-charging><label-charging>
+format-full                 = <ramp-capacity><label-full>
+format-full-foreground      = ${colors.green}
+format-discharging          = <ramp-capacity><label-discharging>
+label-charging              = %time%
+label-charging-foreground   = ${colors.inactive}
+label-discharging           = %time%
+label-discharging-foreground= ${colors.inactive}
+label-full                  = 
+label-full-padding          = 1
+label-full-foreground       = ${colors.foreground}
+ramp-capacity-0             = 
+ramp-capacity-1             = 
+ramp-capacity-2             = 
+ramp-capacity-3             = 
+ramp-capacity-4             = 
+ramp-capacity-padding       = 1
+ramp-capacity-0-foreground  = ${colors.alert}
+ramp-capacity-2-foreground  = ${colors.yellow}
+animation-charging-0        = 
+animation-charging-1        = 
+animation-charging-2        = 
+animation-charging-3        = 
+animation-charging-4        = 
+animation-charging-padding  = 1
+animation-charging-framerate= 1500
+
+[module/date]
+type                        = internal/date
+interval                    = 1
+time                        = %I:%M %P
+label                       = %time%
+label-underline             = ${colors.orange}
+
+[settings]
+pseudo-transparency = true

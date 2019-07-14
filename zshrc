@@ -4,9 +4,6 @@ export UPDATE_ZSH_DAYS=7
 export LANG=en_US.UTF-8
 export OS=`uname -s`
 
-export EDITOR="nvim"
-export VISUAL="$EDITOR"
-export TERM="termite"
 export XAUTHORITY="/home/julia/.Xauthority"
 export PATH="$PATH:/home/julia/.gem/ruby/2.6.0/bin"
 

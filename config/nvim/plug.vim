@@ -24,6 +24,9 @@ Plug 'altercation/vim-colors-solarized'
 " wal colorscheme (:colo wal)
 Plug 'dylanaraps/wal.vim'
 
+" jellybeans colorscheme (:colo wal)
+Plug 'nanotech/jellybeans.vim'
+
 " ----------------------------------------------------------------------------
 "   file system
 " ----------------------------------------------------------------------------

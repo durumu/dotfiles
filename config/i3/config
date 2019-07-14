@@ -5,7 +5,7 @@
 #  Basic Config
 # ============================================================================
 
-font xft:mono
+font xft:Noto Sans 13
 
 # mod to Super/Win
 set $mod Mod4
@@ -38,7 +38,7 @@ gaps outer 0
 # dmenu wrapper filters for only apps with .desktop
 bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
-bindsym $mod+F2 exec firefox
+bindsym $mod+F2 exec $BROWSER
 bindsym $mod+F3 exec spotify
 
 # open Spotify on ws 3
@@ -153,6 +153,10 @@ bindsym $mod+Ctrl+9 move container to workspace $ws9
 #  Misc Keybinds
 # ============================================================================
 
+# brightness
+# bindsym XF86MonBrightnessUp exec xbacklight + 10 
+# bindsym XF86MonBrightnessDown exec xbacklight - 10
+
 # reload the configuration file
 bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
@@ -182,14 +186,17 @@ mode "resize" {
 bindsym $mod+r mode "resize"
 
 # ============================================================================
-#  Startup Applications
+#  Autostart
 # ============================================================================
 
-exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
-# exec --no-startup-id feh --bg-fill ~/
-exec --no-startup-id nm-applet
+exec_always --no-startup-id "sleep 2 && feh --bg-scale $HOME/pictures/mountain_background.jpg"
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+exec_always --no-startup-id xautolock -time 10 -locker blurlock
+
+# exec --no-startup-id compton -i 0.8 -f -D 6 --focus-exclude 'class_g = "mpv"'
+exec --no-startup-id compton
+#exec --no-startup-id nm-applet
 exec --no-startup-id pa-applet
-exec --no-startup-id xautolock -time 10 -locker blurlock
 
 # Lock computer at startup
 exec --no-startup-id blurlock

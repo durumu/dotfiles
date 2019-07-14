@@ -28,7 +28,7 @@ let g:ultisnips_python_style="google" " for honza/vim-snippets
 " ---------------------------------------------------------------------------"
 
 let g:lightline = {
-      \ 'colorscheme': 'wal',
+      \ 'colorscheme': 'jellybeans',
       \ }
 
 " ---------------------------------------------------------------------------"
@@ -83,8 +83,8 @@ set matchtime=2
 let g:matchparen_timeout=20
 let g:matchparen_insert_timeout=20
 
-let g:solarized_termtrans=1 " disable this for no transparency
-colorscheme solarized " wal
+" let g:solarized_termtrans=1 " disable this for no transparency
+colorscheme desert " solarized
 set bg=dark
 
 " replace tildes with whitespace
