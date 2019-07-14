@@ -5,7 +5,7 @@
 #  Basic Config
 # ============================================================================
 
-font xft:Noto Sans 13
+font xft:Inconsolata for Powerline 13
 
 # mod to Super/Win
 set $mod Mod4
@@ -36,7 +36,7 @@ gaps outer 0
 # ============================================================================
 
 # dmenu wrapper filters for only apps with .desktop
-bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
+bindsym $mod+d exec --no-startup-id i3-dmenu-desktop --dmenu='rofi -dmenu -i'
 
 bindsym $mod+F2 exec $BROWSER
 bindsym $mod+F3 exec spotify
@@ -153,9 +153,16 @@ bindsym $mod+Ctrl+9 move container to workspace $ws9
 #  Misc Keybinds
 # ============================================================================
 
-# brightness
-# bindsym XF86MonBrightnessUp exec xbacklight + 10 
-# bindsym XF86MonBrightnessDown exec xbacklight - 10
+# brightness / volume
+bindsym XF86MonBrightnessUp exec light -A 5 
+bindsym XF86MonBrightnessDown exec light -U 5 
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5%
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5%
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle
+bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute 1 toggle
+bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
+bindsym XF86AudioNext exec --no-startup-id playerctl next
+bindsym XF86AudioPrev exec --no-startup-id playerctl previous
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -194,9 +201,6 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 exec_always --no-startup-id xautolock -time 10 -locker blurlock
 
 # exec --no-startup-id compton -i 0.8 -f -D 6 --focus-exclude 'class_g = "mpv"'
-exec --no-startup-id compton
-#exec --no-startup-id nm-applet
-exec --no-startup-id pa-applet
 
 # Lock computer at startup
 exec --no-startup-id blurlock

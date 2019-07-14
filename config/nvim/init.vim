@@ -24,12 +24,17 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 let g:ultisnips_python_style="google" " for honza/vim-snippets
 
 " ---------------------------------------------------------------------------"
-"   lightline                                                                  "
+"   airline                                                                  "
 " ---------------------------------------------------------------------------"
 
-let g:lightline = {
-      \ 'colorscheme': 'jellybeans',
-      \ }
+" Automatically displays all buffers when there's only one tab open
+let g:airline#extensions#tabline#enabled = 1
+
+" Use powerline fonts
+let g:airline_powerline_fonts = 1
+
+" Solarize all the things
+let g:airline_theme='solarized'
 
 " ---------------------------------------------------------------------------"
 "   generic                                                                  "
@@ -84,7 +89,7 @@ let g:matchparen_timeout=20
 let g:matchparen_insert_timeout=20
 
 " let g:solarized_termtrans=1 " disable this for no transparency
-colorscheme desert " solarized
+" colorscheme solarized
 set bg=dark
 
 " replace tildes with whitespace

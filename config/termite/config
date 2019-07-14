@@ -1,7 +1,7 @@
 # vim:ft=dosini
 
 [options]
-font = Inconsolata 13
+font = Inconsolata for Powerline 14
 
 scrollback_lines = 10000
 urgent_on_bell = true

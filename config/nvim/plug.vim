@@ -16,7 +16,8 @@ call plug#begin('~/.local/share/nvim/plugins')
 " ----------------------------------------------------------------------------
 
 " status line
-Plug 'itchyny/lightline.vim'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 
 " solarized colorscheme (:colo solarized)
 Plug 'altercation/vim-colors-solarized'
