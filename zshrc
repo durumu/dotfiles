@@ -7,7 +7,7 @@ export OS=`uname -s`
 export XAUTHORITY="/home/julia/.Xauthority"
 export PATH="$PATH:/home/julia/.gem/ruby/2.6.0/bin"
 
-ZSH_THEME="theunraveler"
+ZSH_THEME="durumu"
 
 CASE_SENSITIVE="true"
 ENABLE_CORRECTION="true"

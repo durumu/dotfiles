@@ -21,3 +21,5 @@
     /usr/local/bin/:
       glob: true
       path: bin/*
+    ~/.oh-my-zsh/custom/themes/durumu.zsh-theme:
+      path: durumu.zsh-theme
