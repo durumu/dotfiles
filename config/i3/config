@@ -5,7 +5,7 @@
 #  Basic Config
 # ============================================================================
 
-font xft:Inconsolata for Powerline 13
+font xft:Inconsolata Nerd Font 14
 
 # mod to Super/Win
 set $mod Mod4
@@ -31,6 +31,12 @@ hide_edge_borders none
 gaps inner 10
 gaps outer 0
 
+# Colors
+client.focused          #002b36 #586e75 #fdf6e3 #268bd2
+client.focused_inactive #002b36 #073642 #839496 #073642
+client.unfocused        #002b36 #073642 #839496 #073642
+client.urgent           #002b36 #dc322f #fdf6e3 #002b36
+
 # ============================================================================
 #  Application Shortcuts
 # ============================================================================
@@ -39,10 +45,10 @@ gaps outer 0
 bindsym $mod+d exec --no-startup-id i3-dmenu-desktop --dmenu='rofi -dmenu -i'
 
 bindsym $mod+F2 exec $BROWSER
-bindsym $mod+F3 exec spotify
+bindsym $mod+F3 exec blockify & spotify
 
 # open Spotify on ws 3
-assign [class="Spotify"] $ws3
+assign [class="Spotify"] $ws9
 
 # ============================================================================
 #  Window Management
@@ -179,10 +185,10 @@ mode "resize" {
         # Pressing right will grow the window’s width.
         # Pressing up will shrink the window’s height.
         # Pressing down will grow the window’s height.
-        bindsym $left       resize shrink width 10 px or 10 ppt
-        bindsym $down       resize grow height 10 px or 10 ppt
-        bindsym $up         resize shrink height 10 px or 10 ppt
-        bindsym $right      resize grow width 10 px or 10 ppt
+        bindsym $left       resize shrink width 5 px or 5 ppt
+        bindsym $down       resize grow height 5 px or 5 ppt
+        bindsym $up         resize shrink height 5 px or 5 ppt
+        bindsym $right      resize grow width 5 px or 5 ppt
         
         # back to normal: Enter or Escape or $mod+r
         bindsym Return mode "default"
@@ -196,11 +202,12 @@ bindsym $mod+r mode "resize"
 #  Autostart
 # ============================================================================
 
-exec_always --no-startup-id "sleep 2 && feh --bg-scale $HOME/pictures/mountain_background.jpg"
+exec_always --no-startup-id "sleep 2 && feh --bg-scale $HOME/pictures/wallpaper.jpg"
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
-exec_always --no-startup-id xautolock -time 10 -locker blurlock
+exec_always --no-startup-id xautolock -time 10 -locker blurlock -detectsleep
 
-# exec --no-startup-id compton -i 0.8 -f -D 6 --focus-exclude 'class_g = "mpv"'
+exec --no-startup-id compton --inactive-opacity 0.8 --fading --fade-delta 6 \
+                     --focus-exclude 'class_g = "mpv"' --no-dock-shadow
 
 # Lock computer at startup
-exec --no-startup-id blurlock
+exec --no-startup-id blurlock #-i wallpaper.jpg

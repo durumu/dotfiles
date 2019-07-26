@@ -25,9 +25,11 @@ Plug 'altercation/vim-colors-solarized'
 " wal colorscheme (:colo wal)
 Plug 'dylanaraps/wal.vim'
 
-" jellybeans colorscheme (:colo wal)
-Plug 'nanotech/jellybeans.vim'
+" a bunch of colorschemes
+"Plug 'rafi/awesome-vim-colorschemes'
 
+" nord colorscheme
+Plug 'arcticicestudio/nord-vim'
 " ----------------------------------------------------------------------------
 "   file system
 " ----------------------------------------------------------------------------
@@ -72,6 +74,8 @@ Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 Plug 'lervag/vimtex', { 'for' : 'tex' }
 
 Plug 'octol/vim-cpp-enhanced-highlight', { 'for' : 'cpp' }
+
+Plug 'vim-python/python-syntax', { 'for' : 'python' }
 
 Plug 'dansomething/vim-eclim', { 'for' : ['cpp', 'c', 'java', 'python'] }
 

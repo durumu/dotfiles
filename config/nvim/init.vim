@@ -23,6 +23,9 @@ let g:UltiSnipsJumpForwardTrigger="<s-tab>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 let g:ultisnips_python_style="google" " for honza/vim-snippets
 
+" python syntax
+let g:python_highlight_all = 1
+
 " ---------------------------------------------------------------------------"
 "   airline                                                                  "
 " ---------------------------------------------------------------------------"
@@ -33,8 +36,7 @@ let g:airline#extensions#tabline#enabled = 1
 " Use powerline fonts
 let g:airline_powerline_fonts = 1
 
-" Solarize all the things
-let g:airline_theme='solarized'
+let g:airline_theme='base16_nord'
 
 " ---------------------------------------------------------------------------"
 "   generic                                                                  "
@@ -89,7 +91,8 @@ let g:matchparen_timeout=20
 let g:matchparen_insert_timeout=20
 
 " let g:solarized_termtrans=1 " disable this for no transparency
-" colorscheme solarized
+set termguicolors
+colorscheme nord
 set bg=dark
 
 " replace tildes with whitespace
