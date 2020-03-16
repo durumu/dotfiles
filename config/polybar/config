@@ -2,12 +2,10 @@
 [colors]
 background          = #2e3440
 foreground          = #d8dee9
-# fix next four
-border              = #436b73
-line                = #268bd2
-alert               = #cb4b16
-inactive            = #586e75
-# end fix
+border              = #00000000
+line                = #81a1c1
+alert               = #d08770
+inactive            = #4c566a
 yellow              = #ebcb8b
 green               = #a3be8c
 cyan                = #88c0d0
@@ -36,7 +34,7 @@ padding-right       = 2
 module-margin       = 1
 modules-left        = i3
 modules-center      = spotifytitle
-modules-right       = wired-network wireless-network backlight volume battery date
+modules-right       = wired-network wireless-network light volume battery0 battery1 date
 scroll-up           = i3wm-wsnext
 scroll-down         = i3wm-wsprev
 
@@ -74,6 +72,13 @@ label                       = %output%
 label-foreground            = ${colors.yellow}
 tail                        = true
 interval                    = 5
+
+[module/light]
+type                        = custom/script
+exec                        = light | xargs printf "%.0f%%"
+label-foreground            = ${colors.inactive}
+format-prefix               = " "
+interval                    = 0.1
 
 [module/weather]
 type                        = custom/script
@@ -120,9 +125,44 @@ ramp-volume-0               = 
 ramp-volume-1               = 
 ramp-volume-2               = 
 
-[module/battery]
+[module/battery0]
 type                        = internal/battery
 battery                     = BAT0
+adapter                     = AC
+full-at                     = 98
+poll-interval               = 5
+time-format                 = %H:%M
+format-charging             = <animation-charging><label-charging>
+format-full                 = <ramp-capacity><label-full>
+format-full-foreground      = ${colors.green}
+format-discharging          = <ramp-capacity><label-discharging>
+label-charging              = %time%
+label-charging-foreground   = ${colors.inactive}
+label-charging-padding      = 1
+label-discharging           = %time%
+label-discharging-foreground= ${colors.inactive}
+label-full                  = 
+label-full-padding          = 1
+label-full-foreground       = ${colors.foreground}
+ramp-capacity-0             = 
+ramp-capacity-1             = 
+ramp-capacity-2             = 
+ramp-capacity-3             = 
+ramp-capacity-4             = 
+ramp-capacity-padding       = 1
+ramp-capacity-0-foreground  = ${colors.alert}
+ramp-capacity-2-foreground  = ${colors.yellow}
+animation-charging-0        = 
+animation-charging-1        = 
+animation-charging-2        = 
+animation-charging-3        = 
+animation-charging-4        = 
+animation-charging-padding  = 1
+animation-charging-framerate= 1500
+
+[module/battery1]
+type                        = internal/battery
+battery                     = BAT1
 adapter                     = AC
 full-at                     = 98
 poll-interval               = 5

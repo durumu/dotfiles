@@ -1,5 +1,5 @@
 " ---------------------------------------------------------------------------"
-"   .initvim                                                                 "
+"   init.vim                                                                 "
 " ---------------------------------------------------------------------------"
 
 " ---------------------------------------------------------------------------"
@@ -14,17 +14,24 @@ source $HOME/.config/nvim/plug.vim
 " ---------------------------------------------------------------------------"
 
 " vim-tex
-let g:tex_flavor="latex" " fix default behavior for .tex
-let g:vimtex_view_method="zathura"
+let g:tex_flavor = 'latex' " fix default behavior for .tex
+let g:vimtex_view_method = 'zathura'
 
 " ultisnips
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<s-tab>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
-let g:ultisnips_python_style="google" " for honza/vim-snippets
+let g:UltiSnipsExpandTrigger = '<tab>'
+let g:UltiSnipsJumpForwardTrigger = '<s-tab>'
+let g:UltiSnipsJumpBackwardTrigger = '<c-z>'
+let g:ultisnips_python_style = 'google' " for honza/vim-snippets
 
 " python syntax
 let g:python_highlight_all = 1
+
+" rust clip
+let g:rust_clip_command='xclip -selection clipboard'
+
+" rust racer command
+set hidden
+let g:racer_experimental_completer = 1
 
 " ---------------------------------------------------------------------------"
 "   airline                                                                  "
@@ -36,7 +43,7 @@ let g:airline#extensions#tabline#enabled = 1
 " Use powerline fonts
 let g:airline_powerline_fonts = 1
 
-let g:airline_theme='base16_nord'
+let g:airline_theme = 'base16_nord'
 
 " ---------------------------------------------------------------------------"
 "   generic                                                                  "
@@ -44,12 +51,13 @@ let g:airline_theme='base16_nord'
 
 set fileformats=unix
 
-let mapleader="\<space>"
-let maplocalleader="\<space>"
-
 " search isn't case sensitive
 set ignorecase
 set smartcase
+
+" let mapleader = '\<space>'
+" let maplocalleader = '\<space>'
+map <Space> <Leader>
 
 " ---------------------------------------------------------------------------"
 "   indent                                                                   "
@@ -76,7 +84,7 @@ set number
 set scrolloff=7
 set wrap
 set linebreak         " break in middle of words
-set textwidth=79      " break to 79 chars wide
+" set textwidth=79      " break to 79 chars wide
 set noerrorbells
 set noshowmode
 
@@ -87,8 +95,8 @@ set splitright        " :vs goes to right
 " flash bracket match on screen
 set showmatch
 set matchtime=2
-let g:matchparen_timeout=20
-let g:matchparen_insert_timeout=20
+let g:matchparen_timeout = 20
+let g:matchparen_insert_timeout = 20
 
 " let g:solarized_termtrans=1 " disable this for no transparency
 set termguicolors
@@ -99,10 +107,13 @@ set bg=dark
 set fcs=eob:\ 
 
 " italicize comments
-highlight comment cterm=italic
+highlight Comment cterm=italic gui=italic
 
 " partial search
 set inccommand=nosplit
+
+" change pl extension
+au FileType perl set filetype=prolog
 
 " ---------------------------------------------------------------------------"
 "   leader mappings                                                          "
@@ -145,10 +156,14 @@ nnoremap <silent> <S-down> <C-w>J
 nnoremap <silent> <S-up> <C-w>K
 nnoremap <silent> <S-right> <C-w>L
 
+" arrow keys are for scrubs
 inoremap <left> <nop>
 inoremap <down> <nop>
 inoremap <up> <nop>
 inoremap <right> <nop>
+
+" enter to follow links
+nnoremap <silent> <enter> <C-]>
 
 " fat fingers
 command! Bd bd
@@ -161,4 +176,11 @@ command! Cp cp
 " why is this a command
 nnoremap Q <nop>
 
-nnoremap <silent> <enter> <C-]>
+" terminal escaping
+tnoremap <Esc> <C-\><C-n>
+
+" rust stuff
+au FileType rust nmap gd <Plug>(rust-def)
+au FileType rust nmap gs <Plug>(rust-def-split)
+au FileType rust nmap gx <Plug>(rust-def-vertical)
+au FileType rust nmap <leader>gd <Plug>(rust-doc)

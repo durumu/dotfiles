@@ -5,7 +5,7 @@
 #  Basic Config
 # ============================================================================
 
-font xft:Inconsolata Nerd Font 14
+font xft:Hack 14
 
 # mod to Super/Win
 set $mod Mod4
@@ -20,6 +20,30 @@ set $right l
 #  Theme
 # ============================================================================
 
+set_from_resource $base03   i3wm.color8     #002b36
+set_from_resource $base02   i3wm.color0     #073642
+set_from_resource $base01   i3wm.color10    #586e75
+set_from_resource $base00   i3wm.color11    #657b83
+set_from_resource $base0    i3wm.color12    #839496
+set_from_resource $base1    i3wm.color14    #93a1a1
+set_from_resource $base2    i3wm.color7     #eee8d5
+set_from_resource $base3    i3wm.color15    #fdf6e3
+
+set_from_resource $yellow   i3wm.color3     #b58900
+set_from_resource $orange   i3wm.color9     #cb4b16
+set_from_resource $red      i3wm.color1     #dc322f
+set_from_resource $magenta  i3wm.color5     #d33682
+set_from_resource $violet   i3wm.color13    #6c71c4
+set_from_resource $blue     i3wm.color4     #268bd2
+set_from_resource $cyan     i3wm.color6     #2aa198
+set_from_resource $green    i3wm.color2     #859900
+
+set_from_resource $background i3wm.background $base3
+set_from_resource $foreground i3wm.foreground $base00
+
+set_from_resource $lighterbg  i3wm.lighterbg  $base02
+set_from_resource $separator  i3wm.separator  $lighterbg
+
 # Configure border style <normal|1pixel|pixel xx|none|pixel>
 new_window pixel 2
 new_float normal
@@ -32,10 +56,11 @@ gaps inner 10
 gaps outer 0
 
 # Colors
-client.focused          #002b36 #586e75 #fdf6e3 #268bd2
-client.focused_inactive #002b36 #073642 #839496 #073642
-client.unfocused        #002b36 #073642 #839496 #073642
-client.urgent           #002b36 #dc322f #fdf6e3 #002b36
+# class                 border  backgr  text    indicator
+client.focused          #2c313d #2e3440 #fdf6e3 #268bd2
+client.focused_inactive #2c313d #303740 #839496 #073642
+client.unfocused        #2c313d #303743 #839496 #073642
+client.urgent           #002b36 #282d37 #fdf6e3 #002b36
 
 # ============================================================================
 #  Application Shortcuts
@@ -45,10 +70,6 @@ client.urgent           #002b36 #dc322f #fdf6e3 #002b36
 bindsym $mod+d exec --no-startup-id i3-dmenu-desktop --dmenu='rofi -dmenu -i'
 
 bindsym $mod+F2 exec $BROWSER
-bindsym $mod+F3 exec blockify & spotify
-
-# open Spotify on ws 3
-assign [class="Spotify"] $ws9
 
 # ============================================================================
 #  Window Management
@@ -119,8 +140,8 @@ set $ws4 "4"
 set $ws5 "5"
 set $ws6 "6"
 set $ws7 "7"
-set $ws8 "8"
-set $ws9 "9"
+set $ws8 "8 "
+set $ws9 "9 "
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
@@ -160,15 +181,15 @@ bindsym $mod+Ctrl+9 move container to workspace $ws9
 # ============================================================================
 
 # brightness / volume
-bindsym XF86MonBrightnessUp exec light -A 5 
-bindsym XF86MonBrightnessDown exec light -U 5 
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5%
-bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5%
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle
-bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute 1 toggle
-bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
-bindsym XF86AudioNext exec --no-startup-id playerctl next
-bindsym XF86AudioPrev exec --no-startup-id playerctl previous
+bindsym XF86MonBrightnessUp   exec --no-startup-id light -A 5 
+bindsym XF86MonBrightnessDown exec --no-startup-id light -U 5 
+bindsym XF86AudioRaiseVolume  exec --no-startup-id pactl set-sink-volume 0 +5%
+bindsym XF86AudioLowerVolume  exec --no-startup-id pactl set-sink-volume 0 -5%
+bindsym XF86AudioMute         exec --no-startup-id pactl set-sink-mute 0 toggle
+bindsym XF86AudioMicMute      exec --no-startup-id pactl set-source-mute 1 toggle
+bindsym XF86AudioPlay         exec --no-startup-id playerctl play-pause
+bindsym XF86AudioNext         exec --no-startup-id playerctl next
+bindsym XF86AudioPrev         exec --no-startup-id playerctl previous
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -211,3 +232,10 @@ exec --no-startup-id compton --inactive-opacity 0.8 --fading --fade-delta 6 \
 
 # Lock computer at startup
 exec --no-startup-id blurlock #-i wallpaper.jpg
+
+# open browser
+exec --no-startup-id $BROWSER
+
+# open Spotify on ws 9
+exec --no-startup-id blockify & spotify
+for_window [class="Spotify"] move to workspace $ws9

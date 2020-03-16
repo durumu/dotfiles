@@ -1,7 +1,7 @@
 # programming
 alias R='R --quiet'
-alias py2='python2'
-alias py='python3'
+alias py2='python2.7'
+alias py='python3.8'
 alias chrome='google-chrome-stable'
 
 # vim

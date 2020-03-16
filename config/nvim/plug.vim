@@ -43,6 +43,9 @@ Plug 'ctrlpvim/ctrlp.vim'
 " :Mkdir, :Move, :Rename and others
 Plug 'tpope/vim-eunuch'
 
+" automatically set indentation
+Plug 'tpope/vim-sleuth'
+
 " ----------------------------------------------------------------------------
 "   movements & objects
 " ----------------------------------------------------------------------------
@@ -69,8 +72,6 @@ Plug 'tpope/vim-surround'
 "   specialized plugins
 " ----------------------------------------------------------------------------
 
-Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
-
 Plug 'lervag/vimtex', { 'for' : 'tex' }
 
 Plug 'octol/vim-cpp-enhanced-highlight', { 'for' : 'cpp' }
@@ -78,6 +79,12 @@ Plug 'octol/vim-cpp-enhanced-highlight', { 'for' : 'cpp' }
 Plug 'vim-python/python-syntax', { 'for' : 'python' }
 
 Plug 'dansomething/vim-eclim', { 'for' : ['cpp', 'c', 'java', 'python'] }
+
+Plug 'rust-lang/rust.vim', { 'for' : 'rust' }
+
+Plug 'racer-rust/vim-racer', { 'for' : 'rust' }
+
+Plug 'liuchengxu/graphviz.vim'
 
 " ----------------------------------------------------------------------------
 "   shortcuts & linting

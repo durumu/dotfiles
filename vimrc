@@ -1,4 +1,4 @@
-" Julia's .vimrc
+" Presley's .vimrc
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
@@ -134,6 +134,8 @@ set background=dark
 let g:solarized_termtrans=1 " disable this for no transparency
 colorscheme solarized
 " italic comments!
+set t_ZH=[3m
+set t_ZR=[23m
 highlight comment cterm=italic
 
 " Airline

@@ -1,15 +1,1 @@
---  Prompt Breakdown:
---    \ESC[48;5;4;38;5;8m
---      sets bg to color 4 
---      sets fg to color 0    
---    \ESC[m
---      resets colors (bg/fg)
---      so bg will be transparent
---    \ESC[38;5;4m
---      sets fg to color 4 (to draw arrow)
---    \ESC[m
---      resets colors again, so haskell code will be normal color
---
--- (also, you can insert %s before/after λ to get "Prelude" and such)
-
-:set prompt "\ESC[48;5;4;38;5;0m λ \ESC[m\ESC[38;5;4m\ESC[m "
+:set prompt "\ESC[34;1m\STXλ \ESC[m\STX"

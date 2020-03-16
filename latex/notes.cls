@@ -15,6 +15,7 @@
     \RequirePackage{amssymb}
     \RequirePackage{amsfonts}
     \RequirePackage{mathtools}
+    \RequirePackage[margin=1.5in]{geometry}
 
 % Style
     \renewcommand\section{\@startsection {section}{1}{\z@}%
