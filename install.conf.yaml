@@ -11,9 +11,6 @@
     ~/.xinitrc:        
     ~/.zshrc:
     ~/.aliases:
-    ~/.vimrc:
-      path: config/nvim/init.vim
-    ~/.zprofile:
     ~/.gitconfig:
     ~/.gitignore:
     ~/.ghci:
