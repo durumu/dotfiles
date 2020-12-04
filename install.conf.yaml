@@ -8,15 +8,11 @@
     ~/.config/:
       glob: true
       path: config/*
-    ~/.xinitrc:        
     ~/.zshrc:
     ~/.aliases:
     ~/.gitconfig:
     ~/.gitignore:
     ~/.ghci:
     ~/.latex:
-    /usr/local/bin/:
-      glob: true
-      path: bin/*
     ~/.oh-my-zsh/custom/themes/durumu.zsh-theme:
       path: durumu.zsh-theme
