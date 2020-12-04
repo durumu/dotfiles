@@ -1,4 +1,3 @@
-- To get backlight working:
-  - download https://github.com/haikarainen/light/blob/master/90-backlight.rules
-  - move it to /etc/udev/rules.d
-  - add my user to group "video"
+- To remove Documents, Videos, etc:
+  - remove them manually
+  - then use `xdg-user-dirs-update`
