@@ -1,44 +1,30 @@
-export ZSH=$HOME/.oh-my-zsh
-export UPDATE_ZSH_DAYS=7
+# get brew to work
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
 export LANG=en_US.UTF-8
-export OS=`uname -s`
-
-export XAUTHORITY="/home/julia/.Xauthority"
-export PATH="$PATH:/home/julia/.gem/ruby/2.6.0/bin"
-
-ZSH_THEME="durumu"
-
-CASE_SENSITIVE="true"
-ENABLE_CORRECTION="true"
-COMPLETION_WAITING_DOTS="true"
-HIST_STAMPS="yyyy-mm-dd"
+export EDITOR=/opt/homebrew/bin/nvim
 
 # vim keybinds
 bindkey -v
 
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-# ZSH_CUSTOM=/path/to/new-custom-folder
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-plugins=( git )
 
-source $ZSH/oh-my-zsh.sh
-source $HOME/.aliases
+export PATH="/opt/homebrew/opt/libpq/bin:/usr/local/texlive/2023/bin/universal-darwin:$PATH"
+export LIBRARY_PATH="$LIBRARY_PATH:/opt/homebrew/lib"
 
-# User configuration
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# ssh
 export SSH_KEY_PATH="~/.ssh/rsa_id"
 
-# TeX
-export TEXINPUTS=":$HOME/.latex//:"
+export PS1="%3~ %(!.#.>) "
+
+source ~/.aliases
+
+function rufftest() {
+    # Build with all warnings enabled
+    cargo clippy --workspace --all-targets --all-features -- -D warnings 
+    if [[ $? ]]
+    then
+        # Test and update ruff.schema.json
+        RUFF_UPDATE_SCHEMA=1 cargo test;
+    fi
+}

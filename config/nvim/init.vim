@@ -1,96 +1,222 @@
-" ---------------------------------------------------------------------------"
-"   init.vim                                                                 "
-" ---------------------------------------------------------------------------"
+set nocompatible
+let g:python3_host_prog="/Users/presley/tools/venvs/main/bin/python"
+let g:python_version=310
 
-" ---------------------------------------------------------------------------"
-"   plugins                                                                  "
-" ---------------------------------------------------------------------------"
+let data_dir = stdpath('data') . '/site'
+if empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
 
-" install plugin manager & all plugins
-source $HOME/.config/nvim/plug.vim
+call plug#begin()
 
-" ---------------------------------------------------------------------------"
-"   plugin config                                                            "
-" ---------------------------------------------------------------------------"
+"Aesthetics
+"""""""""""
 
-" vim-tex
-let g:tex_flavor = 'latex' " fix default behavior for .tex
-let g:vimtex_view_method = 'zathura'
+" my favorite color scheme currently
+Plug 'joshdick/onedark.vim'
 
-" ultisnips
-let g:UltiSnipsExpandTrigger = '<tab>'
-let g:UltiSnipsJumpForwardTrigger = '<s-tab>'
-let g:UltiSnipsJumpBackwardTrigger = '<c-z>'
-let g:ultisnips_python_style = 'google' " for honza/vim-snippets
+" powerline
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 
-" python syntax
-let g:python_highlight_all = 1
+" cool start thing
+Plug 'mhinz/vim-startify'
 
-" rust clip
-let g:rust_clip_command='xclip -selection clipboard'
+" better terminal
+Plug 'Lenovsky/nuake', {'on': 'Nuake'}
 
-" rust racer command
-set hidden
-let g:racer_experimental_completer = 1
+"General Editing
+""""""""""""""""
 
-" ---------------------------------------------------------------------------"
-"   airline                                                                  "
-" ---------------------------------------------------------------------------"
+" some must haves
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-unimpaired'
+" make :bd work more reasonably
+Plug 'qpkorr/vim-bufkill'
 
-" Automatically displays all buffers when there's only one tab open
-let g:airline#extensions#tabline#enabled = 1
+" fast fuzzy find
+Plug 'junegunn/fzf', { 'dir' : '~/.fzf', 'do' : './install --all' }
+Plug 'junegunn/fzf.vim'
 
-" Use powerline fonts
-let g:airline_powerline_fonts = 1
+"Programming
+""""""""""""
 
-let g:airline_theme = 'base16_nord'
+" a lot of syntax files
+Plug 'sheerun/vim-polyglot'
 
-" ---------------------------------------------------------------------------"
-"   generic                                                                  "
-" ---------------------------------------------------------------------------"
+" Git stuff
+Plug 'tpope/vim-fugitive'
+Plug 'dbakker/vim-projectroot'
+Plug 'rhysd/git-messenger.vim'
+Plug 'rust-lang/rust.vim'
 
-set fileformats=unix
+Plug 'rhysd/vim-clang-format'
+Plug 'vim-scripts/a.vim', {'for': 'cpp'}
 
-" search isn't case sensitive
-set ignorecase
-set smartcase
+Plug 'psf/black', { 'branch': 'stable' }
 
-" let mapleader = '\<space>'
-" let maplocalleader = '\<space>'
+" COC stuff
+Plug 'neoclide/coc.nvim', {'branch' : 'release'}
+let g:coc_node_path='/opt/homebrew/bin/node'
+let g:coc_global_extensions=[
+            \'coc-clangd',
+            \'coc-git',
+            \'coc-json',
+            \'coc-lists',
+            \'coc-marketplace',
+            \'coc-pyright',
+            \'coc-rust-analyzer',
+            \'coc-yank',]
+
+
+call plug#end()
+
+"""""""""""""""""
+" Editor Config "
+"""""""""""""""""
+
+set termguicolors
+filetype plugin on
+
+colorscheme onedark
+
 map <Space> <Leader>
 
-" ---------------------------------------------------------------------------"
-"   indent                                                                   "
-" ---------------------------------------------------------------------------"
+set ignorecase " for searches
+set smartcase " for searches
+set hlsearch " highlight search matches
 
-set shiftwidth=0 " make < and > do the same thing as tab
-set softtabstop=-1
+set hidden " don't abandon invisible buffers
 
-" 1 tab = 2 spaces
-set expandtab
-set tabstop=2
+set number " line numbers
 
-" except for Python
-autocmd FileType python :set tabstop=4
-" also java
-autocmd FileType java :set noexpandtab tabstop=4
+" mouse in edit mode only
+set mouse=r
 
-" ---------------------------------------------------------------------------"
-"   aesthetics                                                               "
-" ---------------------------------------------------------------------------"
+set expandtab      " tabs -> spaces
+set tabstop=4      " tabs = 4 spaces
+set shiftwidth=4   " >> = 4 spaces
+set cindent        " indent for c syntax
+set cinoptions+=g2 " scope declarations by 2
+set cinoptions+=h2 " statements after scope decs by 2
+set smartindent
 
-" buffer area
-set number
-set scrolloff=7
-set wrap
-set linebreak         " break in middle of words
-" set textwidth=79      " break to 79 chars wide
-set noerrorbells
-set noshowmode
+set updatetime=300 " send CursorHold event after 300ms
 
-" buffers & windows
-set splitbelow        " :sp goes below
-set splitright        " :vs goes to right
+if exists('+colorcolumn')
+    set colorcolumn=100
+    hi ColorColumn ctermbg=darkgrey guibg=#080808
+endif
+
+au BufRead,BufNewFile *.{c,cpp,cc,h} set filetype=cpp
+let g:alternateExtensions_cc='h'
+let g:alternateExtensions_h='cc,c,cpp'
+
+" use the alt key as meta on mac
+if has("gui_macvim")
+    set macmeta
+endif
+
+"""""""""""""""
+"Plugin Config"
+"""""""""""""""
+
+let g:airline_theme='onedark'
+
+let g:airline_powerline_fonts=1
+let g:airline_inactive_collapse=1
+let g:airline_skip_empty_sections=1
+let g:airline_highlighting_cache=1
+
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_alt_sep = '|'
+
+" No encoding info
+let g:airline_section_y=''
+
+let g:airline_section_error = '%{airline#util#wrap(airline#extensions#coc#get_error(), 0)}'
+let g:airline_section_warning = '%{airline#util#wrap(airline#extensions#coc#get_warning(), 0)}'
+
+let g:fzf_layout= {'window':{'width': 0.9, 'height' : 0.6}}
+
+nmap <leader>ll :CocList lists<cr>
+nmap <leader>lc :CocList commands<cr>
+
+nmap <leader>b :CocList --top buffers<cr>
+nmap <leader>lb :CocList --top lines<cr>
+
+nmap <leader>f :GFiles<cr>
+nmap <leader>c :Commits!<cr>
+nmap <leader>cb :BCommits!<cr>
+
+inoremap <silent><expr> <c-space> coc#refresh()
+inoremap <silent><expr> <cr> pumvisible() ? coc#select_confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+" quick fix
+nmap <leader>qf <Plug>(coc-fix-current)
+
+" navigate diagnostics
+nmap <silent> [d <Plug>(coc-diagnostic-prev)
+nmap <silent> ]d <Plug>(coc-diagnostic-next)
+
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+nmap <silent> gl <Plug>(coc-codelense-action)
+
+" navigate git things
+nmap [g <Plug>(coc-git-prevchunk)
+nmap ]g <Plug>(coc-git-nextchunk)
+nmap gs <Plug>(coc-git-chunkinfo)
+nmap go <Plug>(coc-git-commit)
+
+" show documentation in preview window
+function! s:show_documentation()
+    if (index(['vim', 'help'], &filetype) >= 0)
+        execute 'h '.expand('<cword>')
+    else
+        call CocAction('doHover')
+    endif
+endfunction
+
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+autocmd BufWrite *.rs call CocAction('format')
+
+""""""""""""""""
+" clang_format "
+""""""""""""""""
+let g:clang_format#auto_format_on_insert_leave = 0
+let g:clang_format#auto_format = 1
+let g:clang_format#auto_formatexpr = 0
+
+"""""""""""""""""
+" other plugins "
+"""""""""""""""""
+
+let g:startify_change_to_dir = 0
+let g:startify_change_to_vcs_root = 1
+
+nnoremap <silent> <C-P> :GFiles<CR>
+nnoremap <silent> <leader>t :Nuake<CR>
+
+""""""""""""
+" My Stuff "
+""""""""""""
+highlight Comment cterm=italic gui=italic
+set fcs=eob:\
+set inccommand=nosplit
+
+set splitbelow " :sp goes below
+set splitright " :vs goes right
+
+" space-space resets syntax highlighting and regular highlighting
+nnoremap <silent> <leader><space> :silent noh <Bar>echo<cr>:syn sync fromstart<cr>
 
 " flash bracket match on screen
 set showmatch
@@ -98,89 +224,38 @@ set matchtime=2
 let g:matchparen_timeout = 20
 let g:matchparen_insert_timeout = 20
 
-" let g:solarized_termtrans=1 " disable this for no transparency
-set termguicolors
-colorscheme nord
-set bg=dark
+command! Q q
+command! W w
+command! X x
 
-" replace tildes with whitespace
-set fcs=eob:\ 
+nnoremap Q @q
 
-" italicize comments
-highlight Comment cterm=italic gui=italic
-
-" partial search
-set inccommand=nosplit
-
-" change pl extension
-au FileType perl set filetype=prolog
-
-" ---------------------------------------------------------------------------"
-"   leader mappings                                                          "
-" ---------------------------------------------------------------------------"
-
-" edit commonly-accessed files
-nmap <silent> <leader>ev :split $HOME/.config/nvim/init.vim<cr>
-nmap <silent> <leader>ep :split $HOME/.config/nvim/plug.vim<cr>
-nmap <silent> <leader>ez :split $HOME/.zshrc<cr>
-nmap <silent> <leader>sv :source $HOME/.config/nvim/init.vim<cr>
-
-" clear highlighting
-nnoremap <silent> <leader><space> :nohlsearch<cr>
-
-" ---------------------------------------------------------------------------"
-"   other mappings                                                           "
-" ---------------------------------------------------------------------------"
-
-" reselect visual block after indent/outdent
-vnoremap < <gv
-vnoremap > >gv
-vnoremap = =gv
-
-" Y = yank to end of line.
 nnoremap Y y$
 
-" move by displayed lines
-nnoremap j gj
-nnoremap k gk
+" navigation
+nnoremap <silent> j gj
+nnoremap <silent> k gk
 
-" move focus with arrow keys
 nnoremap <silent> <left> <C-w>h
 nnoremap <silent> <down> <C-w>j
 nnoremap <silent> <up> <C-w>k
 nnoremap <silent> <right> <C-w>l
 
-" shift-arrow keys move windows
 nnoremap <silent> <S-left> <C-w>H
 nnoremap <silent> <S-down> <C-w>J
 nnoremap <silent> <S-up> <C-w>K
 nnoremap <silent> <S-right> <C-w>L
 
-" arrow keys are for scrubs
-inoremap <left> <nop>
-inoremap <down> <nop>
-inoremap <up> <nop>
-inoremap <right> <nop>
+nnoremap <silent> <tab> :bnext<cr>
+nnoremap <silent> <S-tab> :bprevious<cr>
 
-" enter to follow links
 nnoremap <silent> <enter> <C-]>
 
-" fat fingers
-command! Bd bd
-command! BD bd
-command! Q q
-command! W w
-command! Cn cn
-command! Cp cp
 
-" why is this a command
-nnoremap Q <nop>
+noremap <leader>y "+y
+noremap <leader>Y "+y$
 
-" terminal escaping
-tnoremap <Esc> <C-\><C-n>
-
-" rust stuff
-au FileType rust nmap gd <Plug>(rust-def)
-au FileType rust nmap gs <Plug>(rust-def-split)
-au FileType rust nmap gx <Plug>(rust-def-vertical)
-au FileType rust nmap <leader>gd <Plug>(rust-doc)
+augroup black_on_save
+  autocmd!
+  autocmd BufWritePre *.py Black
+augroup end

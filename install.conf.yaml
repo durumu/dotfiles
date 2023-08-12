@@ -14,5 +14,5 @@
     ~/.gitignore:
     ~/.ghci:
     ~/.latex:
-    ~/.oh-my-zsh/custom/themes/durumu.zsh-theme:
-      path: durumu.zsh-theme
+    # ~/.oh-my-zsh/custom/themes/durumu.zsh-theme:
+    #   path: durumu.zsh-theme
