@@ -19,30 +19,93 @@ vim.g.mapleader = " "
 
 require("lazy").setup({
 	-- Aesthetics
-	"joshdick/onedark.vim",
-	"vim-airline/vim-airline",
-	"vim-airline/vim-airline-themes",
+	{
+		"joshdick/onedark.vim",
+		lazy = false,
+		config = function()
+			vim.cmd([[colorscheme onedark]])
+		end,
+	},
+	{
+		"vim-airline/vim-airline",
+		lazy = false,
+		config = function()
+			vim.g.airline_highlighting_cache = 1
+			vim.g.airline_inactive_collapse = 1
+			vim.g.airline_powerline_fonts = 1
+			vim.g.airline_section_error = "%{airline#util#wrap(airline#extensions#coc#get_error(), 0)}"
+			vim.g.airline_section_warning = "%{airline#util#wrap(airline#extensions#coc#get_warning(), 0)}"
+			vim.g.airline_section_y = ""
+			vim.g.airline_skip_empty_sections = 1
+			vim.g["airline#extensions#tabline#enabled"] = 1
+			vim.g["airline#extensions#tabline#left_alt_sep"] = "|"
+			vim.g["airline#extensions#tabline#left_sep"] = " "
+		end,
+	},
+	{
+		"vim-airline/vim-airline-themes",
+		lazy = false,
+		config = function()
+			vim.g.airline_theme = "onedark"
+		end,
+	},
 
 	-- General Editing
 	"tpope/vim-repeat",
 	"tpope/vim-surround",
 	"tpope/vim-commentary",
-	"tpope/vim-unimpaired", --
+	"tpope/vim-unimpaired",
 	"qpkorr/vim-bufkill", -- make :bd work more reliably
 
 	-- Projects
 	{ "junegunn/fzf", dir = "~/.fzf", build = "./install --all" },
-	"junegunn/fzf.vim",
-	"tpope/vim-fugitive",
+	{
+		"junegunn/fzf.vim",
+		config = function()
+			vim.g.fzf_layout = { window = { width = 0.9, height = 0.6 } }
+		end,
+	},
+	"tpope/vim-fugitive", -- :G
 	"rhysd/git-messenger.vim", -- :GitMessenger
 
 	-- Programming
-	{ "neoclide/coc.nvim", branch = "release" }, -- COC
-	"sheerun/vim-polyglot", -- many-language syntax
-	{ "vim-scripts/a.vim", ft = "cpp" }, -- :A
-	{ "psf/black", ft = "py", branch = "stable" }, -- python autoformat
-	{ "rhysd/vim-clang-format", ft = "cpp" }, -- c++ autoformat
-	{ "rust-lang/rust.vim", ft = "rs" }, -- rust syntax
+	{ "neoclide/coc.nvim", ft = { "c", "cpp", "python", "rust" }, branch = "release" }, -- COC
+	{ "vim-scripts/a.vim", ft = { "c", "cpp" } }, -- :A
+	{ -- c++ autoformat
+		"rhysd/vim-clang-format",
+		ft = { "c", "cpp" },
+		config = function()
+			vim.g["clang_format#auto_format_on_insert_leave"] = 0
+			vim.g["clang_format#auto_format"] = 1
+			vim.g["clang_format#auto_formatexpr"] = 0
+		end,
+	},
+	{ -- python autoformat
+		"averms/black-nvim",
+		ft = "python",
+		config = function()
+			vim.api.nvim_create_autocmd({ "BufWritePre" }, {
+				pattern = { "*.py" },
+				callback = function()
+					Black()
+				end,
+			})
+		end,
+	},
+	{ -- lua autoformat
+		"ckipp01/stylua-nvim",
+		ft = "lua",
+		run = "cargo install stylua",
+		config = function()
+			vim.api.nvim_create_autocmd({ "BufWritePre" }, {
+				pattern = { "*.lua" },
+				callback = function()
+					require("stylua-nvim").format_file()
+				end,
+			})
+		end,
+	},
+	{ "rust-lang/rust.vim", ft = "rust" }, -- rust syntax
 
 	-- Productivity
 	"mhinz/vim-startify", -- start page
@@ -65,60 +128,34 @@ vim.g.coc_global_extensions = {
 }
 
 -- Editor Config
-vim.o.termguicolors = true
-vim.cmd("filetype plugin on")
-vim.cmd("colorscheme onedark")
-vim.o.ignorecase = true
-vim.o.smartcase = true
-vim.o.hlsearch = true
-vim.o.hidden = true
-vim.wo.number = true
-vim.o.mouse = "r"
-vim.o.expandtab = true
-vim.o.tabstop = 4
-vim.o.shiftwidth = 4
+vim.cmd([[filetype plugin on]])
 vim.o.cindent = true
 vim.o.cinoptions = vim.o.cinoptions .. "g2"
 vim.o.cinoptions = vim.o.cinoptions .. "h2"
+vim.o.expandtab = true
+vim.o.hidden = true
+vim.o.hlsearch = true
+vim.o.ignorecase = true
+vim.o.mouse = "r"
+vim.o.shiftwidth = 4
+vim.o.smartcase = true
 vim.o.smartindent = true
+vim.o.tabstop = 4
+vim.o.termguicolors = true
 vim.o.updatetime = 300
+vim.wo.number = true
 
-if vim.fn.exists("+colorcolumn") == 1 then
-	vim.o.colorcolumn = "100"
-	vim.cmd("hi ColorColumn ctermbg=darkgrey guibg=#080808")
-end
+vim.o.colorcolumn = "88"
+vim.cmd([[highlight ColorColumn ctermbg=darkgrey guibg=#080808]])
 
-vim.cmd([[
-    au BufRead,BufNewFile *.{c,cpp,cc,h} set filetype=cpp
-]])
+-- vim.cmd([[
+--     au BufRead,BufNewFile *.{c,cpp,cc,h} set filetype=cpp
+-- ]])
 
-vim.g.alternateExtensions_cc = "h"
-vim.g.alternateExtensions_h = "cc,c,cpp"
+-- vim.g.alternateExtensions_cc = "h"
+-- vim.g.alternateExtensions_h = "cc,c,cpp"
 
-if vim.fn.has("gui_macvim") == 1 then
-	vim.o.macmeta = true
-end
-
--- Plugin Config
-vim.g.airline_theme = "onedark"
-vim.g.airline_powerline_fonts = 1
-vim.g.airline_inactive_collapse = 1
-vim.g.airline_skip_empty_sections = 1
-vim.g.airline_highlighting_cache = 1
-vim.g["airline#extensions#tabline#enabled"] = 1
-vim.g["airline#extensions#tabline#left_sep"] = " "
-vim.g["airline#extensions#tabline#left_alt_sep"] = "|"
-vim.g.airline_section_y = ""
-vim.g.airline_section_error = "%{airline#util#wrap(airline#extensions#coc#get_error(), 0)}"
-vim.g.airline_section_warning = "%{airline#util#wrap(airline#extensions#coc#get_warning(), 0)}"
-vim.g.fzf_layout = { window = { width = 0.9, height = 0.6 } }
-
--- clang_format
-vim.g["clang_format#auto_format_on_insert_leave"] = 0
-vim.g["clang_format#auto_format"] = 1
-vim.g["clang_format#auto_formatexpr"] = 0
-
--- other plugins
+-- startify
 vim.g.startify_change_to_dir = 0
 vim.g.startify_change_to_vcs_root = 1
 
@@ -129,48 +166,41 @@ vim.o.inccommand = "nosplit"
 vim.o.splitbelow = true
 vim.o.splitright = true
 
-vim.cmd([[
-    nnoremap <silent> <C-P> :GFiles<CR>
-    nnoremap <silent> <leader>t :Nuake<CR>
+-- Mappings
+local options = { noremap = true, silent = true }
 
-    " space-space resets syntax highlighting and regular highlighting
-    nnoremap <silent> <leader><space> :silent noh <Bar>echo<cr>:syn sync fromstart<cr>
+vim.api.nvim_set_keymap("n", "<C-P>", ":GFiles<CR>", options)
+vim.api.nvim_set_keymap("n", "<leader>t", ":Nuake<CR>", options)
+vim.api.nvim_set_keymap("n", "<leader><space>", ":noh<CR>", options)
 
-    command! Q q
-    command! W w
-    command! X x
+vim.api.nvim_set_keymap("n", "Q", "@q", options)
+vim.api.nvim_set_keymap("n", "Y", "y$", options)
 
-    nnoremap Q @q
+vim.api.nvim_set_keymap("n", "j", "gj", options)
+vim.api.nvim_set_keymap("n", "k", "gk", options)
 
-    nnoremap Y y$
+vim.api.nvim_set_keymap("n", "<left>", "<C-w>h", options)
+vim.api.nvim_set_keymap("n", "<down>", "<C-w>j", options)
+vim.api.nvim_set_keymap("n", "<up>", "<C-w>k", options)
+vim.api.nvim_set_keymap("n", "<right>", "<C-w>l", options)
+vim.api.nvim_set_keymap("n", "<S-left>", "<C-w>H", options)
+vim.api.nvim_set_keymap("n", "<S-down>", "<C-w>J", options)
+vim.api.nvim_set_keymap("n", "<S-up>", "<C-w>K", options)
+vim.api.nvim_set_keymap("n", "<S-right>", "<C-w>L", options)
 
-    " navigation
-    nnoremap <silent> j gj
-    nnoremap <silent> k gk
+vim.api.nvim_set_keymap("n", "<tab>", ":bnext<cr>", options)
+vim.api.nvim_set_keymap("n", "<S-tab>", ":bprevious<cr>", options)
+vim.api.nvim_set_keymap("n", "<enter>", "<C-]>", options)
 
-    nnoremap <silent> <left> <C-w>h
-    nnoremap <silent> <down> <C-w>j
-    nnoremap <silent> <up> <C-w>k
-    nnoremap <silent> <right> <C-w>l
+local modes = { "n", "v" }
+for _, mode in ipairs(modes) do
+	vim.api.nvim_set_keymap(mode, "<leader>y", '"+y', options)
+	vim.api.nvim_set_keymap(mode, "<leader>Y", '"+y$', options)
+end
 
-    nnoremap <silent> <S-left> <C-w>H
-    nnoremap <silent> <S-down> <C-w>J
-    nnoremap <silent> <S-up> <C-w>K
-    nnoremap <silent> <S-right> <C-w>L
+-- Commands
+vim.api.nvim_create_user_command("Q", "q", {})
+vim.api.nvim_create_user_command("W", "w", {})
+vim.api.nvim_create_user_command("X", "x", {})
 
-    nnoremap <silent> <tab> :bnext<cr>
-    nnoremap <silent> <S-tab> :bprevious<cr>
-
-    nnoremap <silent> <enter> <C-]>
-
-
-    noremap <leader>y "+y
-    noremap <leader>Y "+y$
-
-    augroup black_on_save
-        autocmd!
-        autocmd BufWritePre *.py Black
-    augroup end
-]])
-
--- You'll need to further translate the function, autocmds, and remaps.
+-- Autocommands
