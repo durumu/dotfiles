@@ -3,6 +3,8 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 export LANG=en_US.UTF-8
 export EDITOR=/opt/homebrew/bin/nvim
+export SHELL=/bin/zsh
+export OPENAI_API_KEY=$(cat ~/secret/openai.key)
 
 # vim keybinds
 bindkey -v
@@ -15,7 +17,7 @@ export LIBRARY_PATH="$LIBRARY_PATH:/opt/homebrew/lib"
 
 export SSH_KEY_PATH="~/.ssh/rsa_id"
 
-export PS1="%3~ %(!.#.>) "
+export PS1="%1~ %# "
 
 source ~/.aliases
 

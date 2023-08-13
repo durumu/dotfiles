@@ -7,7 +7,7 @@
 - link:
     ~/.config/:
       glob: true
-      path: config/*
+      path: config/**/*
     ~/.zshrc:
     ~/.aliases:
     ~/.gitconfig:
