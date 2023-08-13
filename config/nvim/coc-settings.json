@@ -1,6 +1,8 @@
 {
+    "python.analysis.typeCheckingMode": "off",
+    "pyright.configPath": "~/.config/pyrightconfig.json",
     "clangd.fallbackFlags": [ "-std=c++2a" ],
-    "rust-analyzer.server.path": "/Users/presley/bin/ra-multiplex/target/release/ra-multiplex",
-    "rust-analyzer.server.extraEnv" : { "RA_MUX_SERVER" : "/Users/presley/.config/coc/extensions/coc-rust-analyzer-data/rust-analyzer"},
+    "rust-analyzer.server.path": "~/bin/ra-multiplex/target/release/ra-multiplex",
+    "rust-analyzer.server.extraEnv" : { "RA_MUX_SERVER" : "~/.config/coc/extensions/coc-rust-analyzer-data/rust-analyzer"},
     "inlayHint.enable": false
 }

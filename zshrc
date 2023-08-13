@@ -7,7 +7,6 @@ export SHELL=/bin/zsh
 export OPENAI_API_KEY=$(cat ~/secret/openai.key)
 
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 
 export PATH="/opt/homebrew/opt/libpq/bin:/usr/local/texlive/2023/bin/universal-darwin:$PATH"
@@ -21,10 +20,12 @@ source ~/.aliases
 
 function rufftest() {
     # Build with all warnings enabled
-    cargo clippy --workspace --all-targets --all-features -- -D warnings 
+    cargo clippy --workspace --all-targets --all-features -- -D warnings
     if [[ $? ]]
     then
         # Test and update ruff.schema.json
         RUFF_UPDATE_SCHEMA=1 cargo test;
     fi
 }
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

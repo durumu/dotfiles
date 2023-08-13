@@ -17,20 +17,11 @@ vim.opt.rtp:prepend(lazypath)
 
 vim.g.mapleader = " "
 
-local function keymap(mode, key, action)
-    local options = { noremap = true, silent = true }
-    vim.api.nvim_set_keymap(mode, key, action, options)
-end
-
-local function keymap_nv(key, action)
-    keymap("n", key, action)
-    keymap("v", key, action)
-end
-
 local function coc_config()
     vim.g.coc_node_path = "/opt/homebrew/bin/node"
     vim.g.coc_global_extensions = {
         "coc-clangd",
+        "coc-explorer",
         "coc-git",
         "coc-json",
         "coc-lists",
@@ -40,13 +31,11 @@ local function coc_config()
         "coc-yank",
     }
 
-    keymap("n", "<leader>ll", ":CocList lists<cr>")
-    keymap("n", "<leader>lc", ":CocList commands<cr>")
-    keymap("n", "<leader>lb", ":CocList --top buffers<cr>")
-    keymap("n", "<leader>c", ":Commits!<cr>")
-    keymap("n", "<leader>cb", ":BCommits!<cr>")
-    keymap("i", "<c-space>", "coc#refresh()")
-    keymap("i", "<cr>", function()
+    vim.keymap.set("n", "<leader>ll", ":CocList lists<cr>")
+    vim.keymap.set("n", "<leader>lc", ":CocList commands<cr>")
+    vim.keymap.set("n", "<leader>lb", ":CocList --top buffers<cr>")
+    vim.keymap.set("i", "<c-space>", "coc#refresh()")
+    vim.keymap.set("i", "<cr>", function()
         if vim.fn.pumvisible() == 1 then
             return vim.call("coc#select_confirm")
         else
@@ -60,30 +49,52 @@ local function coc_config()
     end)
 
     -- quick fix
-    keymap("n", "<leader>qf", "<Plug>(coc-fix-current)")
+    vim.keymap.set("n", "<leader>qf", "<Plug>(coc-fix-current)")
 
     -- navigate diagnostics
-    keymap("n", "[d", "<Plug>(coc-diagnostic-prev)")
-    keymap("n", "]d", "<Plug>(coc-diagnostic-next)")
+    vim.keymap.set("n", "[d", "<Plug>(coc-diagnostic-prev)")
+    vim.keymap.set("n", "]d", "<Plug>(coc-diagnostic-next)")
 
     -- other coc mappings
-    keymap("n", "gd", "<Plug>(coc-definition)")
-    keymap("n", "gy", "<Plug>(coc-type-definition)")
-    keymap("n", "gi", "<Plug>(coc-implementation)")
-    keymap("n", "gr", "<Plug>(coc-references)")
-    keymap("n", "gl", "<Plug>(coc-codelense-action)")
+    vim.keymap.set("n", "gd", "<Plug>(coc-definition)")
+    vim.keymap.set("n", "gi", "<Plug>(coc-implementation)")
+    vim.keymap.set("n", "gl", "<Plug>(coc-codelense-action)")
+    vim.keymap.set("n", "gr", "<Plug>(coc-references)")
+    vim.keymap.set("n", "gy", "<Plug>(coc-type-definition)")
 
     -- navigate git things
-    keymap("n", "[g", "<Plug>(coc-git-prevchunk)")
-    keymap("n", "]g", "<Plug>(coc-git-nextchunk)")
-    keymap("n", "gs", "<Plug>(coc-git-chunkinfo)")
-    keymap("n", "go", "<Plug>(coc-git-commit)")
+    vim.keymap.set("n", "[g", "<Plug>(coc-git-prevchunk)")
+    vim.keymap.set("n", "]g", "<Plug>(coc-git-nextchunk)")
+    vim.keymap.set("n", "go", "<Plug>(coc-git-commit)")
+    vim.keymap.set("n", "gs", "<Plug>(coc-git-chunkinfo)")
+
+    -- documentation
+    local function show_documentation()
+        local filetype = vim.bo.filetype
+        if filetype == "vim" or filetype == "help" then
+            vim.cmd("h " .. vim.fn.expand("<cword>"))
+        else
+            vim.call("CocAction", "doHover")
+        end
+    end
+    vim.keymap.set("n", "K", show_documentation)
+end
+
+local function in_git_repo()
+    local handle = io.popen("git rev-parse --is-inside-work-tree 2>/dev/null")
+    local result = handle:read("*a")
+    handle:close()
+
+    -- Trim the result
+    result = string.gsub(result, "^%s*(.-)%s*$", "%1")
+
+    return result == "true"
 end
 
 require("lazy").setup({
     -- Essential
     {
-        "joshdick/onedark.vim",
+        "navarasu/onedark.nvim",
         lazy = false,
         config = function()
             vim.cmd([[colorscheme onedark]])
@@ -124,24 +135,68 @@ require("lazy").setup({
     },
 
     -- General Editing
-    "tpope/vim-repeat", -- make . work with other tpope plugins
-    "tpope/vim-surround",
-    "tpope/vim-commentary", -- gc verb
-    "tpope/vim-unimpaired", --
-    { "qpkorr/vim-bufkill", cmd = "BD" },
-
-    -- Projects
-    { "junegunn/fzf", dir = "~/.fzf", build = "./install --all" },
+    { -- make . work with other tpope plugins
+        "tpope/vim-repeat",
+    },
+    { -- cs/ds/ys
+        "tpope/vim-surround",
+    },
+    { -- gc
+        "tpope/vim-commentary",
+    },
+    { -- []
+        "tpope/vim-unimpaired",
+    },
+    { -- :BD
+        "qpkorr/vim-bufkill",
+        cmd = "BD",
+    },
+    { "vim-scripts/ShowTrailingWhitespace" },
     {
-        "junegunn/fzf.vim",
+        "vim-scripts/DeleteTrailingWhitespace",
         config = function()
-            vim.g.fzf_layout = { window = { width = 0.9, height = 0.6 } }
-            keymap_nv("<C-P>", ":GFiles<CR>")
-            keymap("n", "<leader>f", ":GFiles<cr>")
+            vim.g.DeleteTrailingWhitespace = 1
+            vim.g.DeleteTrailingWhitespace_Action = "delete"
         end,
     },
-    "tpope/vim-fugitive", -- :G
-    "rhysd/git-messenger.vim", -- :GitMessenger
+
+    -- Projects
+    {
+        "nvim-telescope/telescope.nvim",
+        branch = "0.1.x",
+        lazy = false,
+        dependencies = { "nvim-lua/plenary.nvim" },
+        config = function()
+            require("telescope").setup({
+                defaults = {
+                    layout_config = {
+                        horizontal = { height = 0.8, width = 0.9 },
+                        vertical = { height = 0.8, width = 0.9 },
+                    },
+                },
+            })
+            vim.keymap.set("n", "<C-P>", function()
+                if in_git_repo() then
+                    require("telescope.builtin").git_files()
+                else
+                    require("telescope.builtin").find_files()
+                end
+            end)
+            vim.keymap.set("n", "<leader>g", function()
+                require("telescope.builtin").live_grep()
+            end)
+            vim.keymap.set("v", "<leader>g", function()
+                require("telescope.builtin").grep_string()
+            end)
+        end,
+    },
+    { -- :G
+        "tpope/vim-fugitive",
+    },
+    { -- :GitMessenger
+        "rhysd/git-messenger.vim",
+        cmd = "GitMessenger",
+    },
 
     -- Programming
     {
@@ -152,7 +207,7 @@ require("lazy").setup({
     },
     { -- :A
         "vim-scripts/a.vim",
-        ft = { "c", "cpp" },
+        cmd = "A",
     },
     { -- c++ autoformat
         "rhysd/vim-clang-format",
@@ -189,13 +244,14 @@ require("lazy").setup({
             })
         end,
     },
-    { "rust-lang/rust.vim", ft = "rust" }, -- rust syntax
 
     -- Productivity
     { "Lenovsky/nuake", cmd = "Nuake" }, -- terminal
-    "nvim-lua/plenary.nvim", -- needed for CodeGPT
-    "MunifTanjim/nui.nvim", -- needed for CodeGPT
-    "dpayne/CodeGPT.nvim", -- :Chat
+    {
+        "dpayne/CodeGPT.nvim",
+        dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim" },
+        cmd = "Chat",
+    }, -- :Chat
 })
 
 -- Editor Config
@@ -207,7 +263,6 @@ vim.o.cindent = true
 vim.o.cinoptions = vim.o.cinoptions .. "g2" .. "h2"
 vim.o.colorcolumn = "100"
 vim.o.expandtab = true
-vim.o.fcs = "eob:\\"
 vim.o.hidden = true
 vim.o.hlsearch = true
 vim.o.ignorecase = true
@@ -225,6 +280,12 @@ vim.o.updatetime = 300
 vim.wo.number = true
 
 -- Mappings
+local function keymap_nv(key, action)
+    local options = { noremap = true, silent = true }
+    vim.keymap.set("n", key, action, options)
+    vim.keymap.set("v", key, action, options)
+end
+
 -- remaps
 keymap_nv("Y", "y$")
 keymap_nv("j", "gj")
@@ -246,9 +307,9 @@ keymap_nv("<S-tab>", ":bprevious<cr>")
 
 keymap_nv("<enter>", "<C-]>")
 
-keymap_nv("<leader><space>", ":noh<CR>")
+keymap_nv("<leader><space>", ":noh<cr>")
 keymap_nv("<leader>bd", ":BD")
-keymap_nv("<leader>t", ":Nuake<CR>")
+keymap_nv("<leader>t", ":Nuake<cr>")
 keymap_nv("<leader>y", '"+y')
 keymap_nv("<leader>Y", '"+y$')
 

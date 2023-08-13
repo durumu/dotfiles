@@ -5,7 +5,13 @@
 - clean: ['~']
 
 - link:
+    ~/.config:
+      glob: true
+      path: config/*
+      exclude: [ config/nvim ]
     ~/.config/nvim:
+      glob: true
+      path: config/nvim/*
     ~/.zshrc:
     ~/.aliases:
     ~/.gitconfig:
