@@ -5,14 +5,10 @@
 - clean: ['~']
 
 - link:
-    ~/.config/:
-      glob: true
-      path: config/**/*
+    ~/.config/nvim:
     ~/.zshrc:
     ~/.aliases:
     ~/.gitconfig:
     ~/.gitignore:
-    ~/.ghci:
-    ~/.latex:
     # ~/.oh-my-zsh/custom/themes/durumu.zsh-theme:
     #   path: durumu.zsh-theme
