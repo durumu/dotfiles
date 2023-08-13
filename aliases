@@ -1,7 +1,7 @@
 #!/usr/bin/zsh
 
 alias cd1="cd ~/code/code_chat"
-alias evr="nvim ~/.config/nvim/init.vim"
+alias evr="nvim ~/.config/nvim/init.lua"
 alias ezr="nvim ~/.zshrc && source ~/.zshrc"
 alias ga="git add ."
 alias gc="git commit"

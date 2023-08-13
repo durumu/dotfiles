@@ -1,119 +1,116 @@
--- Non-Compatibility mode
-vim.o.compatible = false
-vim.g.python3_host_prog = "/Users/presley/tools/venvs/main/bin/python"
-vim.g.python_version = 310
+vim.g.python3_host_prog = "~/tools/venvs/main/bin/python"
+vim.g.python_version = 311
 
--- Set the data directory path
-local data_dir = vim.fn.stdpath('data') .. '/site'
-
--- Function: Get the data directory path
-local function get_data_dir()
-    return data_dir
+-- Bootstrap lazy.nvim
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+	vim.fn.system({
+		"git",
+		"clone",
+		"--filter=blob:none",
+		"https://github.com/folke/lazy.nvim.git",
+		"--branch=stable", -- latest stable release
+		lazypath,
+	})
 end
+vim.opt.rtp:prepend(lazypath)
 
-if vim.fn.empty(vim.fn.glob(data_dir .. '/autoload/plug.vim')) == 1 then
-    vim.cmd('!curl -fLo ' .. data_dir .. '/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim')
-    vim.cmd("autocmd VimEnter * PlugInstall --sync | source $MYVIMRC")
-end
+vim.g.mapleader = " "
 
-vim.cmd([[
-    call plug#begin()
+require("lazy").setup({
+	-- Aesthetics
+	"joshdick/onedark.vim",
+	"vim-airline/vim-airline",
+	"vim-airline/vim-airline-themes",
 
-    " Aesthetics
-    Plug 'joshdick/onedark.vim'
-    Plug 'vim-airline/vim-airline'
-    Plug 'vim-airline/vim-airline-themes'
-    Plug 'mhinz/vim-startify'
-    Plug 'Lenovsky/nuake', {'on': 'Nuake'}
+	-- General Editing
+	"tpope/vim-repeat",
+	"tpope/vim-surround",
+	"tpope/vim-commentary",
+	"tpope/vim-unimpaired", --
+	"qpkorr/vim-bufkill", -- make :bd work more reliably
 
-    " General Editing
-    Plug 'tpope/vim-repeat'
-    Plug 'tpope/vim-surround'
-    Plug 'tpope/vim-commentary'
-    Plug 'tpope/vim-unimpaired'
-    Plug 'qpkorr/vim-bufkill'
-    Plug 'junegunn/fzf', { 'dir' : '~/.fzf', 'do' : './install --all' }
-    Plug 'junegunn/fzf.vim'
+	-- Projects
+	{ "junegunn/fzf", dir = "~/.fzf", build = "./install --all" },
+	"junegunn/fzf.vim",
+	"tpope/vim-fugitive",
+	"rhysd/git-messenger.vim", -- :GitMessenger
 
-    " Programming
-    Plug 'sheerun/vim-polyglot'
-    Plug 'tpope/vim-fugitive'
-    Plug 'dbakker/vim-projectroot'
-    Plug 'rhysd/git-messenger.vim'
-    Plug 'rust-lang/rust.vim'
-    Plug 'rhysd/vim-clang-format'
-    Plug 'vim-scripts/a.vim', {'for': 'cpp'}
-    Plug 'psf/black', { 'branch': 'stable' }
-    Plug 'nvim-lua/plenary.nvim'
-    Plug 'MunifTanjim/nui.nvim'
-    Plug 'dpayne/CodeGPT.nvim'
+	-- Programming
+	{ "neoclide/coc.nvim", branch = "release" }, -- COC
+	"sheerun/vim-polyglot", -- many-language syntax
+	{ "vim-scripts/a.vim", ft = "cpp" }, -- :A
+	{ "psf/black", ft = "py", branch = "stable" }, -- python autoformat
+	{ "rhysd/vim-clang-format", ft = "cpp" }, -- c++ autoformat
+	{ "rust-lang/rust.vim", ft = "rs" }, -- rust syntax
 
-    " COC stuff
-    Plug 'neoclide/coc.nvim', {'branch' : 'release'}
+	-- Productivity
+	"mhinz/vim-startify", -- start page
+	{ "Lenovsky/nuake", cmd = "Nuake" }, -- terminal
+	"nvim-lua/plenary.nvim", -- needed for CodeGPT
+	"MunifTanjim/nui.nvim", -- needed for CodeGPT
+	"dpayne/CodeGPT.nvim", -- :Chat
+})
 
-    call plug#end()
-]])
-
-vim.g.coc_node_path = '/opt/homebrew/bin/node'
+vim.g.coc_node_path = "/opt/homebrew/bin/node"
 vim.g.coc_global_extensions = {
-    'coc-clangd',
-    'coc-git',
-    'coc-json',
-    'coc-lists',
-    'coc-marketplace',
-    'coc-pyright',
-    'coc-rust-analyzer',
-    'coc-yank',
+	"coc-clangd",
+	"coc-git",
+	"coc-json",
+	"coc-lists",
+	"coc-marketplace",
+	"coc-pyright",
+	"coc-rust-analyzer",
+	"coc-yank",
 }
 
 -- Editor Config
 vim.o.termguicolors = true
-vim.cmd('filetype plugin on')
-vim.cmd('colorscheme onedark')
-vim.g.mapleader = ' '
+vim.cmd("filetype plugin on")
+vim.cmd("colorscheme onedark")
 vim.o.ignorecase = true
 vim.o.smartcase = true
 vim.o.hlsearch = true
 vim.o.hidden = true
 vim.wo.number = true
-vim.o.mouse = 'r'
+vim.o.mouse = "r"
 vim.o.expandtab = true
 vim.o.tabstop = 4
 vim.o.shiftwidth = 4
 vim.o.cindent = true
-vim.o.cinoptions = vim.o.cinoptions .. 'g2'
-vim.o.cinoptions = vim.o.cinoptions .. 'h2'
+vim.o.cinoptions = vim.o.cinoptions .. "g2"
+vim.o.cinoptions = vim.o.cinoptions .. "h2"
 vim.o.smartindent = true
 vim.o.updatetime = 300
 
-if vim.fn.exists('+colorcolumn') == 1 then
-    vim.o.colorcolumn = '100'
-    vim.cmd('hi ColorColumn ctermbg=darkgrey guibg=#080808')
+if vim.fn.exists("+colorcolumn") == 1 then
+	vim.o.colorcolumn = "100"
+	vim.cmd("hi ColorColumn ctermbg=darkgrey guibg=#080808")
 end
 
 vim.cmd([[
     au BufRead,BufNewFile *.{c,cpp,cc,h} set filetype=cpp
 ]])
 
-vim.g.alternateExtensions_cc = 'h'
-vim.g.alternateExtensions_h = 'cc,c,cpp'
+vim.g.alternateExtensions_cc = "h"
+vim.g.alternateExtensions_h = "cc,c,cpp"
 
 if vim.fn.has("gui_macvim") == 1 then
-    vim.o.macmeta = true
+	vim.o.macmeta = true
 end
 
 -- Plugin Config
-vim.g.airline_theme = 'onedark'
+vim.g.airline_theme = "onedark"
 vim.g.airline_powerline_fonts = 1
 vim.g.airline_inactive_collapse = 1
 vim.g.airline_skip_empty_sections = 1
 vim.g.airline_highlighting_cache = 1
 vim.g["airline#extensions#tabline#enabled"] = 1
-vim.g["airline#extensions#tabline#left_sep"] = ' '
-vim.g["airline#extensions#tabline#left_alt_sep"] = '|'
-vim.g.airline_section_y = ''
-vim.g.airline_section_error = '%{airline#util#wrap(airline#extensions#coc#get_error(), 0)}'
-vim.g.airline_section_warning = '%{airline#util#wrap(airline#extensions#coc#get_warning(), 0)}'
+vim.g["airline#extensions#tabline#left_sep"] = " "
+vim.g["airline#extensions#tabline#left_alt_sep"] = "|"
+vim.g.airline_section_y = ""
+vim.g.airline_section_error = "%{airline#util#wrap(airline#extensions#coc#get_error(), 0)}"
+vim.g.airline_section_warning = "%{airline#util#wrap(airline#extensions#coc#get_warning(), 0)}"
 vim.g.fzf_layout = { window = { width = 0.9, height = 0.6 } }
 
 -- clang_format
@@ -126,9 +123,9 @@ vim.g.startify_change_to_dir = 0
 vim.g.startify_change_to_vcs_root = 1
 
 -- My Stuff
-vim.cmd('highlight Comment cterm=italic gui=italic')
-vim.o.fcs = 'eob:\\'
-vim.o.inccommand = 'nosplit'
+vim.cmd("highlight Comment cterm=italic gui=italic")
+vim.o.fcs = "eob:\\"
+vim.o.inccommand = "nosplit"
 vim.o.splitbelow = true
 vim.o.splitright = true
 

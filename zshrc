@@ -6,8 +6,6 @@ export EDITOR=/opt/homebrew/bin/nvim
 export SHELL=/bin/zsh
 export OPENAI_API_KEY=$(cat ~/secret/openai.key)
 
-# vim keybinds
-bindkey -v
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
