@@ -4,14 +4,11 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 export LANG=en_US.UTF-8
 export EDITOR=/opt/homebrew/bin/nvim
 export SHELL=/bin/zsh
-export OPENAI_API_KEY=$(cat ~/secret/openai.key)
-
-
-
 
 export PATH="/opt/homebrew/opt/libpq/bin:/usr/local/texlive/2023/bin/universal-darwin:$PATH"
 export LIBRARY_PATH="$LIBRARY_PATH:/opt/homebrew/lib"
 
+export OPENAI_API_KEY=$(cat ~/secret/openai.key)
 export SSH_KEY_PATH="~/.ssh/rsa_id"
 
 export PS1="%1~ %# "

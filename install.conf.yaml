@@ -5,16 +5,15 @@
 - clean: ['~']
 
 - link:
+    ~/.config/nvim:
+      glob: true
+      create: true
+      path: config/nvim/*
     ~/.config:
       glob: true
       path: config/*
       exclude: [ config/nvim ]
-    ~/.config/nvim:
-      glob: true
-      path: config/nvim/*
     ~/.zshrc:
     ~/.aliases:
     ~/.gitconfig:
     ~/.gitignore:
-    # ~/.oh-my-zsh/custom/themes/durumu.zsh-theme:
-    #   path: durumu.zsh-theme
