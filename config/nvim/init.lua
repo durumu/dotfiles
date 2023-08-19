@@ -21,72 +21,31 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-local function coc_config()
-    vim.g.coc_node_path = "/opt/homebrew/bin/node"
-    vim.g.coc_global_extensions = {
-        "coc-clangd",
-        "coc-explorer",
-        "coc-git",
-        "coc-json",
-        "coc-lists",
-        "coc-marketplace",
-        "coc-pyright",
-        "coc-rust-analyzer",
-        "coc-yank",
-    }
-
-    vim.keymap.set("i", "<c-space>", "coc#refresh()")
-    vim.keymap.set("i", "<cr>", function()
-        if vim.fn.pumvisible() == 1 then
-            return vim.call("coc#select_confirm")
-        else
-            vim.api.nvim_feedkeys("\r", "n", true)
-            return vim.call("coc#on_enter")
-        end
-    end)
-
-    vim.keymap.set({ "n", "v" }, "<leader>ll", ":CocList lists<cr>")
-    vim.keymap.set({ "n", "v" }, "<leader>lc", ":CocList commands<cr>")
-    vim.keymap.set({ "n", "v" }, "<leader>lb", ":CocList --top buffers<cr>")
-    vim.keymap.set({ "n", "v" }, "<leader>qf", "<Plug>(coc-fix-current)")
-
-    -- navigate diagnostics
-    vim.keymap.set({ "n", "v" }, "[d", "<Plug>(coc-diagnostic-prev)")
-    vim.keymap.set({ "n", "v" }, "]d", "<Plug>(coc-diagnostic-next)")
-
-    -- other coc mappings
-    vim.keymap.set({ "n", "v" }, "gd", "<Plug>(coc-definition)")
-    vim.keymap.set({ "n", "v" }, "gi", "<Plug>(coc-implementation)")
-    vim.keymap.set({ "n", "v" }, "gl", "<Plug>(coc-codelense-action)")
-    vim.keymap.set({ "n", "v" }, "gr", "<Plug>(coc-references)")
-    vim.keymap.set({ "n", "v" }, "gy", "<Plug>(coc-type-definition)")
-
-    -- navigate git things
-    vim.keymap.set({ "n", "v" }, "[g", "<Plug>(coc-git-prevchunk)")
-    vim.keymap.set({ "n", "v" }, "]g", "<Plug>(coc-git-nextchunk)")
-    vim.keymap.set({ "n", "v" }, "go", "<Plug>(coc-git-commit)")
-    vim.keymap.set({ "n", "v" }, "gs", "<Plug>(coc-git-chunkinfo)")
-
-    -- documentation
-    local function show_documentation()
-        local filetype = vim.bo.filetype
-        if filetype == "vim" or filetype == "help" then
-            vim.cmd("h " .. vim.fn.expand("<cword>"))
-        else
-            vim.call("CocAction", "doHover")
-        end
-    end
-    vim.keymap.set({ "n", "v" }, "K", show_documentation)
-end
-
 require("lazy").setup({
     -- Essential
-    { -- colorscheme
-        "navarasu/onedark.nvim",
+    { --colorscheme
+        "folke/tokyonight.nvim",
         lazy = false,
         config = function()
-            require("onedark").setup({ style = "darker" })
-            vim.cmd([[colorscheme onedark]])
+            require("tokyonight").setup({
+                style = "moon", -- bg=dark
+                light_style = "day", -- bg=light
+                terminal_colors = true, -- Configure the colors used when opening a `:terminal` in [Neovim](https://github.com/neovim/neovim)
+                styles = {
+                    -- Style to be applied to different syntax groups
+                    -- Value is any valid attr-list value for `:help nvim_set_hl`
+                    comments = { italic = true },
+                    keywords = { italic = false },
+                    functions = {},
+                    variables = {},
+                    -- Background styles. Can be "dark", "transparent" or "normal"
+                    sidebars = "dark", -- style for sidebars, see below
+                    floats = "dark", -- style for floating windows
+                },
+                sidebars = { "qf", "help", "terminal" }, -- darker background on sidebars
+                lualine_bold = true, -- section headers in the lualine theme will be bold
+            })
+            vim.cmd([[colorscheme tokyonight]])
         end,
     },
     { -- powerline
@@ -171,7 +130,7 @@ require("lazy").setup({
         "ibhagwan/fzf-lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
-            -- need to install bat
+            -- also, need to install: rg, fd, bat
             require("fzf-lua").setup({})
         end,
     },
@@ -184,6 +143,7 @@ require("lazy").setup({
     { -- file tree
         "nvim-tree/nvim-tree.lua",
         lazy = false,
+        dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
             require("nvim-tree").setup({
                 sort_by = "case_sensitive",
@@ -205,7 +165,33 @@ require("lazy").setup({
         "neoclide/coc.nvim",
         branch = "release",
         lazy = false,
-        config = coc_config,
+        config = function()
+            vim.g.coc_node_path = "/opt/homebrew/bin/node"
+            vim.g.coc_global_extensions = {
+                "coc-clangd",
+                "coc-explorer",
+                "coc-git",
+                "coc-json",
+                "coc-lists",
+                "coc-lua",
+                "coc-marketplace",
+                "coc-pyright",
+                "coc-rust-analyzer",
+                "coc-yank",
+            }
+
+            -- Some servers have issues with backup files, see #649
+            vim.opt.backup = false
+            vim.opt.writebackup = false
+
+            -- Having longer updatetime (default is 4000 ms = 4s) leads to noticeable
+            -- delays and poor user experience
+            vim.opt.updatetime = 300
+
+            -- Always show the signcolumn, otherwise it would shift the text each time
+            -- diagnostics appeared/became resolved
+            vim.opt.signcolumn = "yes"
+        end,
     },
     { -- rust
         "rust-lang/rust.vim",
@@ -214,7 +200,9 @@ require("lazy").setup({
             vim.g.rustfmt_autosave = 1
         end,
     },
-    { -- c++ autoformat
+
+    -- Autoformat
+    { -- c++
         "rhysd/vim-clang-format",
         ft = { "c", "cpp" },
         config = function()
@@ -223,7 +211,7 @@ require("lazy").setup({
             vim.g["clang_format#auto_formatexpr"] = 0
         end,
     },
-    { -- python autoformat
+    { -- python
         "averms/black-nvim",
         ft = { "python" },
         build = ":UpdateRemotePlugins",
@@ -236,7 +224,7 @@ require("lazy").setup({
             })
         end,
     },
-    { -- lua autoformat
+    { -- lua
         "ckipp01/stylua-nvim",
         ft = { "lua" },
         config = function()
@@ -251,12 +239,18 @@ require("lazy").setup({
     },
 
     -- Productivity
-    { "Lenovsky/nuake", cmd = "Nuake" }, -- terminal
-    {
+    { -- terminal (<C-\>)
+        "akinsho/toggleterm.nvim",
+        lazy = false,
+        config = function()
+            require("toggleterm").setup({ open_mapping = [[<C-\>]] })
+        end,
+    },
+    { -- :Chat
         "dpayne/CodeGPT.nvim",
         dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim" },
         cmd = "Chat",
-    }, -- :Chat
+    },
 })
 
 -- Editor Config
@@ -292,6 +286,9 @@ vim.keymap.set({ "n", "v" }, "k", "gk", { noremap = true, silent = true })
 vim.keymap.set({ "n", "v" }, "Q", "q", { noremap = true, silent = true })
 vim.keymap.set({ "n", "v" }, "q", "@q", { noremap = true, silent = true })
 
+vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { noremap = true, silent = true })
+vim.keymap.set({ "n", "v" }, "<leader>Y", '"+y$', { noremap = true, silent = true })
+
 -- navigation
 vim.keymap.set({ "n", "v" }, "<left>", "<C-w>h", { noremap = true, silent = true })
 vim.keymap.set({ "n", "v" }, "<down>", "<C-w>j", { noremap = true, silent = true })
@@ -314,27 +311,64 @@ end)
 vim.keymap.set({ "n", "v" }, "<leader><leader>", function()
     vim.cmd([[noh]])
 end)
-vim.keymap.set({ "n", "v" }, "<leader>t", function()
-    vim.cmd([[Nuake]])
-end)
 
-vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { noremap = true, silent = true })
-vim.keymap.set({ "n", "v" }, "<leader>Y", '"+y$', { noremap = true, silent = true })
+-- Plugin Mappings
 
+-- git-messenger
 vim.keymap.set({ "n", "v" }, "<leader>gm", function()
     vim.cmd([[GitMessenger]])
 end)
 
+-- nvim-tree
 vim.keymap.set({ "n", "v" }, "<leader>f", function()
     vim.cmd([[NvimTreeToggle]])
 end)
 
+-- fzf-lua
 vim.keymap.set({ "n", "v" }, "<C-p>", function()
     require("fzf-lua").files()
 end, { silent = true })
 vim.keymap.set({ "n", "v" }, "<leader>g", function()
     require("fzf-lua").grep()
 end, { silent = true })
+
+-- coc
+local opts = { expr = true, noremap = true, silent = true, replace_keycodes = false }
+vim.keymap.set("i", "<cr>", [[coc#pum#visible() ? coc#pum#confirm() : "<CR>"]], opts)
+vim.keymap.set("i", "<C-space>", "coc#refresh()", opts)
+
+vim.keymap.set({ "n", "v" }, "<leader>ll", ":CocList lists<cr>")
+vim.keymap.set({ "n", "v" }, "<leader>lc", ":CocList commands<cr>")
+vim.keymap.set({ "n", "v" }, "<leader>lb", ":CocList --top buffers<cr>")
+vim.keymap.set({ "n", "v" }, "<leader>qf", "<Plug>(coc-fix-current)")
+
+-- navigate diagnostics
+vim.keymap.set({ "n", "v" }, "[d", "<Plug>(coc-diagnostic-prev)")
+vim.keymap.set({ "n", "v" }, "]d", "<Plug>(coc-diagnostic-next)")
+
+-- other coc mappings
+vim.keymap.set({ "n", "v" }, "gd", "<Plug>(coc-definition)")
+vim.keymap.set({ "n", "v" }, "gi", "<Plug>(coc-implementation)")
+vim.keymap.set({ "n", "v" }, "gl", "<Plug>(coc-codelense-action)")
+vim.keymap.set({ "n", "v" }, "gr", "<Plug>(coc-references)")
+vim.keymap.set({ "n", "v" }, "gy", "<Plug>(coc-type-definition)")
+
+-- navigate git things
+vim.keymap.set({ "n", "v" }, "[g", "<Plug>(coc-git-prevchunk)")
+vim.keymap.set({ "n", "v" }, "]g", "<Plug>(coc-git-nextchunk)")
+vim.keymap.set({ "n", "v" }, "go", "<Plug>(coc-git-commit)")
+vim.keymap.set({ "n", "v" }, "gs", "<Plug>(coc-git-chunkinfo)")
+
+-- documentation
+local function show_documentation()
+    local filetype = vim.bo.filetype
+    if filetype == "vim" or filetype == "help" then
+        vim.cmd("h " .. vim.fn.expand("<cword>"))
+    else
+        vim.call("CocAction", "doHover")
+    end
+end
+vim.keymap.set({ "n", "v" }, "K", show_documentation)
 
 -- Command
 vim.api.nvim_create_user_command("Q", "qall", {})
