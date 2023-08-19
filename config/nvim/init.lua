@@ -1,5 +1,11 @@
+-- disable netrw
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 vim.g.python3_host_prog = "~/tools/venvs/main/bin/python"
 vim.g.python_version = 311
+
+vim.g.mapleader = " "
 
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -15,8 +21,6 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-vim.g.mapleader = " "
-
 local function coc_config()
     vim.g.coc_node_path = "/opt/homebrew/bin/node"
     vim.g.coc_global_extensions = {
@@ -31,42 +35,37 @@ local function coc_config()
         "coc-yank",
     }
 
-    vim.keymap.set("n", "<leader>ll", ":CocList lists<cr>")
-    vim.keymap.set("n", "<leader>lc", ":CocList commands<cr>")
-    vim.keymap.set("n", "<leader>lb", ":CocList --top buffers<cr>")
     vim.keymap.set("i", "<c-space>", "coc#refresh()")
     vim.keymap.set("i", "<cr>", function()
         if vim.fn.pumvisible() == 1 then
             return vim.call("coc#select_confirm")
         else
-            vim.api.nvim_feedkeys(
-                vim.api.nvim_replace_termcodes("<C-g>u", true, true, true),
-                "n",
-                true
-            )
+            vim.api.nvim_feedkeys("\r", "n", true)
             return vim.call("coc#on_enter")
         end
     end)
 
-    -- quick fix
-    vim.keymap.set("n", "<leader>qf", "<Plug>(coc-fix-current)")
+    vim.keymap.set({ "n", "v" }, "<leader>ll", ":CocList lists<cr>")
+    vim.keymap.set({ "n", "v" }, "<leader>lc", ":CocList commands<cr>")
+    vim.keymap.set({ "n", "v" }, "<leader>lb", ":CocList --top buffers<cr>")
+    vim.keymap.set({ "n", "v" }, "<leader>qf", "<Plug>(coc-fix-current)")
 
     -- navigate diagnostics
-    vim.keymap.set("n", "[d", "<Plug>(coc-diagnostic-prev)")
-    vim.keymap.set("n", "]d", "<Plug>(coc-diagnostic-next)")
+    vim.keymap.set({ "n", "v" }, "[d", "<Plug>(coc-diagnostic-prev)")
+    vim.keymap.set({ "n", "v" }, "]d", "<Plug>(coc-diagnostic-next)")
 
     -- other coc mappings
-    vim.keymap.set("n", "gd", "<Plug>(coc-definition)")
-    vim.keymap.set("n", "gi", "<Plug>(coc-implementation)")
-    vim.keymap.set("n", "gl", "<Plug>(coc-codelense-action)")
-    vim.keymap.set("n", "gr", "<Plug>(coc-references)")
-    vim.keymap.set("n", "gy", "<Plug>(coc-type-definition)")
+    vim.keymap.set({ "n", "v" }, "gd", "<Plug>(coc-definition)")
+    vim.keymap.set({ "n", "v" }, "gi", "<Plug>(coc-implementation)")
+    vim.keymap.set({ "n", "v" }, "gl", "<Plug>(coc-codelense-action)")
+    vim.keymap.set({ "n", "v" }, "gr", "<Plug>(coc-references)")
+    vim.keymap.set({ "n", "v" }, "gy", "<Plug>(coc-type-definition)")
 
     -- navigate git things
-    vim.keymap.set("n", "[g", "<Plug>(coc-git-prevchunk)")
-    vim.keymap.set("n", "]g", "<Plug>(coc-git-nextchunk)")
-    vim.keymap.set("n", "go", "<Plug>(coc-git-commit)")
-    vim.keymap.set("n", "gs", "<Plug>(coc-git-chunkinfo)")
+    vim.keymap.set({ "n", "v" }, "[g", "<Plug>(coc-git-prevchunk)")
+    vim.keymap.set({ "n", "v" }, "]g", "<Plug>(coc-git-nextchunk)")
+    vim.keymap.set({ "n", "v" }, "go", "<Plug>(coc-git-commit)")
+    vim.keymap.set({ "n", "v" }, "gs", "<Plug>(coc-git-chunkinfo)")
 
     -- documentation
     local function show_documentation()
@@ -77,55 +76,67 @@ local function coc_config()
             vim.call("CocAction", "doHover")
         end
     end
-    vim.keymap.set("n", "K", show_documentation)
-end
-
-local function in_git_repo()
-    local handle = io.popen("git rev-parse --is-inside-work-tree 2>/dev/null")
-    local result = handle:read("*a")
-    handle:close()
-
-    -- Trim the result
-    result = string.gsub(result, "^%s*(.-)%s*$", "%1")
-
-    return result == "true"
+    vim.keymap.set({ "n", "v" }, "K", show_documentation)
 end
 
 require("lazy").setup({
     -- Essential
-    {
+    { -- colorscheme
         "navarasu/onedark.nvim",
         lazy = false,
         config = function()
+            require("onedark").setup({ style = "darker" })
             vim.cmd([[colorscheme onedark]])
         end,
     },
-    {
-        "vim-airline/vim-airline",
+    { -- powerline
+        "nvim-lualine/lualine.nvim",
         lazy = false,
+        dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
-            vim.g.airline_highlighting_cache = 1
-            vim.g.airline_inactive_collapse = 1
-            vim.g.airline_powerline_fonts = 1
-            vim.g.airline_section_error =
-                "%{airline#util#wrap(airline#extensions#coc#get_error(), 0)}"
-            vim.g.airline_section_warning =
-                "%{airline#util#wrap(airline#extensions#coc#get_warning(), 0)}"
-            vim.g.airline_section_y = ""
-            vim.g.airline_skip_empty_sections = 1
-            vim.g["airline#extensions#tabline#enabled"] = 1
-            vim.g["airline#extensions#tabline#left_alt_sep"] = "|"
-            vim.g["airline#extensions#tabline#left_sep"] = " "
+            require("lualine").setup({
+                options = {
+                    icons_enabled = true,
+                    component_separators = { left = "│", right = "│" }, -- \u2502
+                    section_separators = { left = "", right = "" },
+                    theme = "auto",
+                    disabled_filetypes = {
+                        statusline = {},
+                        winbar = {},
+                    },
+                    ignore_focus = {},
+                    always_divide_middle = true,
+                    globalstatus = false,
+                    refresh = {
+                        statusline = 1000,
+                        tabline = 1000,
+                        winbar = 1000,
+                    },
+                },
+                sections = {
+                    lualine_a = { "mode" },
+                    lualine_b = { "branch", "diff", "diagnostics" },
+                    lualine_c = { "filename" },
+                    lualine_x = { "encoding", "fileformat", "filetype" },
+                    lualine_y = { "progress" },
+                    lualine_z = { "location" },
+                },
+                inactive_sections = {
+                    lualine_a = {},
+                    lualine_b = {},
+                    lualine_c = { "filename" },
+                    lualine_x = { "location" },
+                    lualine_y = {},
+                    lualine_z = {},
+                },
+                tabline = { lualine_a = { "buffers" } },
+                winbar = {},
+                inactive_winbar = {},
+                extensions = {},
+            })
         end,
     },
-    {
-        "vim-airline/vim-airline-themes",
-        lazy = false,
-        config = function()
-            vim.g.airline_theme = "onedark"
-        end,
-    },
-    {
+    { -- start page
         "mhinz/vim-startify",
         lazy = false,
         config = function()
@@ -141,53 +152,27 @@ require("lazy").setup({
     { -- cs/ds/ys
         "tpope/vim-surround",
     },
-    { -- gc
-        "tpope/vim-commentary",
+    { -- gc for line comment, gb for block comment
+        "numToStr/Comment.nvim",
+        lazy = false,
+        config = function()
+            require("Comment").setup()
+        end,
     },
     { -- []
         "tpope/vim-unimpaired",
     },
-    { -- :BD
-        "qpkorr/vim-bufkill",
-        cmd = "BD",
-    },
-    { "vim-scripts/ShowTrailingWhitespace" },
-    {
-        "vim-scripts/DeleteTrailingWhitespace",
-        config = function()
-            vim.g.DeleteTrailingWhitespace = 1
-            vim.g.DeleteTrailingWhitespace_Action = "delete"
-        end,
+    { -- <C-a> and <C-x> for dates
+        "tpope/vim-speeddating",
     },
 
     -- Projects
     {
-        "nvim-telescope/telescope.nvim",
-        branch = "0.1.x",
-        lazy = false,
-        dependencies = { "nvim-lua/plenary.nvim" },
+        "ibhagwan/fzf-lua",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
-            require("telescope").setup({
-                defaults = {
-                    layout_config = {
-                        horizontal = { height = 0.8, width = 0.9 },
-                        vertical = { height = 0.8, width = 0.9 },
-                    },
-                },
-            })
-            vim.keymap.set("n", "<C-P>", function()
-                if in_git_repo() then
-                    require("telescope.builtin").git_files()
-                else
-                    require("telescope.builtin").find_files()
-                end
-            end)
-            vim.keymap.set("n", "<leader>g", function()
-                require("telescope.builtin").live_grep()
-            end)
-            vim.keymap.set("v", "<leader>g", function()
-                require("telescope.builtin").grep_string()
-            end)
+            -- need to install bat
+            require("fzf-lua").setup({})
         end,
     },
     { -- :G
@@ -195,19 +180,39 @@ require("lazy").setup({
     },
     { -- :GitMessenger
         "rhysd/git-messenger.vim",
-        cmd = "GitMessenger",
+    },
+    { -- file tree
+        "nvim-tree/nvim-tree.lua",
+        lazy = false,
+        config = function()
+            require("nvim-tree").setup({
+                sort_by = "case_sensitive",
+                view = {
+                    width = 30,
+                },
+                renderer = {
+                    group_empty = true,
+                },
+                filters = {
+                    dotfiles = true,
+                },
+            })
+        end,
     },
 
     -- Programming
     {
         "neoclide/coc.nvim",
-        ft = { "c", "cpp", "python", "rust" },
         branch = "release",
+        lazy = false,
         config = coc_config,
     },
-    { -- :A
-        "vim-scripts/a.vim",
-        cmd = "A",
+    { -- rust
+        "rust-lang/rust.vim",
+        ft = { "rust" },
+        config = function()
+            vim.g.rustfmt_autosave = 1
+        end,
     },
     { -- c++ autoformat
         "rhysd/vim-clang-format",
@@ -220,7 +225,8 @@ require("lazy").setup({
     },
     { -- python autoformat
         "averms/black-nvim",
-        ft = "python",
+        ft = { "python" },
+        build = ":UpdateRemotePlugins",
         config = function()
             vim.api.nvim_create_autocmd({ "BufWritePre" }, {
                 pattern = { "*.py" },
@@ -232,10 +238,9 @@ require("lazy").setup({
     },
     { -- lua autoformat
         "ckipp01/stylua-nvim",
-        ft = "lua",
-        run = "cargo install stylua",
+        ft = { "lua" },
         config = function()
-            require("stylua-nvim").setup({ config_file = "~/.dotfiles/stylua.toml" })
+            require("stylua-nvim").setup({ config_file = "~/.dotfiles/config/stylua.toml" })
             vim.api.nvim_create_autocmd({ "BufWritePre" }, {
                 pattern = { "*.lua" },
                 callback = function()
@@ -280,40 +285,74 @@ vim.o.updatetime = 300
 vim.wo.number = true
 
 -- Mappings
-local function keymap_nv(key, action)
-    local options = { noremap = true, silent = true }
-    vim.keymap.set("n", key, action, options)
-    vim.keymap.set("v", key, action, options)
-end
-
 -- remaps
-keymap_nv("Y", "y$")
-keymap_nv("j", "gj")
-keymap_nv("k", "gk")
-keymap_nv("Q", "q")
-keymap_nv("q", "@q")
+vim.keymap.set({ "n", "v" }, "Y", "y$", { noremap = true, silent = true })
+vim.keymap.set({ "n", "v" }, "j", "gj", { noremap = true, silent = true })
+vim.keymap.set({ "n", "v" }, "k", "gk", { noremap = true, silent = true })
+vim.keymap.set({ "n", "v" }, "Q", "q", { noremap = true, silent = true })
+vim.keymap.set({ "n", "v" }, "q", "@q", { noremap = true, silent = true })
 
 -- navigation
-keymap_nv("<left>", "<C-w>h")
-keymap_nv("<down>", "<C-w>j")
-keymap_nv("<up>", "<C-w>k")
-keymap_nv("<right>", "<C-w>l")
-keymap_nv("<S-left>", "<C-w>H")
-keymap_nv("<S-down>", "<C-w>J")
-keymap_nv("<S-up>", "<C-w>K")
-keymap_nv("<S-right>", "<C-w>L")
-keymap_nv("<tab>", ":bnext<cr>")
-keymap_nv("<S-tab>", ":bprevious<cr>")
+vim.keymap.set({ "n", "v" }, "<left>", "<C-w>h", { noremap = true, silent = true })
+vim.keymap.set({ "n", "v" }, "<down>", "<C-w>j", { noremap = true, silent = true })
+vim.keymap.set({ "n", "v" }, "<up>", "<C-w>k", { noremap = true, silent = true })
+vim.keymap.set({ "n", "v" }, "<right>", "<C-w>l", { noremap = true, silent = true })
+vim.keymap.set({ "n", "v" }, "<S-left>", "<C-w>H", { noremap = true, silent = true })
+vim.keymap.set({ "n", "v" }, "<S-down>", "<C-w>J", { noremap = true, silent = true })
+vim.keymap.set({ "n", "v" }, "<S-up>", "<C-w>K", { noremap = true, silent = true })
+vim.keymap.set({ "n", "v" }, "<S-right>", "<C-w>L", { noremap = true, silent = true })
 
-keymap_nv("<enter>", "<C-]>")
+vim.keymap.set({ "n", "v" }, "<enter>", "<C-]>", { noremap = true, silent = true })
 
-keymap_nv("<leader><space>", ":noh<cr>")
-keymap_nv("<leader>bd", ":BD")
-keymap_nv("<leader>t", ":Nuake<cr>")
-keymap_nv("<leader>y", '"+y')
-keymap_nv("<leader>Y", '"+y$')
+vim.keymap.set({ "n", "v" }, "<tab>", function()
+    vim.cmd([[bnext]])
+end)
+vim.keymap.set({ "n", "v" }, "<S-tab>", function()
+    vim.cmd([[bprevious]])
+end)
 
--- Commands
-vim.api.nvim_create_user_command("Q", "q", {})
-vim.api.nvim_create_user_command("W", "w", {})
-vim.api.nvim_create_user_command("X", "x", {})
+vim.keymap.set({ "n", "v" }, "<leader><leader>", function()
+    vim.cmd([[noh]])
+end)
+vim.keymap.set({ "n", "v" }, "<leader>t", function()
+    vim.cmd([[Nuake]])
+end)
+
+vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { noremap = true, silent = true })
+vim.keymap.set({ "n", "v" }, "<leader>Y", '"+y$', { noremap = true, silent = true })
+
+vim.keymap.set({ "n", "v" }, "<leader>gm", function()
+    vim.cmd([[GitMessenger]])
+end)
+
+vim.keymap.set({ "n", "v" }, "<leader>f", function()
+    vim.cmd([[NvimTreeToggle]])
+end)
+
+vim.keymap.set({ "n", "v" }, "<C-p>", function()
+    require("fzf-lua").files()
+end, { silent = true })
+vim.keymap.set({ "n", "v" }, "<leader>g", function()
+    require("fzf-lua").grep()
+end, { silent = true })
+
+-- Command
+vim.api.nvim_create_user_command("Q", "qall", {})
+vim.api.nvim_create_user_command("W", "wall", {})
+vim.api.nvim_create_user_command("X", "xall", {})
+
+-- delete trailing whitespace
+function delete_trailing_whitespace()
+    local current_pos = vim.api.nvim_win_get_cursor(0) -- Save current cursor position
+
+    -- Execute the substitution command across the whole buffer to remove trailing whitespace
+    vim.api.nvim_command(":%s/\\s\\+$//e")
+
+    vim.api.nvim_win_set_cursor(0, current_pos) -- Restore cursor position
+end
+
+vim.api.nvim_create_autocmd({ "BufWritePre" }, {
+    callback = function()
+        delete_trailing_whitespace()
+    end,
+})
