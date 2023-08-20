@@ -6,7 +6,6 @@ vim.g.python3_host_prog = "~/tools/venvs/main/bin/python"
 vim.g.python_version = 311
 
 vim.g.mapleader = " "
-
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -26,11 +25,11 @@ require("lazy").setup({
     { --colorscheme
         "folke/tokyonight.nvim",
         lazy = false,
+        priority = 1000, -- load before other plugins
         config = function()
             require("tokyonight").setup({
                 style = "moon", -- bg=dark
                 light_style = "day", -- bg=light
-                terminal_colors = true, -- Configure the colors used when opening a `:terminal` in [Neovim](https://github.com/neovim/neovim)
                 styles = {
                     -- Style to be applied to different syntax groups
                     -- Value is any valid attr-list value for `:help nvim_set_hl`
@@ -55,43 +54,11 @@ require("lazy").setup({
         config = function()
             require("lualine").setup({
                 options = {
-                    icons_enabled = true,
                     component_separators = { left = "│", right = "│" }, -- \u2502
                     section_separators = { left = "", right = "" },
-                    theme = "auto",
-                    disabled_filetypes = {
-                        statusline = {},
-                        winbar = {},
-                    },
-                    ignore_focus = {},
-                    always_divide_middle = true,
-                    globalstatus = false,
-                    refresh = {
-                        statusline = 1000,
-                        tabline = 1000,
-                        winbar = 1000,
-                    },
-                },
-                sections = {
-                    lualine_a = { "mode" },
-                    lualine_b = { "branch", "diff", "diagnostics" },
-                    lualine_c = { "filename" },
-                    lualine_x = { "encoding", "fileformat", "filetype" },
-                    lualine_y = { "progress" },
-                    lualine_z = { "location" },
-                },
-                inactive_sections = {
-                    lualine_a = {},
-                    lualine_b = {},
-                    lualine_c = { "filename" },
-                    lualine_x = { "location" },
-                    lualine_y = {},
-                    lualine_z = {},
                 },
                 tabline = { lualine_a = { "buffers" } },
-                winbar = {},
-                inactive_winbar = {},
-                extensions = {},
+                extensions = { "lazy" },
             })
         end,
     },
@@ -99,8 +66,18 @@ require("lazy").setup({
         "mhinz/vim-startify",
         lazy = false,
         config = function()
+            vim.g.webdevicons_enable_startify = 1
+            vim.g.startify_enable_special = 0
+            vim.g.startify_session_autoload = 1
+            vim.g.startify_session_delete_buffers = 1
             vim.g.startify_change_to_dir = 0
             vim.g.startify_change_to_vcs_root = 1
+            vim.g.startify_fortune_use_unicode = 1
+            vim.g.startify_bookmarks = {
+                { v = "~/.config/nvim/init.lua" },
+                { z = "~/.zshrc" },
+                { a = "~/.aliases" },
+            }
         end,
     },
 
@@ -125,11 +102,50 @@ require("lazy").setup({
         "tpope/vim-speeddating",
     },
 
+    -- Text objects
+    { -- if/af
+        "kana/vim-textobj-function",
+        dependencies = { "kana/vim-textobj-user" },
+    },
+    { -- ie/ae
+        "kana/vim-textobj-entire",
+        dependencies = { "kana/vim-textobj-user" },
+    },
+    { -- i,/a,
+        "sgur/vim-textobj-parameter",
+        dependencies = { "kana/vim-textobj-user" },
+    },
+    { -- iv/av
+        "julian/vim-textobj-variable-segment",
+        dependencies = { "kana/vim-textobj-user" },
+    },
+    { -- ic/ac
+        "glts/vim-textobj-comment",
+        dependencies = { "kana/vim-textobj-user" },
+    },
+
     -- Projects
     {
         "ibhagwan/fzf-lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },
+        keys = { { "<C-p>", mode = { "n", "v" } }, { "<leader>rg", mode = { "n", "v" } } },
+        cmd = "Rg",
         config = function()
+            vim.keymap.set({ "n", "v" }, "<C-p>", function()
+                require("fzf-lua").files()
+            end, { silent = true })
+
+            vim.api.nvim_create_user_command("Rg", function(arg)
+                require("fzf-lua").grep({ search = arg.args })
+            end, { nargs = "*" })
+
+            vim.keymap.set({ "n" }, "<leader>rg", function()
+                require("fzf-lua").grep()
+            end, { silent = true })
+            vim.keymap.set({ "v" }, "<leader>rg", function()
+                require("fzf-lua").grep({ search = require("fzf-lua").utils.get_visual_selection() })
+            end, { silent = true })
+
             -- also, need to install: rg, fd, bat
             require("fzf-lua").setup({})
         end,
@@ -137,24 +153,23 @@ require("lazy").setup({
     { -- :G
         "tpope/vim-fugitive",
     },
-    { -- :GitMessenger
+    { -- :GitMessenger (<space>gm)
         "rhysd/git-messenger.vim",
     },
     { -- file tree
         "nvim-tree/nvim-tree.lua",
-        lazy = false,
         dependencies = { "nvim-tree/nvim-web-devicons" },
+        keys = {
+            { "<leader>ft", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree", mode = { "n", "v" } },
+        },
         config = function()
             require("nvim-tree").setup({
                 sort_by = "case_sensitive",
                 view = {
                     width = 30,
                 },
-                renderer = {
-                    group_empty = true,
-                },
                 filters = {
-                    dotfiles = true,
+                    dotfiles = false,
                 },
             })
         end,
@@ -212,14 +227,15 @@ require("lazy").setup({
         end,
     },
     { -- python
-        "averms/black-nvim",
+        "psf/black",
         ft = { "python" },
-        build = ":UpdateRemotePlugins",
+        branch = "stable",
         config = function()
+            vim.g.black_virtualenv = "~/tools/venvs/main"
             vim.api.nvim_create_autocmd({ "BufWritePre" }, {
                 pattern = { "*.py" },
                 callback = function()
-                    Black()
+                    vim.cmd([[Black]])
                 end,
             })
         end,
@@ -241,7 +257,6 @@ require("lazy").setup({
     -- Productivity
     { -- terminal (<C-\>)
         "akinsho/toggleterm.nvim",
-        lazy = false,
         config = function()
             require("toggleterm").setup({ open_mapping = [[<C-\>]] })
         end,
@@ -250,17 +265,18 @@ require("lazy").setup({
         "dpayne/CodeGPT.nvim",
         dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim" },
         cmd = "Chat",
+        config = function()
+            require("codegpt.config")
+        end,
     },
 })
 
 -- Editor Config
 vim.cmd([[highlight Comment cterm=italic gui=italic]])
 vim.cmd([[filetype plugin on]])
-vim.cmd([[highlight ColorColumn ctermbg=darkgrey guibg=#080808]])
 
 vim.o.cindent = true
 vim.o.cinoptions = vim.o.cinoptions .. "g2" .. "h2"
-vim.o.colorcolumn = "100"
 vim.o.expandtab = true
 vim.o.hidden = true
 vim.o.hlsearch = true
@@ -277,6 +293,21 @@ vim.o.termguicolors = true
 vim.o.updatetime = 300
 
 vim.wo.number = true
+
+-- dark grey column right past max line length
+vim.cmd([[highlight ColorColumn ctermbg=darkgrey]])
+
+vim.api.nvim_exec(
+    [[
+  augroup SetColorColumn
+      autocmd!
+      autocmd FileType lua setlocal colorcolumn=101
+      autocmd FileType python setlocal colorcolumn=89
+      autocmd FileType c,cpp,rust setlocal colorcolumn=81
+  augroup END
+]],
+    false
+)
 
 -- Mappings
 -- remaps
@@ -313,24 +344,6 @@ vim.keymap.set({ "n", "v" }, "<leader><leader>", function()
 end)
 
 -- Plugin Mappings
-
--- git-messenger
-vim.keymap.set({ "n", "v" }, "<leader>gm", function()
-    vim.cmd([[GitMessenger]])
-end)
-
--- nvim-tree
-vim.keymap.set({ "n", "v" }, "<leader>f", function()
-    vim.cmd([[NvimTreeToggle]])
-end)
-
--- fzf-lua
-vim.keymap.set({ "n", "v" }, "<C-p>", function()
-    require("fzf-lua").files()
-end, { silent = true })
-vim.keymap.set({ "n", "v" }, "<leader>g", function()
-    require("fzf-lua").grep()
-end, { silent = true })
 
 -- coc
 local opts = { expr = true, noremap = true, silent = true, replace_keycodes = false }
@@ -376,17 +389,10 @@ vim.api.nvim_create_user_command("W", "wall", {})
 vim.api.nvim_create_user_command("X", "xall", {})
 
 -- delete trailing whitespace
-function delete_trailing_whitespace()
-    local current_pos = vim.api.nvim_win_get_cursor(0) -- Save current cursor position
-
-    -- Execute the substitution command across the whole buffer to remove trailing whitespace
-    vim.api.nvim_command(":%s/\\s\\+$//e")
-
-    vim.api.nvim_win_set_cursor(0, current_pos) -- Restore cursor position
-end
-
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     callback = function()
-        delete_trailing_whitespace()
+        local current_pos = vim.api.nvim_win_get_cursor(0) -- Save current cursor position
+        vim.api.nvim_command(":%s/\\s\\+$//e")
+        vim.api.nvim_win_set_cursor(0, current_pos) -- Restore cursor position
     end,
 })
