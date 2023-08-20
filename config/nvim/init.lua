@@ -160,7 +160,7 @@ require("lazy").setup({
         "nvim-tree/nvim-tree.lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         keys = {
-            { "<leader>ft", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree", mode = { "n", "v" } },
+            { "<leader>f", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree", mode = { "n", "v" } },
         },
         config = function()
             require("nvim-tree").setup({
@@ -190,6 +190,7 @@ require("lazy").setup({
                 "coc-lists",
                 "coc-lua",
                 "coc-marketplace",
+                "coc-pairs",
                 "coc-pyright",
                 "coc-rust-analyzer",
                 "coc-yank",
@@ -342,17 +343,40 @@ end)
 vim.keymap.set({ "n", "v" }, "<leader><leader>", function()
     vim.cmd([[noh]])
 end)
+vim.keymap.set({ "n", "v" }, "<leader>bd", function()
+    vim.cmd([[bd]])
+end)
 
 -- Plugin Mappings
 
 -- coc
-local opts = { expr = true, noremap = true, silent = true, replace_keycodes = false }
-vim.keymap.set("i", "<cr>", [[coc#pum#visible() ? coc#pum#confirm() : "<CR>"]], opts)
-vim.keymap.set("i", "<C-space>", "coc#refresh()", opts)
+local opts = { silent = true, noremap = true, expr = true, replace_keycodes = false }
+vim.keymap.set(
+    "i",
+    "<TAB>",
+    'coc#pum#visible() ? coc#pum#next(1) : v:lua.check_back_space() ? "<TAB>" : coc#refresh()',
+    opts
+)
+vim.keymap.set("i", "<S-TAB>", [[coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"]], opts)
 
-vim.keymap.set({ "n", "v" }, "<leader>ll", ":CocList lists<cr>")
-vim.keymap.set({ "n", "v" }, "<leader>lc", ":CocList commands<cr>")
-vim.keymap.set({ "n", "v" }, "<leader>lb", ":CocList --top buffers<cr>")
+-- Make <CR> to accept selected completion item or notify coc.nvim to format
+-- <C-g>u breaks current undo, please make your own choice
+vim.keymap.set(
+    "i",
+    "<cr>",
+    [[coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"]],
+    opts
+)
+
+-- Use <c-j> to trigger snippets
+vim.keymap.set("i", "<C-j>", "<Plug>(coc-snippets-expand-jump)")
+-- Use <c-space> to trigger completion
+vim.keymap.set("i", "<C-space>", "coc#refresh()", { silent = true, expr = true })
+
+vim.keymap.set({ "n", "v" }, "<leader>ll", "<cmd>CocList lists<cr>")
+vim.keymap.set({ "n", "v" }, "<leader>lc", "<cmd>CocList commands<cr>")
+vim.keymap.set({ "n", "v" }, "<leader>lb", "<cmd>CocList --top buffers<cr>")
+vim.keymap.set({ "n", "v" }, "<leader>ly", "<cmd>CocList --A --normal yank<cr>")
 vim.keymap.set({ "n", "v" }, "<leader>qf", "<Plug>(coc-fix-current)")
 
 -- navigate diagnostics
