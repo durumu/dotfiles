@@ -25,7 +25,7 @@ zstyle ':vcs_info:*' unstagedstr '•'
 # %F{12}/%f - begin color 12/end color
 # %1~ - last 1 directory, abbreviating home as ~
 # %(!.#.>) - # if superuser, > if not
-PROMPT='%B${vcs_info_msg_0_}%F{blue}%1~%f %F{blue}%(!.#.>)%f %b'
+PROMPT='%B%F{blue}%2~%f ${vcs_info_msg_0_}%F{blue}%(!.#.>)%f %b'
 
 [ -f ~/.aliases ] && source ~/.aliases
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

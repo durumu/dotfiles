@@ -22,29 +22,37 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     -- Essential
-    { --colorscheme
-        "folke/tokyonight.nvim",
+    -- { --colorscheme
+    --     "folke/tokyonight.nvim",
+    --     lazy = false,
+    --     priority = 1000, -- load before other plugins
+    --     config = function()
+    --         require("tokyonight").setup({
+    --             style = "moon", -- bg=dark
+    --             light_style = "day", -- bg=light
+    --             styles = {
+    --                 -- Style to be applied to different syntax groups
+    --                 -- Value is any valid attr-list value for `:help nvim_set_hl`
+    --                 comments = { italic = true },
+    --                 keywords = { italic = false },
+    --                 functions = {},
+    --                 variables = {},
+    --                 -- Background styles. Can be "dark", "transparent" or "normal"
+    --                 sidebars = "dark", -- style for sidebars, see below
+    --                 floats = "dark", -- style for floating windows
+    --             },
+    --             sidebars = { "qf", "help", "terminal" }, -- darker background on sidebars
+    --             lualine_bold = true, -- section headers in the lualine theme will be bold
+    --         })
+    --         vim.cmd([[colorscheme tokyonight]])
+    --     end,
+    -- },
+    { -- colorscheme
+        "navarasu/onedark.nvim",
         lazy = false,
-        priority = 1000, -- load before other plugins
+        priority = 1000,
         config = function()
-            require("tokyonight").setup({
-                style = "moon", -- bg=dark
-                light_style = "day", -- bg=light
-                styles = {
-                    -- Style to be applied to different syntax groups
-                    -- Value is any valid attr-list value for `:help nvim_set_hl`
-                    comments = { italic = true },
-                    keywords = { italic = false },
-                    functions = {},
-                    variables = {},
-                    -- Background styles. Can be "dark", "transparent" or "normal"
-                    sidebars = "dark", -- style for sidebars, see below
-                    floats = "dark", -- style for floating windows
-                },
-                sidebars = { "qf", "help", "terminal" }, -- darker background on sidebars
-                lualine_bold = true, -- section headers in the lualine theme will be bold
-            })
-            vim.cmd([[colorscheme tokyonight]])
+            vim.cmd([[colorscheme onedark]])
         end,
     },
     { -- powerline
@@ -57,6 +65,8 @@ require("lazy").setup({
                     component_separators = { left = "│", right = "│" }, -- \u2502
                     section_separators = { left = "", right = "" },
                 },
+                sections = { lualine_c = { { "filename", path = 1 } } },
+                inactive_sections = { lualine_c = { { "filename", path = 1 } } },
                 tabline = { lualine_a = { "buffers" } },
                 extensions = { "lazy" },
             })
@@ -132,7 +142,7 @@ require("lazy").setup({
         cmd = "Rg",
         config = function()
             vim.keymap.set({ "n", "v" }, "<C-p>", function()
-                require("fzf-lua").files()
+                require("fzf-lua").git_files()
             end, { silent = true })
 
             vim.api.nvim_create_user_command("Rg", function(arg)
@@ -160,7 +170,7 @@ require("lazy").setup({
         "nvim-tree/nvim-tree.lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         keys = {
-            { "<leader>f", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree", mode = { "n", "v" } },
+            { "<leader>ft", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree", mode = { "n", "v" } },
         },
         config = function()
             require("nvim-tree").setup({
@@ -207,6 +217,66 @@ require("lazy").setup({
             -- Always show the signcolumn, otherwise it would shift the text each time
             -- diagnostics appeared/became resolved
             vim.opt.signcolumn = "yes"
+
+            -- mappings
+            local opts = { silent = true, noremap = true, expr = true, replace_keycodes = false }
+            function _G.check_back_space()
+                local col = vim.fn.col(".") - 1
+                return col == 0 or vim.fn.getline("."):sub(col, col):match("%s") ~= nil
+            end
+
+            vim.keymap.set(
+                "i",
+                "<TAB>",
+                [[coc#pum#visible() ? coc#pum#next(1) : v:lua._G.check_back_space() ? "<TAB>" : coc#refresh()]],
+                opts
+            )
+            vim.keymap.set("i", "<S-TAB>", [[coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"]], opts)
+
+            -- Make <CR> to accept selected completion item or notify coc.nvim to format
+            -- <C-g>u breaks current undo, please make your own choice
+            vim.keymap.set(
+                "i",
+                "<cr>",
+                [[coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"]],
+                opts
+            )
+
+            -- lists
+            vim.keymap.set({ "n", "v" }, "<leader>ll", "<cmd>CocList lists<cr>")
+            vim.keymap.set({ "n", "v" }, "<leader>lc", "<cmd>CocList commands<cr>")
+            vim.keymap.set({ "n", "v" }, "<leader>lb", "<cmd>CocList --top buffers<cr>")
+            vim.keymap.set({ "n", "v" }, "<leader>ly", "<cmd>CocList --A --normal yank<cr>")
+
+            -- navigate diagnostics
+            vim.keymap.set({ "n", "v" }, "[d", "<Plug>(coc-diagnostic-prev)")
+            vim.keymap.set({ "n", "v" }, "]d", "<Plug>(coc-diagnostic-next)")
+
+            -- other coc mappings
+            vim.keymap.set({ "n", "v" }, "gd", "<Plug>(coc-definition)")
+            vim.keymap.set({ "n", "v" }, "gi", "<Plug>(coc-implementation)")
+            vim.keymap.set({ "n", "v" }, "gl", "<Plug>(coc-codelense-action)")
+            vim.keymap.set({ "n", "v" }, "gr", "<Plug>(coc-references)")
+            vim.keymap.set({ "n", "v" }, "gy", "<Plug>(coc-type-definition)")
+
+            vim.keymap.set({ "n", "v" }, "<leader>qf", "<Plug>(coc-fix-current)")
+
+            -- navigate git things
+            vim.keymap.set({ "n", "v" }, "[g", "<Plug>(coc-git-prevchunk)")
+            vim.keymap.set({ "n", "v" }, "]g", "<Plug>(coc-git-nextchunk)")
+            vim.keymap.set({ "n", "v" }, "go", "<Plug>(coc-git-commit)")
+            vim.keymap.set({ "n", "v" }, "gs", "<Plug>(coc-git-chunkinfo)")
+
+            -- documentation
+            local function show_documentation()
+                local filetype = vim.bo.filetype
+                if filetype == "vim" or filetype == "help" then
+                    vim.cmd("h " .. vim.fn.expand("<cword>"))
+                else
+                    vim.call("CocAction", "doHover")
+                end
+            end
+            vim.keymap.set({ "n", "v" }, "K", show_documentation)
         end,
     },
     { -- rust
@@ -348,64 +418,6 @@ vim.keymap.set({ "n", "v" }, "<leader>bd", function()
 end)
 
 -- Plugin Mappings
-
--- coc
-local opts = { silent = true, noremap = true, expr = true, replace_keycodes = false }
-vim.keymap.set(
-    "i",
-    "<TAB>",
-    'coc#pum#visible() ? coc#pum#next(1) : v:lua.check_back_space() ? "<TAB>" : coc#refresh()',
-    opts
-)
-vim.keymap.set("i", "<S-TAB>", [[coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"]], opts)
-
--- Make <CR> to accept selected completion item or notify coc.nvim to format
--- <C-g>u breaks current undo, please make your own choice
-vim.keymap.set(
-    "i",
-    "<cr>",
-    [[coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"]],
-    opts
-)
-
--- Use <c-j> to trigger snippets
-vim.keymap.set("i", "<C-j>", "<Plug>(coc-snippets-expand-jump)")
--- Use <c-space> to trigger completion
-vim.keymap.set("i", "<C-space>", "coc#refresh()", { silent = true, expr = true })
-
-vim.keymap.set({ "n", "v" }, "<leader>ll", "<cmd>CocList lists<cr>")
-vim.keymap.set({ "n", "v" }, "<leader>lc", "<cmd>CocList commands<cr>")
-vim.keymap.set({ "n", "v" }, "<leader>lb", "<cmd>CocList --top buffers<cr>")
-vim.keymap.set({ "n", "v" }, "<leader>ly", "<cmd>CocList --A --normal yank<cr>")
-vim.keymap.set({ "n", "v" }, "<leader>qf", "<Plug>(coc-fix-current)")
-
--- navigate diagnostics
-vim.keymap.set({ "n", "v" }, "[d", "<Plug>(coc-diagnostic-prev)")
-vim.keymap.set({ "n", "v" }, "]d", "<Plug>(coc-diagnostic-next)")
-
--- other coc mappings
-vim.keymap.set({ "n", "v" }, "gd", "<Plug>(coc-definition)")
-vim.keymap.set({ "n", "v" }, "gi", "<Plug>(coc-implementation)")
-vim.keymap.set({ "n", "v" }, "gl", "<Plug>(coc-codelense-action)")
-vim.keymap.set({ "n", "v" }, "gr", "<Plug>(coc-references)")
-vim.keymap.set({ "n", "v" }, "gy", "<Plug>(coc-type-definition)")
-
--- navigate git things
-vim.keymap.set({ "n", "v" }, "[g", "<Plug>(coc-git-prevchunk)")
-vim.keymap.set({ "n", "v" }, "]g", "<Plug>(coc-git-nextchunk)")
-vim.keymap.set({ "n", "v" }, "go", "<Plug>(coc-git-commit)")
-vim.keymap.set({ "n", "v" }, "gs", "<Plug>(coc-git-chunkinfo)")
-
--- documentation
-local function show_documentation()
-    local filetype = vim.bo.filetype
-    if filetype == "vim" or filetype == "help" then
-        vim.cmd("h " .. vim.fn.expand("<cword>"))
-    else
-        vim.call("CocAction", "doHover")
-    end
-end
-vim.keymap.set({ "n", "v" }, "K", show_documentation)
 
 -- Command
 vim.api.nvim_create_user_command("Q", "qall", {})
