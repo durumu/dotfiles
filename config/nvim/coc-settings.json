@@ -2,4 +2,5 @@
     "clangd.fallbackFlags": [ "-std=c++2a" ],
     "inlayHint.enable": false,
     "Lua.diagnostics.globals": ["vim"],
+    "rust-analyzer.trace.server": "verbose"
 }

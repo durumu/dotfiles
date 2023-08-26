@@ -22,37 +22,29 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     -- Essential
-    -- { --colorscheme
-    --     "folke/tokyonight.nvim",
-    --     lazy = false,
-    --     priority = 1000, -- load before other plugins
-    --     config = function()
-    --         require("tokyonight").setup({
-    --             style = "moon", -- bg=dark
-    --             light_style = "day", -- bg=light
-    --             styles = {
-    --                 -- Style to be applied to different syntax groups
-    --                 -- Value is any valid attr-list value for `:help nvim_set_hl`
-    --                 comments = { italic = true },
-    --                 keywords = { italic = false },
-    --                 functions = {},
-    --                 variables = {},
-    --                 -- Background styles. Can be "dark", "transparent" or "normal"
-    --                 sidebars = "dark", -- style for sidebars, see below
-    --                 floats = "dark", -- style for floating windows
-    --             },
-    --             sidebars = { "qf", "help", "terminal" }, -- darker background on sidebars
-    --             lualine_bold = true, -- section headers in the lualine theme will be bold
-    --         })
-    --         vim.cmd([[colorscheme tokyonight]])
-    --     end,
-    -- },
-    { -- colorscheme
-        "navarasu/onedark.nvim",
+    { --colorscheme
+        "folke/tokyonight.nvim",
         lazy = false,
-        priority = 1000,
+        priority = 1000, -- load before other plugins
         config = function()
-            vim.cmd([[colorscheme onedark]])
+            require("tokyonight").setup({
+                style = "moon", -- bg=dark
+                light_style = "day", -- bg=light
+                styles = {
+                    -- Style to be applied to different syntax groups
+                    -- Value is any valid attr-list value for `:help nvim_set_hl`
+                    comments = { italic = true },
+                    keywords = { italic = false },
+                    functions = {},
+                    variables = {},
+                    -- Background styles. Can be "dark", "transparent" or "normal"
+                    sidebars = "dark", -- style for sidebars, see below
+                    floats = "dark", -- style for floating windows
+                },
+                sidebars = { "qf", "help", "terminal" }, -- darker background on sidebars
+                lualine_bold = true, -- section headers in the lualine theme will be bold
+            })
+            vim.cmd([[colorscheme tokyonight]])
         end,
     },
     { -- powerline
@@ -77,7 +69,6 @@ require("lazy").setup({
         lazy = false,
         config = function()
             vim.g.webdevicons_enable_startify = 1
-            vim.g.startify_enable_special = 0
             vim.g.startify_session_autoload = 1
             vim.g.startify_session_delete_buffers = 1
             vim.g.startify_change_to_dir = 0
