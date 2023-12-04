@@ -5,7 +5,7 @@ export LANG=en_US.UTF-8
 export EDITOR=/opt/homebrew/bin/nvim
 export SHELL=/bin/zsh
 
-export PATH="/opt/homebrew/opt/libpq/bin:/usr/local/texlive/2023/bin/universal-darwin:$PATH"
+export PATH="/opt/homebrew/opt/libpq/bin:/usr/local/texlive/2023/bin/universal-darwin:/Users/presley/.local/bin:$PATH"
 export LIBRARY_PATH="$LIBRARY_PATH:/opt/homebrew/lib"
 
 export OPENAI_API_KEY=$(cat ~/.secret/openai.key)
@@ -29,3 +29,11 @@ PROMPT='%B%F{blue}%2~%f ${vcs_info_msg_0_}%F{blue}%(!.#.>)%f %b'
 
 [ -f ~/.aliases ] && source ~/.aliases
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Unlimited history!
+HISTSIZE=10000000
+SAVEHIST=10000000
+# Overwrite duplicate commands
+setopt hist_ignore_all_dups
+# Do not record commands that start with a space in history
+setopt hist_ignore_space

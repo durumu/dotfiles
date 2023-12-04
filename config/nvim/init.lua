@@ -161,7 +161,7 @@ require("lazy").setup({
         "nvim-tree/nvim-tree.lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         keys = {
-            { "<leader>ft", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree", mode = { "n", "v" } },
+            { "<leader>e", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree", mode = { "n", "v" } },
         },
         config = function()
             require("nvim-tree").setup({
@@ -171,6 +171,14 @@ require("lazy").setup({
                 },
                 filters = {
                     dotfiles = false,
+                },
+                actions = {
+                    open_file = {
+                        quit_on_open = true,
+                    },
+                },
+                update_focused_file = {
+                    enable = true,
                 },
             })
         end,
