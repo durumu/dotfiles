@@ -31,6 +31,7 @@ PROMPT='%B%F{blue}%2~%f ${vcs_info_msg_0_}%F{blue}%(!.#.>)%f %b'
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Unlimited history!
+HISTFILE=~/.zsh_history
 HISTSIZE=10000000
 SAVEHIST=10000000
 # Overwrite duplicate commands
