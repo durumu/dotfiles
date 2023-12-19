@@ -296,20 +296,6 @@ require("lazy").setup({
             vim.g["clang_format#auto_formatexpr"] = 0
         end,
     },
-    { -- python
-        "psf/black",
-        ft = { "python" },
-        branch = "stable",
-        config = function()
-            vim.g.black_virtualenv = "~/tools/venvs/main"
-            vim.api.nvim_create_autocmd({ "BufWritePre" }, {
-                pattern = { "*.py" },
-                callback = function()
-                    vim.cmd([[Black]])
-                end,
-            })
-        end,
-    },
     { -- lua
         "ckipp01/stylua-nvim",
         ft = { "lua" },
