@@ -2,10 +2,11 @@
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
-vim.g.python3_host_prog = "~/tools/venvs/main/bin/python"
+vim.g.python3_host_prog = "/Users/presley/tools/venvs/main/bin/python3"
 vim.g.python_version = 311
 
 vim.g.mapleader = " "
+
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -102,30 +103,198 @@ require("lazy").setup({
     { -- <C-a> and <C-x> for dates
         "tpope/vim-speeddating",
     },
-
-    -- Text objects
-    { -- if/af
-        "kana/vim-textobj-function",
-        dependencies = { "kana/vim-textobj-user" },
-    },
-    { -- ie/ae
+    { -- text objects - ie/ae
         "kana/vim-textobj-entire",
         dependencies = { "kana/vim-textobj-user" },
     },
-    { -- i,/a,
-        "sgur/vim-textobj-parameter",
-        dependencies = { "kana/vim-textobj-user" },
+
+    -- Treesitter
+    {
+        "nvim-treesitter/nvim-treesitter",
+        build = ":TSUpdate",
     },
-    { -- iv/av
-        "julian/vim-textobj-variable-segment",
-        dependencies = { "kana/vim-textobj-user" },
+    {
+        "nvim-treesitter/nvim-treesitter-textobjects",
+        dependencies = { "nvim-treesitter/nvim-treesitter" },
+        config = function()
+            require("nvim-treesitter.configs").setup({
+                modules = {},
+                sync_install = false,
+                ensure_installed = "all",
+                auto_install = true,
+                ignore_install = {},
+                highlight = { enable = true },
+                indent = { enable = true },
+                textobjects = {
+                    select = {
+                        enable = true,
+                        keymaps = {
+                            ["i,"] = "@parameter.inner",
+                            ["a,"] = "@parameter.outer",
+                            ["ic"] = "@comment.inner",
+                            ["ac"] = "@comment.outer",
+                            ["if"] = "@function.inner",
+                            ["af"] = "@function.outer",
+                            ["il"] = "@class.inner",
+                            ["al"] = "@class.outer",
+                            ["ix"] = "@call.inner",
+                            ["ax"] = "@call.outer",
+                        },
+                    },
+                },
+            })
+        end,
     },
-    { -- ic/ac
-        "glts/vim-textobj-comment",
-        dependencies = { "kana/vim-textobj-user" },
+    {
+        "neovim/nvim-lspconfig",
+        config = function()
+            local opts = { noremap = true, silent = true }
+            vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
+            vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
+
+            local format_augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+
+            local on_attach = function(_, bufnr)
+                -- Enable completion
+                vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+
+                local bufopts = { noremap = true, silent = true, buffer = bufnr }
+
+                vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
+                vim.keymap.set("n", "gs", vim.lsp.buf.signature_help, bufopts)
+                vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
+                vim.keymap.set("n", "gn", vim.lsp.buf.rename, bufopts)
+                vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts)
+                vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, bufopts)
+
+                vim.api.nvim_create_autocmd("BufWritePre", {
+                    group = format_augroup,
+                    buffer = bufnr,
+                    callback = function()
+                        vim.lsp.buf.format()
+                    end,
+                })
+            end
+
+            local lsp = require("lspconfig")
+
+            lsp.pyright.setup({
+                cmd = { "/Users/presley/tools/venvs/main/bin/pyright-langserver", "--stdio" },
+                on_attach = on_attach,
+                settings = {
+                    python = {
+                        pythonPath = vim.g.python3_host_prog,
+                        analysis = {
+                            diagnosticMode = "openFilesOnly",
+                        },
+                    },
+                },
+            })
+
+            lsp.ruff_lsp.setup({
+                cmd = { "/Users/presley/tools/venvs/main/bin/ruff-lsp" },
+                on_attach = function(client, bufnr)
+                    -- Disable hover in favor of Pyright
+                    client.server_capabilities.hoverProvider = false
+                    -- Add a ruff autofix
+                    -- vim.api.nvim_create_user_command("T", ..., {})
+                    vim.api.nvim_clear_autocmds({ group = format_augroup, buffer = bufnr })
+                    on_attach(client, bufnr)
+
+                    -- Automatically organize imports on save
+                    vim.api.nvim_create_autocmd("BufWritePre", {
+                        group = format_augroup,
+                        buffer = bufnr,
+                        callback = function()
+                            vim.lsp.buf.code_action({
+                                filter = function(code_action)
+                                    -- kind of a hack, but idk how to do this better
+                                    return code_action.title == "Ruff: Organize Imports"
+                                end,
+                                apply = true,
+                            })
+                        end,
+                    })
+                end,
+            })
+
+            lsp.rust_analyzer.setup({
+                settings = { ["rust-analyzer"] = { trace = { server = "verbose" } } },
+                on_attach = on_attach,
+            })
+
+            lsp.clangd.setup({
+                settings = { fallbackFlags = { "-std=c++2a" } },
+                on_attach = on_attach,
+            })
+
+            -- This setup is intended for neovim plugins
+            lsp.lua_ls.setup({
+                settings = {
+                    Lua = {
+                        -- Neovim uses LuaJIT
+                        format = { enable = false },
+                        runtime = { version = "LuaJIT" },
+                        workspace = {
+                            -- Make the server aware of Neovim runtime files
+                            library = vim.api.nvim_get_runtime_file("", true),
+                        },
+                        diagnostics = { globals = { "vim" } },
+                    },
+                },
+                on_attach = on_attach,
+            })
+        end,
     },
 
-    -- Projects
+    -- Autocomplete
+    {
+        "hrsh7th/nvim-cmp",
+        dependencies = {
+            "hrsh7th/cmp-nvim-lsp",
+            "hrsh7th/cmp-buffer",
+            "hrsh7th/cmp-path",
+            "hrsh7th/cmp-cmdline",
+            "hrsh7th/cmp-vsnip",
+            "hrsh7th/vim-vsnip",
+        },
+        config = function()
+            -- vim.keymap.set({ "i" }, "<Tab>", function()
+            --     if vim.fn.pumvisible() == 1 then
+            --         return vim.api.nvim_replace_termcodes("<C-n>", true, true, true)
+            --     else
+            --         return vim.api.nvim_replace_termcodes("<TAB>", true, true, true)
+            --     end
+            -- end)
+            --
+            -- vim.keymap.set({ "i" }, "<S-Tab>", function()
+            --     if vim.fn.pumvisible() == 1 then
+            --         return vim.api.nvim_replace_termcodes("<C-p>", true, true, true)
+            --     else
+            --         return vim.api.nvim_replace_termcodes("<C-h>", true, true, true)
+            --     end
+            -- end)
+            --
+            local cmp = require("cmp")
+            cmp.setup({
+                snippet = {
+                    expand = function(args)
+                        vim.fn["vsnip#anonymous"](args.body)
+                    end,
+                },
+                mapping = cmp.mapping.preset.insert({
+                    ["<CR>"] = cmp.mapping.confirm({ select = true }),
+                }),
+                sources = cmp.config.sources({
+                    { name = "nvim_lsp" },
+                    { name = "vsnip" },
+                    { name = "buffer" },
+                }),
+            })
+        end,
+    },
+
+    -- Project Navigation
     {
         "ibhagwan/fzf-lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -184,100 +353,7 @@ require("lazy").setup({
         end,
     },
 
-    -- Programming
-    {
-        "neoclide/coc.nvim",
-        branch = "release",
-        lazy = false,
-        config = function()
-            vim.g.coc_node_path = "/opt/homebrew/bin/node"
-            vim.g.coc_global_extensions = {
-                "coc-clangd",
-                "coc-explorer",
-                "coc-git",
-                "coc-json",
-                "coc-lists",
-                "coc-lua",
-                "coc-marketplace",
-                "coc-pairs",
-                "coc-pyright",
-                "coc-rust-analyzer",
-                "coc-yank",
-            }
-
-            -- Some servers have issues with backup files, see #649
-            vim.opt.backup = false
-            vim.opt.writebackup = false
-
-            -- Having longer updatetime (default is 4000 ms = 4s) leads to noticeable
-            -- delays and poor user experience
-            vim.opt.updatetime = 300
-
-            -- Always show the signcolumn, otherwise it would shift the text each time
-            -- diagnostics appeared/became resolved
-            vim.opt.signcolumn = "yes"
-
-            -- mappings
-            local opts = { silent = true, noremap = true, expr = true, replace_keycodes = false }
-            function _G.check_back_space()
-                local col = vim.fn.col(".") - 1
-                return col == 0 or vim.fn.getline("."):sub(col, col):match("%s") ~= nil
-            end
-
-            vim.keymap.set(
-                "i",
-                "<TAB>",
-                [[coc#pum#visible() ? coc#pum#next(1) : v:lua._G.check_back_space() ? "<TAB>" : coc#refresh()]],
-                opts
-            )
-            vim.keymap.set("i", "<S-TAB>", [[coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"]], opts)
-
-            -- Make <CR> to accept selected completion item or notify coc.nvim to format
-            -- <C-g>u breaks current undo, please make your own choice
-            vim.keymap.set(
-                "i",
-                "<cr>",
-                [[coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"]],
-                opts
-            )
-
-            -- lists
-            vim.keymap.set({ "n", "v" }, "<leader>ll", "<cmd>CocList lists<cr>")
-            vim.keymap.set({ "n", "v" }, "<leader>lc", "<cmd>CocList commands<cr>")
-            vim.keymap.set({ "n", "v" }, "<leader>lb", "<cmd>CocList --top buffers<cr>")
-            vim.keymap.set({ "n", "v" }, "<leader>ly", "<cmd>CocList --A --normal yank<cr>")
-
-            -- navigate diagnostics
-            vim.keymap.set({ "n", "v" }, "[d", "<Plug>(coc-diagnostic-prev)")
-            vim.keymap.set({ "n", "v" }, "]d", "<Plug>(coc-diagnostic-next)")
-
-            -- other coc mappings
-            vim.keymap.set({ "n", "v" }, "gd", "<Plug>(coc-definition)")
-            vim.keymap.set({ "n", "v" }, "gi", "<Plug>(coc-implementation)")
-            vim.keymap.set({ "n", "v" }, "gl", "<Plug>(coc-codelense-action)")
-            vim.keymap.set({ "n", "v" }, "gr", "<Plug>(coc-references)")
-            vim.keymap.set({ "n", "v" }, "gy", "<Plug>(coc-type-definition)")
-
-            vim.keymap.set({ "n", "v" }, "<leader>qf", "<Plug>(coc-fix-current)")
-
-            -- navigate git things
-            vim.keymap.set({ "n", "v" }, "[g", "<Plug>(coc-git-prevchunk)")
-            vim.keymap.set({ "n", "v" }, "]g", "<Plug>(coc-git-nextchunk)")
-            vim.keymap.set({ "n", "v" }, "go", "<Plug>(coc-git-commit)")
-            vim.keymap.set({ "n", "v" }, "gs", "<Plug>(coc-git-chunkinfo)")
-
-            -- documentation
-            local function show_documentation()
-                local filetype = vim.bo.filetype
-                if filetype == "vim" or filetype == "help" then
-                    vim.cmd("h " .. vim.fn.expand("<cword>"))
-                else
-                    vim.call("CocAction", "doHover")
-                end
-            end
-            vim.keymap.set({ "n", "v" }, "K", show_documentation)
-        end,
-    },
+    -- Autoformat
     { -- rust
         "rust-lang/rust.vim",
         ft = { "rust" },
@@ -285,22 +361,13 @@ require("lazy").setup({
             vim.g.rustfmt_autosave = 1
         end,
     },
-
-    -- Autoformat
-    { -- c++
-        "rhysd/vim-clang-format",
-        ft = { "c", "cpp" },
-        config = function()
-            vim.g["clang_format#auto_format_on_insert_leave"] = 0
-            vim.g["clang_format#auto_format"] = 1
-            vim.g["clang_format#auto_formatexpr"] = 0
-        end,
-    },
     { -- lua
         "ckipp01/stylua-nvim",
         ft = { "lua" },
         config = function()
-            require("stylua-nvim").setup({ config_file = "~/.dotfiles/config/stylua.toml" })
+            require("stylua-nvim").setup({
+                config_file = "/Users/presley/.dotfiles/config/stylua.toml",
+            })
             vim.api.nvim_create_autocmd({ "BufWritePre" }, {
                 pattern = { "*.lua" },
                 callback = function()
