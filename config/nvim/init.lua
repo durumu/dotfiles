@@ -3,6 +3,7 @@ vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 vim.g.python3_host_prog = "/Users/presley/tools/venvs/main/bin/python3"
+
 vim.g.python_version = 311
 
 vim.g.mapleader = " "
@@ -253,17 +254,27 @@ require("lazy").setup({
 
     -- Autocomplete
     {
+        "zbirenbaum/copilot.lua",
+        event = "InsertEnter",
+        opts = {
+            suggestion = { enabled = false },
+            panel = { enabled = false },
+        },
+    },
+    {
         "hrsh7th/nvim-cmp",
         dependencies = {
             "hrsh7th/cmp-nvim-lsp",
             "hrsh7th/cmp-nvim-lua",
             "hrsh7th/cmp-buffer",
             "hrsh7th/cmp-path",
-            "hrsh7th/cmp-cmdline",
             "L3MON4D3/LuaSnip",
             "saadparwaiz1/cmp_luasnip",
+            "zbirenbaum/copilot-cmp",
         },
         config = function()
+            require("copilot_cmp").setup()
+
             local cmp = require("cmp")
             cmp.setup({
                 snippet = {
@@ -275,12 +286,13 @@ require("lazy").setup({
                     ["<CR>"] = cmp.mapping.confirm({ select = true }),
                 }),
                 sources = cmp.config.sources({
+                    { name = "copilot" },
                     { name = "nvim_lsp" },
                     { name = "luasnip" },
                     { name = "buffer" },
                     { name = "nvim_lua" },
-                    -- { name = "path" },
-                    -- { name = "cmdline" },
+                    { name = "copilot" },
+                    { name = "path" },
                 }),
             })
         end,
@@ -327,9 +339,6 @@ require("lazy").setup({
             fzf.setup({})
         end,
     },
-    -- { -- :G
-    --     "tpope/vim-fugitive",
-    -- },
     { -- git blame window
         "rhysd/git-messenger.vim",
         keys = { "<leader>gm" },
