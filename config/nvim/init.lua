@@ -1,4 +1,4 @@
--- disable netrw
+-- disable netrw (we use nvim-tree instead)
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
@@ -38,6 +38,7 @@ require("lazy").setup({
                     keywords = { italic = false },
                     functions = {},
                     variables = {},
+
                     -- Background styles. Can be "dark", "transparent" or "normal"
                     sidebars = "dark", -- style for sidebars, see below
                     floats = "dark", -- style for floating windows
@@ -45,7 +46,7 @@ require("lazy").setup({
                 sidebars = { "qf", "help", "terminal" }, -- darker background on sidebars
                 lualine_bold = true, -- section headers in the lualine theme will be bold
             })
-            vim.cmd([[colorscheme tokyonight]])
+            vim.cmd.colorscheme("tokyonight")
         end,
     },
     { -- powerline
@@ -86,22 +87,24 @@ require("lazy").setup({
     -- General Editing
     { -- make . work with other tpope plugins
         "tpope/vim-repeat",
+        keys = { "." },
     },
-    { -- cs/ds/ys
+    {
         "tpope/vim-surround",
+        keys = { "cs", "ds", "ys" },
     },
     { -- gc for line comment, gb for block comment
         "numToStr/Comment.nvim",
-        lazy = false,
-        config = function()
-            require("Comment").setup()
-        end,
+        keys = { { "gc", mode = { "n", "v" } }, { "gb", mode = { "n", "v" } } },
+        opts = {},
     },
     { -- []
         "tpope/vim-unimpaired",
+        keys = { "[", "]" },
     },
-    { -- <C-a> and <C-x> for dates
+    {
         "tpope/vim-speeddating",
+        keys = { "<C-a>", "<C-x>" },
     },
     { -- text objects - ie/ae
         "kana/vim-textobj-entire",
@@ -131,6 +134,8 @@ require("lazy").setup({
                         keymaps = {
                             ["i,"] = "@parameter.inner",
                             ["a,"] = "@parameter.outer",
+                            ["ia"] = "@attribute.inner",
+                            ["aa"] = "@attribute.outer",
                             ["ic"] = "@comment.inner",
                             ["ac"] = "@comment.outer",
                             ["if"] = "@function.inner",
@@ -148,7 +153,7 @@ require("lazy").setup({
     {
         "neovim/nvim-lspconfig",
         config = function()
-            local opts = { noremap = true, silent = true }
+            local opts = { silent = true }
             vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
             vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
 
@@ -158,7 +163,7 @@ require("lazy").setup({
                 -- Enable completion
                 vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
 
-                local bufopts = { noremap = true, silent = true, buffer = bufnr }
+                local bufopts = { silent = true, buffer = bufnr }
 
                 vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
                 vim.keymap.set("n", "gs", vim.lsp.buf.signature_help, bufopts)
@@ -232,9 +237,8 @@ require("lazy").setup({
             lsp.lua_ls.setup({
                 settings = {
                     Lua = {
-                        -- Neovim uses LuaJIT
-                        format = { enable = false },
-                        runtime = { version = "LuaJIT" },
+                        format = { enable = false }, -- I use stylua for formatting
+                        runtime = { version = "LuaJIT" }, -- Neovim uses LuaJIT
                         workspace = {
                             -- Make the server aware of Neovim runtime files
                             library = vim.api.nvim_get_runtime_file("", true),
@@ -252,34 +256,19 @@ require("lazy").setup({
         "hrsh7th/nvim-cmp",
         dependencies = {
             "hrsh7th/cmp-nvim-lsp",
+            "hrsh7th/cmp-nvim-lua",
             "hrsh7th/cmp-buffer",
             "hrsh7th/cmp-path",
             "hrsh7th/cmp-cmdline",
-            "hrsh7th/cmp-vsnip",
-            "hrsh7th/vim-vsnip",
+            "L3MON4D3/LuaSnip",
+            "saadparwaiz1/cmp_luasnip",
         },
         config = function()
-            -- vim.keymap.set({ "i" }, "<Tab>", function()
-            --     if vim.fn.pumvisible() == 1 then
-            --         return vim.api.nvim_replace_termcodes("<C-n>", true, true, true)
-            --     else
-            --         return vim.api.nvim_replace_termcodes("<TAB>", true, true, true)
-            --     end
-            -- end)
-            --
-            -- vim.keymap.set({ "i" }, "<S-Tab>", function()
-            --     if vim.fn.pumvisible() == 1 then
-            --         return vim.api.nvim_replace_termcodes("<C-p>", true, true, true)
-            --     else
-            --         return vim.api.nvim_replace_termcodes("<C-h>", true, true, true)
-            --     end
-            -- end)
-            --
             local cmp = require("cmp")
             cmp.setup({
                 snippet = {
                     expand = function(args)
-                        vim.fn["vsnip#anonymous"](args.body)
+                        require("luasnip").lsp_expand(args.body)
                     end,
                 },
                 mapping = cmp.mapping.preset.insert({
@@ -287,8 +276,11 @@ require("lazy").setup({
                 }),
                 sources = cmp.config.sources({
                     { name = "nvim_lsp" },
-                    { name = "vsnip" },
+                    { name = "luasnip" },
                     { name = "buffer" },
+                    { name = "nvim_lua" },
+                    -- { name = "path" },
+                    -- { name = "cmdline" },
                 }),
             })
         end,
@@ -298,70 +290,76 @@ require("lazy").setup({
     {
         "ibhagwan/fzf-lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },
-        keys = { { "<C-p>", mode = { "n", "v" } }, { "<leader>rg", mode = { "n", "v" } } },
+        lazy = true,
+        keys = {
+            {
+                "<C-p>",
+                mode = { "n", "v" },
+                function()
+                    require("fzf-lua").git_files()
+                end,
+            },
+            { "<leader>rg", mode = { "n", "v" } },
+        },
         cmd = "Rg",
         config = function()
-            vim.keymap.set({ "n", "v" }, "<C-p>", function()
-                require("fzf-lua").git_files()
-            end, { silent = true })
+            local opts = { silent = true }
+            local fzf = require("fzf-lua")
 
             vim.api.nvim_create_user_command("Rg", function(arg)
-                require("fzf-lua").grep({ search = arg.args })
+                fzf.grep({ search = arg.args })
             end, { nargs = "*" })
 
-            vim.keymap.set({ "n" }, "<leader>rg", function()
-                require("fzf-lua").grep()
-            end, { silent = true })
+            vim.keymap.set({ "n" }, "<leader>rg", fzf.grep, opts)
+
+            -- like s.strip() in python
+            local strip = function(s)
+                return (s:gsub("^%s*(.-)%s*$", "%1"))
+            end
+
             vim.keymap.set({ "v" }, "<leader>rg", function()
-                require("fzf-lua").grep({ search = require("fzf-lua").utils.get_visual_selection() })
-            end, { silent = true })
+                fzf.grep({
+                    search = strip(fzf.utils.get_visual_selection()),
+                })
+            end, opts)
 
             -- also, need to install: rg, fd, bat
-            require("fzf-lua").setup({})
+            fzf.setup({})
         end,
     },
-    { -- :G
-        "tpope/vim-fugitive",
-    },
-    { -- :GitMessenger (<space>gm)
+    -- { -- :G
+    --     "tpope/vim-fugitive",
+    -- },
+    { -- git blame window
         "rhysd/git-messenger.vim",
+        keys = { "<leader>gm" },
     },
     { -- file tree
         "nvim-tree/nvim-tree.lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         keys = {
-            { "<leader>e", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree", mode = { "n", "v" } },
+            { "<C-f>", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree", mode = { "n", "v" } },
         },
-        config = function()
-            require("nvim-tree").setup({
-                sort_by = "case_sensitive",
-                view = {
-                    width = 30,
+        opts = {
+            sort_by = "case_sensitive",
+            view = {
+                width = 30,
+            },
+            filters = {
+                dotfiles = false,
+            },
+            actions = {
+                open_file = {
+                    quit_on_open = true,
                 },
-                filters = {
-                    dotfiles = false,
-                },
-                actions = {
-                    open_file = {
-                        quit_on_open = true,
-                    },
-                },
-                update_focused_file = {
-                    enable = true,
-                },
-            })
-        end,
+            },
+            update_focused_file = {
+                enable = true,
+            },
+        },
     },
 
-    -- Autoformat
-    { -- rust
-        "rust-lang/rust.vim",
-        ft = { "rust" },
-        config = function()
-            vim.g.rustfmt_autosave = 1
-        end,
-    },
-    { -- lua
+    { -- autoformat lua
         "ckipp01/stylua-nvim",
         ft = { "lua" },
         config = function()
@@ -377,104 +375,72 @@ require("lazy").setup({
         end,
     },
 
-    -- Productivity
     { -- terminal (<C-\>)
         "akinsho/toggleterm.nvim",
-        config = function()
-            require("toggleterm").setup({ open_mapping = [[<C-\>]] })
-        end,
-    },
-    { -- :Chat
-        "dpayne/CodeGPT.nvim",
-        dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim" },
-        cmd = "Chat",
-        config = function()
-            require("codegpt.config")
-        end,
+        keys = { [[<C-\>]] },
+        opts = { open_mapping = [[<C-\>]] },
     },
 })
 
 -- Editor Config
-vim.cmd([[highlight Comment cterm=italic gui=italic]])
-vim.cmd([[filetype plugin on]])
 
-vim.o.cindent = true
-vim.o.cinoptions = vim.o.cinoptions .. "g2" .. "h2"
-vim.o.expandtab = true
-vim.o.hidden = true
-vim.o.hlsearch = true
-vim.o.ignorecase = true
-vim.o.inccommand = "nosplit"
-vim.o.mouse = "r"
-vim.o.shiftwidth = 4
-vim.o.smartcase = true
-vim.o.smartindent = true
-vim.o.splitbelow = true
-vim.o.splitright = true
-vim.o.tabstop = 4
-vim.o.termguicolors = true
+vim.wo.number = true -- line numbers
+vim.o.smartcase = true -- smart case in searching
+vim.o.splitbelow = true -- :sp puts new window on bottom
+vim.o.splitright = true -- :vs puts new window on right
 vim.o.updatetime = 300
 
-vim.wo.number = true
+-- Add a color column right past the max line length.
+local add_color_column = function()
+    local colorcolumn_augroup = vim.api.nvim_create_augroup("SetColorColumn", { clear = true })
 
--- dark grey column right past max line length
-vim.cmd([[highlight ColorColumn ctermbg=darkgrey]])
+    -- Table of file types to max line length
+    local max_line_length = {
+        lua = 100, -- stylua
+        python = 88, -- black/ruff
+        c = 80,
+        cpp = 80, -- clangd
+        rust = 100, -- rustfmt
+    }
 
-vim.api.nvim_exec(
-    [[
-  augroup SetColorColumn
-      autocmd!
-      autocmd FileType lua setlocal colorcolumn=101
-      autocmd FileType python setlocal colorcolumn=89
-      autocmd FileType c,cpp,rust setlocal colorcolumn=81
-  augroup END
-]],
-    false
-)
+    -- Create autocmds for each file type
+    for ft, line_length in pairs(max_line_length) do
+        vim.api.nvim_create_autocmd("FileType", {
+            pattern = ft,
+            command = "setlocal colorcolumn=" .. tostring(line_length + 1),
+            group = colorcolumn_augroup,
+        })
+    end
+end
+add_color_column()
 
 -- Mappings
--- remaps
-vim.keymap.set({ "n", "v" }, "Y", "y$", { noremap = true, silent = true })
-vim.keymap.set({ "n", "v" }, "j", "gj", { noremap = true, silent = true })
-vim.keymap.set({ "n", "v" }, "k", "gk", { noremap = true, silent = true })
-vim.keymap.set({ "n", "v" }, "Q", "q", { noremap = true, silent = true })
-vim.keymap.set({ "n", "v" }, "q", "@q", { noremap = true, silent = true })
+local opts = { silent = true }
 
-vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { noremap = true, silent = true })
-vim.keymap.set({ "n", "v" }, "<leader>Y", '"+y$', { noremap = true, silent = true })
+-- remaps
+vim.keymap.set({ "n", "v" }, "Y", "y$", opts)
+vim.keymap.set({ "n", "v" }, "j", "gj", opts)
+vim.keymap.set({ "n", "v" }, "k", "gk", opts)
+
+vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', opts)
+vim.keymap.set({ "n", "v" }, "<leader>Y", '"+y$', opts)
 
 -- navigation
-vim.keymap.set({ "n", "v" }, "<left>", "<C-w>h", { noremap = true, silent = true })
-vim.keymap.set({ "n", "v" }, "<down>", "<C-w>j", { noremap = true, silent = true })
-vim.keymap.set({ "n", "v" }, "<up>", "<C-w>k", { noremap = true, silent = true })
-vim.keymap.set({ "n", "v" }, "<right>", "<C-w>l", { noremap = true, silent = true })
-vim.keymap.set({ "n", "v" }, "<S-left>", "<C-w>H", { noremap = true, silent = true })
-vim.keymap.set({ "n", "v" }, "<S-down>", "<C-w>J", { noremap = true, silent = true })
-vim.keymap.set({ "n", "v" }, "<S-up>", "<C-w>K", { noremap = true, silent = true })
-vim.keymap.set({ "n", "v" }, "<S-right>", "<C-w>L", { noremap = true, silent = true })
+vim.keymap.set({ "n", "v" }, "<left>", "<C-w>h", opts)
+vim.keymap.set({ "n", "v" }, "<down>", "<C-w>j", opts)
+vim.keymap.set({ "n", "v" }, "<up>", "<C-w>k", opts)
+vim.keymap.set({ "n", "v" }, "<right>", "<C-w>l", opts)
+vim.keymap.set({ "n", "v" }, "<S-left>", "<C-w>H", opts)
+vim.keymap.set({ "n", "v" }, "<S-down>", "<C-w>J", opts)
+vim.keymap.set({ "n", "v" }, "<S-up>", "<C-w>K", opts)
+vim.keymap.set({ "n", "v" }, "<S-right>", "<C-w>L", opts)
 
-vim.keymap.set({ "n", "v" }, "<enter>", "<C-]>", { noremap = true, silent = true })
+vim.keymap.set({ "n", "v" }, "<tab>", vim.cmd.bnext, opts)
+vim.keymap.set({ "n", "v" }, "<S-tab>", vim.cmd.bprevious, opts)
 
-vim.keymap.set({ "n", "v" }, "<tab>", function()
-    vim.cmd([[bnext]])
-end)
-vim.keymap.set({ "n", "v" }, "<S-tab>", function()
-    vim.cmd([[bprevious]])
-end)
+vim.keymap.set({ "n", "v" }, "<enter>", "<C-]>", opts)
 
-vim.keymap.set({ "n", "v" }, "<leader><leader>", function()
-    vim.cmd([[noh]])
-end)
-vim.keymap.set({ "n", "v" }, "<leader>bd", function()
-    vim.cmd([[bd]])
-end)
-
--- Plugin Mappings
-
--- Command
-vim.api.nvim_create_user_command("Q", "qall", {})
-vim.api.nvim_create_user_command("W", "wall", {})
-vim.api.nvim_create_user_command("X", "xall", {})
+vim.keymap.set({ "n", "v" }, "<leader><leader>", vim.cmd.noh, opts)
 
 -- delete trailing whitespace
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
