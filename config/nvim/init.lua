@@ -28,44 +28,37 @@ require("lazy").setup({
         "folke/tokyonight.nvim",
         lazy = false,
         priority = 1000, -- load before other plugins
-        config = function()
-            require("tokyonight").setup({
-                style = "moon", -- bg=dark
-                light_style = "day", -- bg=light
-                styles = {
-                    -- Style to be applied to different syntax groups
-                    -- Value is any valid attr-list value for `:help nvim_set_hl`
-                    comments = { italic = true },
-                    keywords = { italic = false },
-                    functions = {},
-                    variables = {},
+        opts = {
+            style = "moon", -- bg=dark
+            light_style = "day", -- bg=light
+            styles = {
+                -- Style to be applied to different syntax groups
+                -- Value is any valid attr-list value for `:help nvim_set_hl`
+                keywords = { italic = false },
 
-                    -- Background styles. Can be "dark", "transparent" or "normal"
-                    sidebars = "dark", -- style for sidebars, see below
-                    floats = "dark", -- style for floating windows
-                },
-                sidebars = { "qf", "help", "terminal" }, -- darker background on sidebars
-                lualine_bold = true, -- section headers in the lualine theme will be bold
-            })
-            vim.cmd.colorscheme("tokyonight")
-        end,
+                -- Background styles. Can be "dark", "transparent" or "normal"
+                sidebars = "dark", -- style for sidebars, see below
+                floats = "dark", -- style for floating windows
+            },
+            sidebars = { "qf", "help", "terminal" }, -- darker background on sidebars
+            lualine_bold = true, -- section headers in the lualine theme will be bold
+        },
     },
     { -- powerline
         "nvim-lualine/lualine.nvim",
         lazy = false,
         dependencies = { "nvim-tree/nvim-web-devicons" },
-        config = function()
-            require("lualine").setup({
-                options = {
-                    component_separators = { left = "│", right = "│" }, -- \u2502
-                    section_separators = { left = "", right = "" },
-                },
-                sections = { lualine_c = { { "filename", path = 1 } } },
-                inactive_sections = { lualine_c = { { "filename", path = 1 } } },
-                tabline = { lualine_a = { "buffers" } },
-                extensions = { "lazy" },
-            })
-        end,
+        opts = {
+            theme = "tokyonight",
+            options = {
+                component_separators = { left = "│", right = "│" }, -- \u2502
+                section_separators = { left = "", right = "" },
+            },
+            sections = { lualine_c = { { "filename", path = 1 } } },
+            inactive_sections = { lualine_c = { { "filename", path = 1 } } },
+            tabline = { lualine_a = { "buffers" } },
+            extensions = { "lazy" },
+        },
     },
     { -- start page
         "mhinz/vim-startify",
@@ -86,32 +79,25 @@ require("lazy").setup({
     },
 
     -- General Editing
-    { -- make . work with other tpope plugins
-        "tpope/vim-repeat",
-        keys = { "." },
-    },
     {
-        "tpope/vim-surround",
-        keys = { "cs", "ds", "ys" },
-    },
-    { -- gc for line comment, gb for block comment
-        "numToStr/Comment.nvim",
-        keys = { { "gc", mode = { "n", "v" } }, { "gb", mode = { "n", "v" } } },
-        opts = {},
-    },
-    { -- []
-        "tpope/vim-unimpaired",
-        keys = { "[", "]" },
-    },
-    {
-        "tpope/vim-speeddating",
-        keys = { "<C-a>", "<C-x>" },
-    },
-    { -- text objects - ie/ae
-        "kana/vim-textobj-entire",
-        dependencies = { "kana/vim-textobj-user" },
-    },
+        "echasnovski/mini.nvim",
+        config = function()
+            require("mini.basics").setup()
+            require("mini.bracketed").setup()
+            require("mini.comment").setup()
+            require("mini.cursorword").setup()
+            require("mini.trailspace").setup()
 
+            vim.api.nvim_create_autocmd("BufWritePre", {
+                desc = "Delete trailing whitespace on save",
+                callback = require("mini.trailspace").trim,
+            })
+        end,
+    },
+    {
+        "kylechui/nvim-surround",
+        event = "VeryLazy",
+    },
     -- Treesitter
     {
         "nvim-treesitter/nvim-treesitter",
@@ -154,10 +140,6 @@ require("lazy").setup({
     {
         "neovim/nvim-lspconfig",
         config = function()
-            local opts = { silent = true }
-            vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
-            vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
-
             local format_augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
             local on_attach = function(_, bufnr)
@@ -174,6 +156,7 @@ require("lazy").setup({
                 vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, bufopts)
 
                 vim.api.nvim_create_autocmd("BufWritePre", {
+                    desc = "Format on save",
                     group = format_augroup,
                     buffer = bufnr,
                     callback = function()
@@ -202,25 +185,32 @@ require("lazy").setup({
                 on_attach = function(client, bufnr)
                     -- Disable hover in favor of Pyright
                     client.server_capabilities.hoverProvider = false
-                    -- Add a ruff autofix
-                    -- vim.api.nvim_create_user_command("T", ..., {})
+
                     vim.api.nvim_clear_autocmds({ group = format_augroup, buffer = bufnr })
+
                     on_attach(client, bufnr)
 
-                    -- Automatically organize imports on save
+                    local perform_code_action_titled = function(title)
+                        vim.lsp.buf.code_action({
+                            filter = function(code_action)
+                                return code_action.title == title
+                            end,
+                            apply = true,
+                        })
+                    end
+
                     vim.api.nvim_create_autocmd("BufWritePre", {
+                        desc = "Automatically organize imports on save",
                         group = format_augroup,
                         buffer = bufnr,
                         callback = function()
-                            vim.lsp.buf.code_action({
-                                filter = function(code_action)
-                                    -- kind of a hack, but idk how to do this better
-                                    return code_action.title == "Ruff: Organize Imports"
-                                end,
-                                apply = true,
-                            })
+                            perform_code_action_titled("Ruff: Organize Imports")
                         end,
                     })
+
+                    vim.api.nvim_create_user_command("T", function()
+                        perform_code_action_titled("Ruff: Fix All")
+                    end, { desc = "Fix all" })
                 end,
             })
 
@@ -268,8 +258,6 @@ require("lazy").setup({
             "hrsh7th/cmp-nvim-lua",
             "hrsh7th/cmp-buffer",
             "hrsh7th/cmp-path",
-            "L3MON4D3/LuaSnip",
-            "saadparwaiz1/cmp_luasnip",
             "zbirenbaum/copilot-cmp",
         },
         config = function()
@@ -277,18 +265,12 @@ require("lazy").setup({
 
             local cmp = require("cmp")
             cmp.setup({
-                snippet = {
-                    expand = function(args)
-                        require("luasnip").lsp_expand(args.body)
-                    end,
-                },
                 mapping = cmp.mapping.preset.insert({
                     ["<CR>"] = cmp.mapping.confirm({ select = true }),
                 }),
                 sources = cmp.config.sources({
                     { name = "copilot" },
                     { name = "nvim_lsp" },
-                    { name = "luasnip" },
                     { name = "buffer" },
                     { name = "nvim_lua" },
                     { name = "copilot" },
@@ -339,6 +321,9 @@ require("lazy").setup({
             fzf.setup({})
         end,
     },
+    { -- :G
+        "tpope/vim-fugitive",
+    },
     { -- git blame window
         "rhysd/git-messenger.vim",
         keys = { "<leader>gm" },
@@ -372,14 +357,14 @@ require("lazy").setup({
         "ckipp01/stylua-nvim",
         ft = { "lua" },
         config = function()
-            require("stylua-nvim").setup({
+            local stylua = require("stylua-nvim")
+            stylua.setup({
                 config_file = "/Users/presley/.dotfiles/config/stylua.toml",
             })
             vim.api.nvim_create_autocmd({ "BufWritePre" }, {
-                pattern = { "*.lua" },
-                callback = function()
-                    require("stylua-nvim").format_file()
-                end,
+                desc = "Format file on save",
+                pattern = "*.lua",
+                callback = stylua.format_file,
             })
         end,
     },
@@ -392,45 +377,30 @@ require("lazy").setup({
 })
 
 -- Editor Config
+vim.cmd.colorscheme("tokyonight")
 
-vim.wo.number = true -- line numbers
-vim.o.smartcase = true -- smart case in searching
-vim.o.splitbelow = true -- :sp puts new window on bottom
-vim.o.splitright = true -- :vs puts new window on right
-vim.o.updatetime = 300
-
--- Add a color column right past the max line length.
-local add_color_column = function()
-    local colorcolumn_augroup = vim.api.nvim_create_augroup("SetColorColumn", { clear = true })
-
-    -- Table of file types to max line length
-    local max_line_length = {
-        lua = 100, -- stylua
-        python = 88, -- black/ruff
-        c = 80,
-        cpp = 80, -- clangd
-        rust = 100, -- rustfmt
-    }
-
-    -- Create autocmds for each file type
-    for ft, line_length in pairs(max_line_length) do
-        vim.api.nvim_create_autocmd("FileType", {
-            pattern = ft,
-            command = "setlocal colorcolumn=" .. tostring(line_length + 1),
-            group = colorcolumn_augroup,
-        })
-    end
-end
-add_color_column()
+vim.api.nvim_create_autocmd("FileType", {
+    desc = "Add a color column right past the max line length",
+    pattern = "*",
+    callback = function()
+        local max_line_length = {
+            lua = 100, -- stylua
+            python = 88, -- black/ruff
+            c = 80,
+            cpp = 80, -- clangd
+            rust = 100, -- rustfmt
+        }
+        local line_length = max_line_length[vim.bo.filetype]
+        if line_length then
+            vim.wo.colorcolumn = tostring(line_length + 1)
+        end
+    end,
+})
 
 -- Mappings
 local opts = { silent = true }
 
 -- remaps
-vim.keymap.set({ "n", "v" }, "Y", "y$", opts)
-vim.keymap.set({ "n", "v" }, "j", "gj", opts)
-vim.keymap.set({ "n", "v" }, "k", "gk", opts)
-
 vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', opts)
 vim.keymap.set({ "n", "v" }, "<leader>Y", '"+y$', opts)
 
@@ -450,12 +420,3 @@ vim.keymap.set({ "n", "v" }, "<S-tab>", vim.cmd.bprevious, opts)
 vim.keymap.set({ "n", "v" }, "<enter>", "<C-]>", opts)
 
 vim.keymap.set({ "n", "v" }, "<leader><leader>", vim.cmd.noh, opts)
-
--- delete trailing whitespace
-vim.api.nvim_create_autocmd({ "BufWritePre" }, {
-    callback = function()
-        local current_pos = vim.api.nvim_win_get_cursor(0) -- Save current cursor position
-        vim.api.nvim_command(":%s/\\s\\+$//e")
-        vim.api.nvim_win_set_cursor(0, current_pos) -- Restore cursor position
-    end,
-})
