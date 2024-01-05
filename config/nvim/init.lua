@@ -85,7 +85,7 @@ require("lazy").setup({
             require("mini.basics").setup()
             require("mini.bracketed").setup()
             require("mini.comment").setup()
-            require("mini.cursorword").setup()
+            require("mini.cursorword").setup({ delay = 0 })
             require("mini.trailspace").setup()
 
             vim.api.nvim_create_autocmd("BufWritePre", {
@@ -97,6 +97,7 @@ require("lazy").setup({
     {
         "kylechui/nvim-surround",
         event = "VeryLazy",
+        opts = {},
     },
     -- Treesitter
     {
@@ -286,25 +287,18 @@ require("lazy").setup({
         dependencies = { "nvim-tree/nvim-web-devicons" },
         lazy = true,
         keys = {
-            {
-                "<C-p>",
-                mode = { "n", "v" },
-                function()
-                    require("fzf-lua").git_files()
-                end,
-            },
+            { "<C-p>" },
             { "<leader>rg", mode = { "n", "v" } },
         },
         cmd = "Rg",
         config = function()
-            local opts = { silent = true }
             local fzf = require("fzf-lua")
 
             vim.api.nvim_create_user_command("Rg", function(arg)
-                fzf.grep({ search = arg.args })
+                fzf.live_grep_native({ search = arg.args })
             end, { nargs = "*" })
 
-            vim.keymap.set({ "n" }, "<leader>rg", fzf.grep, opts)
+            vim.keymap.set({ "n" }, "<leader>rg", fzf.live_grep_native, { silent = true })
 
             -- like s.strip() in python
             local strip = function(s)
@@ -312,12 +306,66 @@ require("lazy").setup({
             end
 
             vim.keymap.set({ "v" }, "<leader>rg", function()
-                fzf.grep({
+                fzf.live_grep_native({
                     search = strip(fzf.utils.get_visual_selection()),
                 })
-            end, opts)
+            end, { silent = true })
 
-            -- also, need to install: rg, fd, bat
+            local function get_hash()
+                -- The get_hash() is utilised to create an independent "store"
+                -- By default `fre --add` adds to global history, in order to restrict this to
+                -- current directory we can create a hash which will keep history separate.
+                -- With this in mind, we can also append git branch to make sorting based on
+                -- Current dir + git branch
+                local str = 'echo "dir:' .. vim.fn.getcwd()
+                if vim.b.gitsigns_head then
+                    str = str .. ";git:" .. vim.b.gitsigns_head .. '"'
+                else
+                    str = str .. '"'
+                end
+                local hash = vim.fn.system(str .. " | md5sum | awk '{print $1}'")
+                vim.print(hash)
+                return hash
+            end
+
+            local fre = "fre --store_name " .. get_hash()
+
+            local function fzf_mru(opts)
+                opts = fzf.config.normalize_opts(opts, fzf.config.globals.files)
+                local no_dups = [[awk '!x[$0]++']] -- remove dups, but keep order
+                -- todo: not sure why i need the zsh call here?
+                opts.cmd = [[zsh -c "cat <(]] .. fre .. [[ --sorted) <(rg --files)" | ]] .. no_dups
+
+                opts.fzf_opts = vim.tbl_extend("force", opts.fzf_opts, {
+                    ["--tiebreak"] = "index", -- make sure that items towards top are from history
+                })
+                opts.actions = vim.tbl_extend("force", opts.actions or {}, {
+                    ["ctrl-d"] = {
+                        -- Ctrl-d to remove from history
+                        function(sel)
+                            if #sel < 1 then
+                                return
+                            end
+                            vim.fn.system(fre .. " --delete " .. sel[1])
+                        end,
+                        -- This will refresh the list
+                        fzf.actions.resume,
+                    },
+                })
+
+                fzf.core.fzf_wrap(opts, opts.cmd, function(selected)
+                    if not selected or #selected < 2 then
+                        return
+                    end
+                    vim.fn.system(fre .. " --add " .. selected[2])
+                    fzf.actions.act(opts.actions, selected, opts)
+                end)()
+            end
+
+            vim.api.nvim_create_user_command("FzfMru", fzf_mru, {})
+            vim.keymap.set("n", "<C-p>", fzf_mru, { desc = "Open Files" })
+
+            -- also, need to install: rg, fre - maybe
             fzf.setup({})
         end,
     },
@@ -326,13 +374,14 @@ require("lazy").setup({
     },
     { -- git blame window
         "rhysd/git-messenger.vim",
-        keys = { "<leader>gm" },
+        keys = { { "<leader>gm", vim.cmd.GitMessenger } },
+        cmd = "GitMessenger",
     },
     { -- file tree
         "nvim-tree/nvim-tree.lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         keys = {
-            { "<C-f>", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree", mode = { "n", "v" } },
+            { "<C-f>", vim.cmd.NvimTreeToggle, desc = "NvimTree", mode = { "n", "v" } },
         },
         opts = {
             sort_by = "case_sensitive",
