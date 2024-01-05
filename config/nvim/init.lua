@@ -3,10 +3,9 @@ vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 vim.g.python3_host_prog = "/Users/presley/tools/venvs/main/bin/python3"
-
 vim.g.python_version = 311
 
-vim.g.mapleader = " "
+vim.g.mapleader = " " -- before everything else
 
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -28,17 +27,20 @@ require("lazy").setup({
         "folke/tokyonight.nvim",
         lazy = false,
         priority = 1000, -- load before other plugins
-        opts = {
-            style = "moon", -- bg=dark
-            light_style = "day", -- bg=light
-            styles = {
-                -- Style to be applied to different syntax groups
-                -- Value is any valid attr-list value for `:help nvim_set_hl`
-                keywords = { italic = false },
-            },
-            sidebars = { "qf", "help", "terminal" }, -- darker background on sidebars
-            lualine_bold = true, -- bold tab headers in the lualine theme
-        },
+        config = function()
+            require("tokyonight").setup({
+                style = "moon", -- bg=dark
+                light_style = "day", -- bg=light
+                styles = {
+                    -- Style to be applied to different syntax groups
+                    -- Value is any valid attr-list value for `:help nvim_set_hl`
+                    keywords = { italic = false },
+                },
+                sidebars = { "qf", "help", "terminal" }, -- darker background on sidebars
+                lualine_bold = true, -- bold tab headers in the lualine theme
+            })
+            vim.cmd.colorscheme("tokyonight")
+        end,
     },
     { -- powerline
         "nvim-lualine/lualine.nvim",
@@ -75,34 +77,38 @@ require("lazy").setup({
     },
 
     -- General Editing
-    {
-        "echasnovski/mini.nvim",
+    { "echasnovski/mini.cursorword", event = "VeryLazy", opts = { delay = 0 } },
+    { -- highlight and delete trailing whitespace
+        "echasnovski/mini.trailspace",
+        event = "VeryLazy",
         config = function()
-            require("mini.basics").setup()
-            require("mini.bracketed").setup()
-            require("mini.comment").setup()
-            require("mini.cursorword").setup({ delay = 0 })
-            require("mini.trailspace").setup()
+            local trailspace = require("mini.trailspace")
+            trailspace.setup()
 
-            vim.api.nvim_create_autocmd("BufWritePre", {
-                desc = "Delete trailing whitespace on save",
-                callback = require("mini.trailspace").trim,
-            })
+            vim.api.nvim_create_autocmd(
+                "BufWritePre",
+                { desc = "Delete trailing whitespace on save", callback = trailspace.trim }
+            )
         end,
     },
-    "tpope/vim-sleuth", -- autodetect shiftwidth/expandtab etc
-    { "kylechui/nvim-surround", opts = {} }, -- cs/ds/ys
-    { "folke/which-key.nvim", opts = {} }, -- show pending keybinds.
 
-    -- Treesitter
+    { -- autodetect shiftwidth/expandtab etc. must run before other plugins
+        "tpope/vim-sleuth",
+        priority = 1000,
+    },
+    { "tpope/vim-surround", event = "VeryLazy" }, -- cs/ds/ys
+    { "tpope/vim-unimpaired", event = "VeryLazy" }, -- []
+    { "tpope/vim-commentary", event = "VeryLazy" }, -- gc
+    { "tpope/vim-repeat", event = "VeryLazy" }, -- .
+
+    { "folke/which-key.nvim", event = "VeryLazy", opts = {} }, -- show pending keybinds.
+
+    -- Code
     {
         "nvim-treesitter/nvim-treesitter",
-        build = ":TSUpdate",
-    },
-    {
-        "nvim-treesitter/nvim-treesitter-textobjects",
-        dependencies = { "nvim-treesitter/nvim-treesitter" },
         event = "VeryLazy",
+        dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
+        build = ":TSUpdate",
         config = function()
             require("nvim-treesitter.configs").setup({
                 modules = {},
@@ -134,13 +140,10 @@ require("lazy").setup({
             })
         end,
     },
-
     {
         "neovim/nvim-lspconfig",
         event = "VeryLazy",
         config = function()
-            local format_augroup = vim.api.nvim_create_augroup("LspFormatting", {})
-
             -- [[ Configure LSP ]]
             -- from https://github.com/nvim-lua/kickstart.nvim/blob/master/init.lua
             --  This function gets run when an LSP connects to a particular buffer.
@@ -171,15 +174,6 @@ require("lazy").setup({
 
                 -- Lesser used LSP functionality
                 nmap("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
-
-                vim.api.nvim_create_autocmd("BufWritePre", {
-                    desc = "Format on save",
-                    group = format_augroup,
-                    buffer = bufnr,
-                    callback = function()
-                        vim.lsp.buf.format()
-                    end,
-                })
             end
 
             -- document existing key chains
@@ -215,13 +209,14 @@ require("lazy").setup({
                 },
             })
 
+            local organize_augroup = "organize_imports"
             lsp.ruff_lsp.setup({
                 cmd = { "/Users/presley/tools/venvs/main/bin/ruff-lsp" },
                 on_attach = function(client, bufnr)
                     -- Disable hover in favor of Pyright
                     client.server_capabilities.hoverProvider = false
 
-                    vim.api.nvim_clear_autocmds({ group = format_augroup, buffer = bufnr })
+                    vim.api.nvim_clear_autocmds({ group = organize_augroup, buffer = bufnr })
 
                     on_attach(client, bufnr)
 
@@ -236,7 +231,7 @@ require("lazy").setup({
 
                     vim.api.nvim_create_autocmd("BufWritePre", {
                         desc = "Automatically organize imports on save",
-                        group = format_augroup,
+                        group = organize_augroup,
                         buffer = bufnr,
                         callback = function()
                             perform_code_action_titled("Ruff: Organize Imports")
@@ -263,7 +258,7 @@ require("lazy").setup({
             lsp.lua_ls.setup({
                 settings = {
                     Lua = {
-                        format = { enable = false }, -- I use stylua for formatting
+                        format = { enable = false }, -- I use stylua
                         runtime = { version = "LuaJIT" }, -- Neovim uses LuaJIT
                         workspace = {
                             -- Make the server aware of Neovim runtime files
@@ -278,7 +273,21 @@ require("lazy").setup({
             })
         end,
     },
+    {
+        "stevearc/conform.nvim",
+        event = "VeryLazy",
+        config = function()
+            local conform = require("conform")
 
+            conform.setup({
+                format_on_save = { timeout_ms = 500, lsp_fallback = true },
+                formatters_by_ft = {
+                    lua = { "stylua" },
+                    -- everything else uses the LSP formatter.
+                },
+            })
+        end,
+    },
     -- Autocomplete
     {
         "zbirenbaum/copilot.lua",
@@ -290,6 +299,7 @@ require("lazy").setup({
     },
     {
         "hrsh7th/nvim-cmp",
+        event = "VeryLazy",
         dependencies = {
             "hrsh7th/cmp-nvim-lsp",
             "hrsh7th/cmp-nvim-lua",
@@ -321,7 +331,6 @@ require("lazy").setup({
     {
         "ibhagwan/fzf-lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },
-        lazy = true,
         keys = {
             { "<C-p>" },
             { "<leader>rg", mode = { "n", "v" } },
@@ -337,7 +346,7 @@ require("lazy").setup({
             vim.keymap.set({ "n" }, "<leader>rg", fzf.live_grep_native, { silent = true })
 
             -- like s.strip() in python
-            local strip = function(s)
+            local function strip(s)
                 return (s:gsub("^%s*(.-)%s*$", "%1"))
             end
 
@@ -398,18 +407,36 @@ require("lazy").setup({
             fzf.setup({})
         end,
     },
+    { -- file tree
+        "nvim-tree/nvim-tree.lua",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        keys = {
+            { "<C-f>", vim.cmd.NvimTreeToggle, desc = "NvimTree", mode = { "n", "v" } },
+        },
+        opts = {
+            sort_by = "case_sensitive",
+            view = { width = 30 },
+            filters = { dotfiles = false },
+            actions = { open_file = { quit_on_open = true } },
+            update_focused_file = { enable = true },
+        },
+    },
+    { -- terminal (<C-\>)
+        "akinsho/toggleterm.nvim",
+        keys = { [[<C-\>]] },
+        opts = { open_mapping = [[<C-\>]] },
+    },
 
-    "tpope/vim-fugitive", -- :G
-
+    -- Git
+    { "tpope/vim-fugitive", event = "VeryLazy" }, -- :G
     { -- git blame window
         "rhysd/git-messenger.vim",
         keys = { { "<leader>gm", vim.cmd.GitMessenger } },
-        cmd = "GitMessenger",
     },
-
     {
         -- Adds git related signs to the gutter, as well as utilities for managing changes
         "lewis6991/gitsigns.nvim",
+        event = "VeryLazy",
         opts = {
             -- See `:help gitsigns.txt`
             signs = {
@@ -491,57 +518,48 @@ require("lazy").setup({
             end,
         },
     },
-    { -- file tree
-        "nvim-tree/nvim-tree.lua",
-        dependencies = { "nvim-tree/nvim-web-devicons" },
-        keys = {
-            { "<C-f>", vim.cmd.NvimTreeToggle, desc = "NvimTree", mode = { "n", "v" } },
-        },
-        opts = {
-            sort_by = "case_sensitive",
-            view = {
-                width = 30,
-            },
-            filters = {
-                dotfiles = false,
-            },
-            actions = {
-                open_file = {
-                    quit_on_open = true,
-                },
-            },
-            update_focused_file = {
-                enable = true,
-            },
-        },
-    },
-
-    { -- autoformat lua
-        "ckipp01/stylua-nvim",
-        ft = { "lua" },
-        config = function()
-            local stylua = require("stylua-nvim")
-            stylua.setup({
-                config_file = "/Users/presley/.dotfiles/config/stylua.toml",
-            })
-            vim.api.nvim_create_autocmd({ "BufWritePre" }, {
-                desc = "Format file on save",
-                pattern = "*.lua",
-                callback = stylua.format_file,
-            })
-        end,
-    },
-
-    { -- terminal (<C-\>)
-        "akinsho/toggleterm.nvim",
-        keys = { [[<C-\>]] },
-        opts = { open_mapping = [[<C-\>]] },
-    },
 })
 
 -- Editor Config
-vim.cmd.colorscheme("tokyonight")
+-- General
+vim.o.undofile = true -- Enable persistent undo (see also `:h undodir`)
 
+vim.o.backup = false -- Don't store backup while overwriting the file
+vim.o.writebackup = false -- Don't store backup while overwriting the file
+
+vim.o.mouse = "a" -- Enable mouse for all available modes
+
+-- Appearance
+vim.o.breakindent = true -- Indent wrapped lines to match line start
+vim.o.cursorline = true -- Highlight current line
+vim.o.linebreak = true -- Wrap long lines at 'breakat' (if 'wrap' is set)
+vim.o.number = true -- Show line number on current line
+vim.o.relativenumber = true -- Relative line numbers
+vim.o.splitbelow = true -- Horizontal splits will be below
+vim.o.splitright = true -- Vertical splits will be to the right
+
+vim.o.signcolumn = "yes" -- Always show sign column (otherwise it will shift text)
+vim.o.fillchars = "eob: " -- Don't show `~` outside of buffer
+
+-- Editing
+vim.o.ignorecase = true -- Ignore case when searching (use `\C` to force not doing that)
+vim.o.incsearch = true -- Show search results while typing
+vim.o.infercase = true -- Infer letter cases for a richer built-in keyword completion
+vim.o.smartcase = true -- Don't ignore case when searching if pattern has upper case
+vim.o.smartindent = true -- Make indenting smart
+
+vim.o.completeopt = "menuone,noinsert,noselect" -- Customize completions
+vim.o.virtualedit = "block" -- Allow going past the end of line in visual block mode
+vim.o.formatoptions = "qjl1" -- Don't autoformat comments
+
+-- Autocommands
+vim.api.nvim_create_autocmd("TextYankPost", {
+    desc = "Highlight yanked text",
+    pattern = "*",
+    callback = function()
+        vim.highlight.on_yank({ timeout = 200 })
+    end,
+})
 vim.api.nvim_create_autocmd("FileType", {
     desc = "Add a color column right past the max line length",
     pattern = "*",
@@ -568,6 +586,8 @@ vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', opts)
 vim.keymap.set({ "n", "v" }, "<leader>Y", '"+y$', opts)
 
 -- navigation
+vim.keymap.set({ "n", "v" }, "j", [[v:count == 0 ? 'gj' : 'j']], { expr = true })
+vim.keymap.set({ "n", "v" }, "k", [[v:count == 0 ? 'gk' : 'k']], { expr = true })
 vim.keymap.set({ "n", "v" }, "<left>", "<C-w>h", opts)
 vim.keymap.set({ "n", "v" }, "<down>", "<C-w>j", opts)
 vim.keymap.set({ "n", "v" }, "<up>", "<C-w>k", opts)
