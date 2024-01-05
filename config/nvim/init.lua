@@ -141,6 +141,16 @@ require("lazy").setup({
         end,
     },
     {
+        "nvimdev/lspsaga.nvim",
+        config = function()
+            require("lspsaga").setup({})
+        end,
+        dependencies = {
+            "nvim-treesitter/nvim-treesitter", -- optional
+            "nvim-tree/nvim-web-devicons", -- optional
+        },
+    },
+    {
         "neovim/nvim-lspconfig",
         event = "VeryLazy",
         config = function()
@@ -551,6 +561,11 @@ vim.o.smartindent = true -- Make indenting smart
 vim.o.completeopt = "menuone,noinsert,noselect" -- Customize completions
 vim.o.virtualedit = "block" -- Allow going past the end of line in visual block mode
 vim.o.formatoptions = "qjl1" -- Don't autoformat comments
+
+vim.o.expandtab = true -- Use spaces instead of tabs
+vim.o.shiftwidth = 4 -- Number of spaces to use for each step of (auto)indent
+vim.o.softtabstop = 4 -- Number of spaces that <Tab> counts for while performing editing operations
+vim.o.tabstop = 4 -- Number of spaces that <Tab> in file uses
 
 -- Autocommands
 vim.api.nvim_create_autocmd("TextYankPost", {
