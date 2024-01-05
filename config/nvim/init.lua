@@ -35,13 +35,9 @@ require("lazy").setup({
                 -- Style to be applied to different syntax groups
                 -- Value is any valid attr-list value for `:help nvim_set_hl`
                 keywords = { italic = false },
-
-                -- Background styles. Can be "dark", "transparent" or "normal"
-                sidebars = "dark", -- style for sidebars, see below
-                floats = "dark", -- style for floating windows
             },
             sidebars = { "qf", "help", "terminal" }, -- darker background on sidebars
-            lualine_bold = true, -- section headers in the lualine theme will be bold
+            lualine_bold = true, -- bold tab headers in the lualine theme
         },
     },
     { -- powerline
@@ -94,11 +90,10 @@ require("lazy").setup({
             })
         end,
     },
-    {
-        "kylechui/nvim-surround",
-        event = "VeryLazy",
-        opts = {},
-    },
+    "tpope/vim-sleuth", -- autodetect shiftwidth/expandtab etc
+    { "kylechui/nvim-surround", opts = {} }, -- cs/ds/ys
+    { "folke/which-key.nvim", opts = {} }, -- show pending keybinds.
+
     -- Treesitter
     {
         "nvim-treesitter/nvim-treesitter",
@@ -107,6 +102,7 @@ require("lazy").setup({
     {
         "nvim-treesitter/nvim-treesitter-textobjects",
         dependencies = { "nvim-treesitter/nvim-treesitter" },
+        event = "VeryLazy",
         config = function()
             require("nvim-treesitter.configs").setup({
                 modules = {},
@@ -138,23 +134,43 @@ require("lazy").setup({
             })
         end,
     },
+
     {
         "neovim/nvim-lspconfig",
+        event = "VeryLazy",
         config = function()
             local format_augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
+            -- [[ Configure LSP ]]
+            -- from https://github.com/nvim-lua/kickstart.nvim/blob/master/init.lua
+            --  This function gets run when an LSP connects to a particular buffer.
             local on_attach = function(_, bufnr)
-                -- Enable completion
-                vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+                -- Function that lets us more easily define mappings specific
+                -- for LSP related items. It sets the mode, buffer and description for us each time.
+                local nmap = function(keys, func, desc)
+                    if desc then
+                        desc = "LSP: " .. desc
+                    end
 
-                local bufopts = { silent = true, buffer = bufnr }
+                    vim.keymap.set("n", keys, func, { buffer = bufnr, desc = desc })
+                end
 
-                vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
-                vim.keymap.set("n", "gs", vim.lsp.buf.signature_help, bufopts)
-                vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
-                vim.keymap.set("n", "gn", vim.lsp.buf.rename, bufopts)
-                vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts)
-                vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, bufopts)
+                nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
+                nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
+
+                nmap("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
+                nmap("gr", vim.lsp.buf.references, "[G]oto [R]eferences")
+                nmap("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
+                nmap("<leader>D", vim.lsp.buf.type_definition, "Type [D]efinition")
+                nmap("<leader>ds", vim.lsp.buf.document_symbol, "[D]ocument [S]ymbols")
+                nmap("<leader>ws", vim.lsp.buf.workspace_symbol, "[W]orkspace [S]ymbols")
+
+                -- See `:help K` for why this keymap
+                nmap("K", vim.lsp.buf.hover, "Hover Documentation")
+                nmap("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
+
+                -- Lesser used LSP functionality
+                nmap("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
 
                 vim.api.nvim_create_autocmd("BufWritePre", {
                     desc = "Format on save",
@@ -165,6 +181,24 @@ require("lazy").setup({
                     end,
                 })
             end
+
+            -- document existing key chains
+            require("which-key").register({
+                ["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
+                ["<leader>d"] = { name = "[D]ocument", _ = "which_key_ignore" },
+                ["<leader>g"] = { name = "[G]it", _ = "which_key_ignore" },
+                ["<leader>h"] = { name = "Git [H]unk", _ = "which_key_ignore" },
+                ["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
+                ["<leader>s"] = { name = "[S]earch", _ = "which_key_ignore" },
+                ["<leader>t"] = { name = "[T]oggle", _ = "which_key_ignore" },
+                ["<leader>w"] = { name = "[W]orkspace", _ = "which_key_ignore" },
+            })
+            -- register which-key VISUAL mode
+            -- required for visual <leader>hs (hunk stage) to work
+            require("which-key").register({
+                ["<leader>"] = { name = "VISUAL <leader>" },
+                ["<leader>h"] = { "Git [H]unk" },
+            }, { mode = "v" })
 
             local lsp = require("lspconfig")
 
@@ -315,23 +349,16 @@ require("lazy").setup({
                 -- The get_hash() is utilised to create an independent "store"
                 -- By default `fre --add` adds to global history, in order to restrict this to
                 -- current directory we can create a hash which will keep history separate.
-                -- With this in mind, we can also append git branch to make sorting based on
-                -- Current dir + git branch
-                local str = 'echo "dir:' .. vim.fn.getcwd()
-                if vim.b.gitsigns_head then
-                    str = str .. ";git:" .. vim.b.gitsigns_head .. '"'
-                else
-                    str = str .. '"'
-                end
-                local hash = vim.fn.system(str .. " | md5sum | awk '{print $1}'")
+                local hash = vim.fn.system("pwd | md5")
+                -- for linux, use vim.fn.system("pwd | md5sum | awk '{print $1}'")
                 vim.print(hash)
                 return hash
             end
 
-            local fre = "fre --store_name " .. get_hash()
-
             local function fzf_mru(opts)
                 opts = fzf.config.normalize_opts(opts, fzf.config.globals.files)
+
+                local fre = "fre --store_name " .. get_hash()
                 local no_dups = [[awk '!x[$0]++']] -- remove dups, but keep order
                 -- todo: not sure why i need the zsh call here?
                 opts.cmd = [[zsh -c "cat <(]] .. fre .. [[ --sorted) <(rg --files)" | ]] .. no_dups
@@ -369,13 +396,98 @@ require("lazy").setup({
             fzf.setup({})
         end,
     },
-    { -- :G
-        "tpope/vim-fugitive",
-    },
+
+    "tpope/vim-fugitive", -- :G
+
     { -- git blame window
         "rhysd/git-messenger.vim",
         keys = { { "<leader>gm", vim.cmd.GitMessenger } },
         cmd = "GitMessenger",
+    },
+
+    {
+        -- Adds git related signs to the gutter, as well as utilities for managing changes
+        "lewis6991/gitsigns.nvim",
+        opts = {
+            -- See `:help gitsigns.txt`
+            signs = {
+                add = { text = "+" },
+                change = { text = "~" },
+                delete = { text = "_" },
+                topdelete = { text = "‾" },
+                changedelete = { text = "~" },
+            },
+            on_attach = function(bufnr)
+                local gs = package.loaded.gitsigns
+
+                local function map(mode, l, r, opts)
+                    opts = opts or {}
+                    opts.buffer = bufnr
+                    vim.keymap.set(mode, l, r, opts)
+                end
+
+                -- Navigation
+                map({ "n", "v" }, "]c", function()
+                    if vim.wo.diff then
+                        return "]c"
+                    end
+                    vim.schedule(function()
+                        gs.next_hunk()
+                    end)
+                    return "<Ignore>"
+                end, { expr = true, desc = "Jump to next hunk" })
+
+                map({ "n", "v" }, "[c", function()
+                    if vim.wo.diff then
+                        return "[c"
+                    end
+                    vim.schedule(function()
+                        gs.prev_hunk()
+                    end)
+                    return "<Ignore>"
+                end, { expr = true, desc = "Jump to previous hunk" })
+
+                -- Actions
+                -- visual mode
+                map("v", "<leader>hs", function()
+                    gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
+                end, { desc = "stage git hunk" })
+                map("v", "<leader>hr", function()
+                    gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
+                end, { desc = "reset git hunk" })
+                -- normal mode
+                map("n", "<leader>hs", gs.stage_hunk, { desc = "git stage hunk" })
+                map("n", "<leader>hr", gs.reset_hunk, { desc = "git reset hunk" })
+                map("n", "<leader>hS", gs.stage_buffer, { desc = "git Stage buffer" })
+                map("n", "<leader>hu", gs.undo_stage_hunk, { desc = "undo stage hunk" })
+                map("n", "<leader>hR", gs.reset_buffer, { desc = "git Reset buffer" })
+                map("n", "<leader>hp", gs.preview_hunk, { desc = "preview git hunk" })
+                map("n", "<leader>hb", function()
+                    gs.blame_line({ full = false })
+                end, { desc = "git blame line" })
+                map("n", "<leader>hd", gs.diffthis, { desc = "git diff against index" })
+                map("n", "<leader>hD", function()
+                    gs.diffthis("~")
+                end, { desc = "git diff against last commit" })
+
+                -- Toggles
+                map(
+                    "n",
+                    "<leader>tb",
+                    gs.toggle_current_line_blame,
+                    { desc = "toggle git blame line" }
+                )
+                map("n", "<leader>td", gs.toggle_deleted, { desc = "toggle git show deleted" })
+
+                -- Text object
+                map(
+                    { "o", "x" },
+                    "ih",
+                    ":<C-U>Gitsigns select_hunk<CR>",
+                    { desc = "select git hunk" }
+                )
+            end,
+        },
     },
     { -- file tree
         "nvim-tree/nvim-tree.lua",
@@ -462,6 +574,10 @@ vim.keymap.set({ "n", "v" }, "<S-left>", "<C-w>H", opts)
 vim.keymap.set({ "n", "v" }, "<S-down>", "<C-w>J", opts)
 vim.keymap.set({ "n", "v" }, "<S-up>", "<C-w>K", opts)
 vim.keymap.set({ "n", "v" }, "<S-right>", "<C-w>L", opts)
+
+-- drop highlight on these, since mini.cursorword already highlights current word
+vim.keymap.set({ "n", "v" }, "*", "*:noh<CR>", opts)
+vim.keymap.set({ "n", "v" }, "#", "#:noh<CR>", opts)
 
 vim.keymap.set({ "n", "v" }, "<tab>", vim.cmd.bnext, opts)
 vim.keymap.set({ "n", "v" }, "<S-tab>", vim.cmd.bprevious, opts)
