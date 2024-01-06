@@ -558,7 +558,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
     end,
 })
 vim.api.nvim_create_autocmd("FileType", {
-    desc = "Add a color column right past the max line length",
+    desc = "Add a color column immediately after the max line length",
     pattern = "*",
     callback = function()
         local max_line_length = {
