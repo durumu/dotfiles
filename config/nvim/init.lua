@@ -141,16 +141,6 @@ require("lazy").setup({
         end,
     },
     {
-        "nvimdev/lspsaga.nvim",
-        config = function()
-            require("lspsaga").setup({})
-        end,
-        dependencies = {
-            "nvim-treesitter/nvim-treesitter", -- optional
-            "nvim-tree/nvim-web-devicons", -- optional
-        },
-    },
-    {
         "neovim/nvim-lspconfig",
         event = "VeryLazy",
         config = function()
@@ -174,16 +164,12 @@ require("lazy").setup({
                 nmap("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
                 nmap("gr", vim.lsp.buf.references, "[G]oto [R]eferences")
                 nmap("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
-                nmap("<leader>D", vim.lsp.buf.type_definition, "Type [D]efinition")
                 nmap("<leader>ds", vim.lsp.buf.document_symbol, "[D]ocument [S]ymbols")
                 nmap("<leader>ws", vim.lsp.buf.workspace_symbol, "[W]orkspace [S]ymbols")
 
                 -- See `:help K` for why this keymap
                 nmap("K", vim.lsp.buf.hover, "Hover Documentation")
                 nmap("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
-
-                -- Lesser used LSP functionality
-                nmap("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
             end
 
             -- document existing key chains
@@ -558,14 +544,10 @@ vim.o.infercase = true -- Infer letter cases for a richer built-in keyword compl
 vim.o.smartcase = true -- Don't ignore case when searching if pattern has upper case
 vim.o.smartindent = true -- Make indenting smart
 
-vim.o.completeopt = "menuone,noinsert,noselect" -- Customize completions
-vim.o.virtualedit = "block" -- Allow going past the end of line in visual block mode
-vim.o.formatoptions = "qjl1" -- Don't autoformat comments
-
+-- Tabs
 vim.o.expandtab = true -- Use spaces instead of tabs
 vim.o.shiftwidth = 4 -- Number of spaces to use for each step of (auto)indent
 vim.o.softtabstop = 4 -- Number of spaces that <Tab> counts for while performing editing operations
-vim.o.tabstop = 4 -- Number of spaces that <Tab> in file uses
 
 -- Autocommands
 vim.api.nvim_create_autocmd("TextYankPost", {
