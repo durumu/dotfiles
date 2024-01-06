@@ -25,26 +25,24 @@ require("lazy").setup({
     -- Essential
     { --colorscheme
         "folke/tokyonight.nvim",
-        lazy = false,
         priority = 1000, -- load before other plugins
-        config = function()
-            require("tokyonight").setup({
-                style = "moon", -- bg=dark
-                light_style = "day", -- bg=light
-                styles = {
-                    -- Style to be applied to different syntax groups
-                    -- Value is any valid attr-list value for `:help nvim_set_hl`
-                    keywords = { italic = false },
-                },
-                sidebars = { "qf", "help", "terminal" }, -- darker background on sidebars
-                lualine_bold = true, -- bold tab headers in the lualine theme
-            })
+        opts = {
+            style = "moon", -- bg=dark
+            light_style = "day", -- bg=light
+            styles = {
+                -- Style to be applied to different syntax groups
+                -- Value is any valid attr-list value for `:help nvim_set_hl`
+                keywords = { italic = false },
+            },
+            sidebars = { "qf", "help", "terminal" }, -- darker background on sidebars
+            lualine_bold = true, -- bold tab headers in the lualine theme
+        },
+        init = function()
             vim.cmd.colorscheme("tokyonight")
         end,
     },
     { -- powerline
         "nvim-lualine/lualine.nvim",
-        lazy = false,
         dependencies = { "nvim-tree/nvim-web-devicons" },
         opts = {
             theme = "tokyonight",
@@ -60,7 +58,6 @@ require("lazy").setup({
     },
     { -- start page
         "mhinz/vim-startify",
-        lazy = false,
         config = function()
             vim.g.webdevicons_enable_startify = 1
             vim.g.startify_session_autoload = 1
@@ -69,7 +66,7 @@ require("lazy").setup({
             vim.g.startify_change_to_vcs_root = 1
             vim.g.startify_fortune_use_unicode = 1
             vim.g.startify_bookmarks = {
-                { v = "~/.config/nvim/init.lua" },
+                { v = "~/.dotfiles/config/nvim/init.lua" },
                 { z = "~/.zshrc" },
                 { a = "~/.aliases" },
             }
@@ -77,7 +74,11 @@ require("lazy").setup({
     },
 
     -- General Editing
-    { "echasnovski/mini.cursorword", event = "VeryLazy", opts = { delay = 0 } },
+    "tpope/vim-sleuth", -- autodetect shiftwidth/expandtab etc
+    "tpope/vim-surround", -- cs/ds/ys
+    "tpope/vim-commentary", -- gc
+    "tpope/vim-repeat", -- .
+    { "echasnovski/mini.cursorword", opts = { delay = 0 } },
     { -- highlight and delete trailing whitespace
         "echasnovski/mini.trailspace",
         event = "VeryLazy",
@@ -91,16 +92,6 @@ require("lazy").setup({
             )
         end,
     },
-
-    { -- autodetect shiftwidth/expandtab etc. must run before other plugins
-        "tpope/vim-sleuth",
-        priority = 1000,
-    },
-    { "tpope/vim-surround", event = "VeryLazy" }, -- cs/ds/ys
-    { "tpope/vim-unimpaired", event = "VeryLazy" }, -- []
-    { "tpope/vim-commentary", event = "VeryLazy" }, -- gc
-    { "tpope/vim-repeat", event = "VeryLazy" }, -- .
-
     { "folke/which-key.nvim", event = "VeryLazy", opts = {} }, -- show pending keybinds.
 
     -- Code
@@ -310,6 +301,20 @@ require("lazy").setup({
             cmp.setup({
                 mapping = cmp.mapping.preset.insert({
                     ["<CR>"] = cmp.mapping.confirm({ select = true }),
+                    ["<Tab>"] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                            cmp.select_next_item()
+                        else
+                            fallback()
+                        end
+                    end, { "i", "s" }),
+                    ["<S-Tab>"] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                            cmp.select_prev_item()
+                        else
+                            fallback()
+                        end
+                    end, { "i", "s" }),
                 }),
                 sources = cmp.config.sources({
                     { name = "copilot" },
@@ -424,11 +429,7 @@ require("lazy").setup({
     },
 
     -- Git
-    { "tpope/vim-fugitive", event = "VeryLazy" }, -- :G
-    { -- git blame window
-        "rhysd/git-messenger.vim",
-        keys = { { "<leader>gm", vim.cmd.GitMessenger } },
-    },
+    "tpope/vim-fugitive", -- :G
     {
         -- Adds git related signs to the gutter, as well as utilities for managing changes
         "lewis6991/gitsigns.nvim",
@@ -440,10 +441,10 @@ require("lazy").setup({
                 change = { text = "~" },
                 delete = { text = "_" },
                 topdelete = { text = "‾" },
-                changedelete = { text = "~" },
+                changedelete = { text = "≃" },
             },
             on_attach = function(bufnr)
-                local gs = package.loaded.gitsigns
+                local gs = require("gitsigns")
 
                 local function map(mode, l, r, opts)
                     opts = opts or {}
@@ -452,9 +453,9 @@ require("lazy").setup({
                 end
 
                 -- Navigation
-                map({ "n", "v" }, "]c", function()
+                map({ "n", "v" }, "]g", function()
                     if vim.wo.diff then
-                        return "]c"
+                        return "]g"
                     end
                     vim.schedule(function()
                         gs.next_hunk()
@@ -462,9 +463,9 @@ require("lazy").setup({
                     return "<Ignore>"
                 end, { expr = true, desc = "Jump to next hunk" })
 
-                map({ "n", "v" }, "[c", function()
+                map({ "n", "v" }, "[g", function()
                     if vim.wo.diff then
-                        return "[c"
+                        return "[g"
                     end
                     vim.schedule(function()
                         gs.prev_hunk()
@@ -472,7 +473,7 @@ require("lazy").setup({
                     return "<Ignore>"
                 end, { expr = true, desc = "Jump to previous hunk" })
 
-                -- Actions
+                -- Hunk Actions
                 -- visual mode
                 map("v", "<leader>hs", function()
                     gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
@@ -485,15 +486,17 @@ require("lazy").setup({
                 map("n", "<leader>hr", gs.reset_hunk, { desc = "git reset hunk" })
                 map("n", "<leader>hS", gs.stage_buffer, { desc = "git Stage buffer" })
                 map("n", "<leader>hu", gs.undo_stage_hunk, { desc = "undo stage hunk" })
-                map("n", "<leader>hR", gs.reset_buffer, { desc = "git Reset buffer" })
                 map("n", "<leader>hp", gs.preview_hunk, { desc = "preview git hunk" })
-                map("n", "<leader>hb", function()
+
+                -- Git Actions
+                map("n", "<leader>gd", gs.diffthis, { desc = "git diff against index" })
+                map("n", "<leader>gD", function()
+                    gs.diffthis("~")
+                end, { desc = "git Diff against last commit" })
+                map("n", "<leader>gm", function()
                     gs.blame_line({ full = false })
                 end, { desc = "git blame line" })
-                map("n", "<leader>hd", gs.diffthis, { desc = "git diff against index" })
-                map("n", "<leader>hD", function()
-                    gs.diffthis("~")
-                end, { desc = "git diff against last commit" })
+                map("n", "<leader>gR", gs.reset_buffer, { desc = "git Reset buffer" })
 
                 -- Toggles
                 map(
@@ -505,12 +508,9 @@ require("lazy").setup({
                 map("n", "<leader>td", gs.toggle_deleted, { desc = "toggle git show deleted" })
 
                 -- Text object
-                map(
-                    { "o", "x" },
-                    "ih",
-                    ":<C-U>Gitsigns select_hunk<CR>",
-                    { desc = "select git hunk" }
-                )
+                map({ "o", "x" }, "ih", function()
+                    vim.cmd.Gitsigns("select hunk")
+                end, { desc = "select git hunk" })
             end,
         },
     },
