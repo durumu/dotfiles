@@ -78,10 +78,10 @@ require("lazy").setup({
     "tpope/vim-surround", -- cs/ds/ys
     "tpope/vim-commentary", -- gc
     "tpope/vim-repeat", -- .
+    { "echasnovski/mini.bracketed" },
     { "echasnovski/mini.cursorword", opts = { delay = 0 } },
     { -- highlight and delete trailing whitespace
         "echasnovski/mini.trailspace",
-        event = "VeryLazy",
         config = function()
             local trailspace = require("mini.trailspace")
             trailspace.setup()
@@ -429,7 +429,7 @@ require("lazy").setup({
     },
 
     -- Git
-    "tpope/vim-fugitive", -- :G
+    { "tpope/vim-fugitive", event = "VeryLazy" },
     {
         -- Adds git related signs to the gutter, as well as utilities for managing changes
         "lewis6991/gitsigns.nvim",
