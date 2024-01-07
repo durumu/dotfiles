@@ -22,7 +22,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
-    -- Essential
+    -- Essential (non-lazy)
     { --colorscheme
         "folke/tokyonight.nvim",
         priority = 1000, -- load before other plugins
@@ -72,14 +72,14 @@ require("lazy").setup({
             }
         end,
     },
+    { "tpope/vim-sleuth" }, -- autodetect shiftwidth/expandtab etc
 
     -- General Editing
-    "tpope/vim-sleuth", -- autodetect shiftwidth/expandtab etc
-    "tpope/vim-surround", -- cs/ds/ys
-    "tpope/vim-commentary", -- gc
-    "tpope/vim-repeat", -- .
-    { "echasnovski/mini.bracketed" },
-    { "echasnovski/mini.cursorword", opts = { delay = 0 } },
+    { "tpope/vim-surround", event = "VeryLazy" }, -- cs/ds/ys
+    { "tpope/vim-commentary", event = "VeryLazy" }, -- gc
+    { "tpope/vim-repeat", event = "VeryLazy" }, -- .
+    { "echasnovski/mini.bracketed", event = "VeryLazy", opts = {} },
+    { "echasnovski/mini.cursorword", event = "VeryLazy", opts = { delay = 0 } },
     { -- highlight and delete trailing whitespace
         "echasnovski/mini.trailspace",
         config = function()
@@ -133,7 +133,6 @@ require("lazy").setup({
     },
     {
         "neovim/nvim-lspconfig",
-        event = "VeryLazy",
         config = function()
             -- [[ Configure LSP ]]
             -- from https://github.com/nvim-lua/kickstart.nvim/blob/master/init.lua
@@ -225,19 +224,35 @@ require("lazy").setup({
                         end,
                     })
 
-                    vim.api.nvim_create_user_command("T", function()
+                    vim.api.nvim_buf_create_user_command(bufnr, "T", function()
                         perform_code_action_titled("Ruff: Fix All")
                     end, { desc = "Fix all" })
                 end,
             })
 
             lsp.rust_analyzer.setup({
-                settings = { ["rust-analyzer"] = { trace = { server = "verbose" } } },
+                settings = {
+                    ["rust-analyzer"] = {
+                        checkOnSave = { command = "clippy" },
+                        trace = { server = "verbose" },
+                    },
+                },
                 on_attach = on_attach,
             })
 
             lsp.clangd.setup({
                 settings = { fallbackFlags = { "-std=c++2a" } },
+                on_attach = on_attach,
+            })
+
+            lsp.gopls.setup({
+                settings = {
+                    gopls = {
+                        analyses = { unusedparams = true },
+                        staticcheck = true,
+                        gofumpt = true,
+                    },
+                },
                 on_attach = on_attach,
             })
 
@@ -270,6 +285,7 @@ require("lazy").setup({
                 format_on_save = { timeout_ms = 500, lsp_fallback = true },
                 formatters_by_ft = {
                     lua = { "stylua" },
+                    go = { "goimports" },
                     -- everything else uses the LSP formatter.
                 },
             })
@@ -306,11 +322,7 @@ require("lazy").setup({
     {
         "ibhagwan/fzf-lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },
-        keys = {
-            { "<C-p>" },
-            { "<leader>rg", mode = { "n", "v" } },
-        },
-        cmd = "Rg",
+        event = "VeryLazy",
         config = function()
             local fzf = require("fzf-lua")
 
@@ -384,21 +396,22 @@ require("lazy").setup({
     },
     { -- file tree
         "nvim-tree/nvim-tree.lua",
+        event = "VeryLazy",
         dependencies = { "nvim-tree/nvim-web-devicons" },
-        keys = {
-            { "<C-f>", vim.cmd.NvimTreeToggle, desc = "NvimTree", mode = { "n", "v" } },
-        },
-        opts = {
-            sort_by = "case_sensitive",
-            view = { width = 30 },
-            filters = { dotfiles = false },
-            actions = { open_file = { quit_on_open = true } },
-            update_focused_file = { enable = true },
-        },
+        config = function()
+            require("nvim-tree").setup({
+                sort_by = "case_sensitive",
+                view = { width = 30 },
+                filters = { dotfiles = false },
+                actions = { open_file = { quit_on_open = true } },
+                update_focused_file = { enable = true },
+            })
+            vim.keymap.set({ "n", "v" }, "<C-f>", vim.cmd.NvimTreeToggle, { desc = "NvimTree" })
+        end,
     },
     { -- terminal (<C-\>)
         "akinsho/toggleterm.nvim",
-        keys = { [[<C-\>]] },
+        event = "VeryLazy",
         opts = { open_mapping = [[<C-\>]] },
     },
 
@@ -522,6 +535,7 @@ vim.o.smartindent = true -- Make indenting smart
 vim.o.expandtab = true -- Use spaces instead of tabs
 vim.o.shiftwidth = 4 -- Number of spaces to use for each step of (auto)indent
 vim.o.softtabstop = 4 -- Number of spaces that <Tab> counts for while performing editing operations
+vim.o.tabstop = 4 -- When forced to use tab, make it this wide
 
 -- Autocommands
 vim.api.nvim_create_autocmd("TextYankPost", {
@@ -552,10 +566,6 @@ vim.api.nvim_create_autocmd("FileType", {
 -- Mappings
 local opts = { silent = true }
 
--- remaps
-vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', opts)
-vim.keymap.set({ "n", "v" }, "<leader>Y", '"+y$', opts)
-
 -- navigation
 vim.keymap.set({ "n", "v" }, "j", [[v:count == 0 ? 'gj' : 'j']], { expr = true })
 vim.keymap.set({ "n", "v" }, "k", [[v:count == 0 ? 'gk' : 'k']], { expr = true })
@@ -567,6 +577,14 @@ vim.keymap.set({ "n", "v" }, "<S-left>", "<C-w>H", opts)
 vim.keymap.set({ "n", "v" }, "<S-down>", "<C-w>J", opts)
 vim.keymap.set({ "n", "v" }, "<S-up>", "<C-w>K", opts)
 vim.keymap.set({ "n", "v" }, "<S-right>", "<C-w>L", opts)
+
+vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', opts)
+vim.keymap.set({ "n", "v" }, "<leader>Y", '"+y$', opts)
+
+-- a" includes whitespace, 2i" does not
+for _, delimiter in ipairs({ "'", "`", '"' }) do
+    vim.keymap.set({ "o", "v" }, "a" .. delimiter, "2i" .. delimiter)
+end
 
 -- drop highlight on these, since mini.cursorword already highlights current word
 vim.keymap.set({ "n", "v" }, "*", "*:noh<CR>", opts)

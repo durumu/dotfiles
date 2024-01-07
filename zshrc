@@ -5,7 +5,7 @@ export LANG=en_US.UTF-8
 export EDITOR=/opt/homebrew/bin/nvim
 export SHELL=/bin/zsh
 
-export PATH="/opt/homebrew/opt/libpq/bin:/usr/local/texlive/2023/bin/universal-darwin:/Users/presley/.local/bin:$PATH"
+export PATH="/opt/homebrew/opt/libpq/bin:/usr/local/texlive/2023/bin/universal-darwin:/Users/presley/.local/bin:/Users/presley/go/bin:$PATH"
 export LIBRARY_PATH="$LIBRARY_PATH:/opt/homebrew/lib"
 
 export OPENAI_API_KEY=$(cat ~/.secret/openai.key)
