@@ -277,14 +277,6 @@ require("lazy").setup({
     },
     -- Autocomplete
     {
-        "zbirenbaum/copilot.lua",
-        event = "InsertEnter",
-        opts = {
-            suggestion = { enabled = false },
-            panel = { enabled = false },
-        },
-    },
-    {
         "hrsh7th/nvim-cmp",
         event = "VeryLazy",
         dependencies = {
@@ -292,41 +284,23 @@ require("lazy").setup({
             "hrsh7th/cmp-nvim-lua",
             "hrsh7th/cmp-buffer",
             "hrsh7th/cmp-path",
-            "zbirenbaum/copilot-cmp",
         },
         config = function()
-            require("copilot_cmp").setup()
-
             local cmp = require("cmp")
             cmp.setup({
                 mapping = cmp.mapping.preset.insert({
                     ["<CR>"] = cmp.mapping.confirm({ select = true }),
-                    ["<Tab>"] = cmp.mapping(function(fallback)
-                        if cmp.visible() then
-                            cmp.select_next_item()
-                        else
-                            fallback()
-                        end
-                    end, { "i", "s" }),
-                    ["<S-Tab>"] = cmp.mapping(function(fallback)
-                        if cmp.visible() then
-                            cmp.select_prev_item()
-                        else
-                            fallback()
-                        end
-                    end, { "i", "s" }),
                 }),
                 sources = cmp.config.sources({
-                    { name = "copilot" },
                     { name = "nvim_lsp" },
                     { name = "buffer" },
                     { name = "nvim_lua" },
-                    { name = "copilot" },
                     { name = "path" },
                 }),
             })
         end,
     },
+    { "github/copilot.vim", event = "VeryLazy" },
 
     -- Project Navigation
     {
