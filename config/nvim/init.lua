@@ -78,7 +78,11 @@ require("lazy").setup({
     { "tpope/vim-surround", event = "VeryLazy" }, -- cs/ds/ys
     { "tpope/vim-commentary", event = "VeryLazy" }, -- gc
     { "tpope/vim-repeat", event = "VeryLazy" }, -- .
-    { "echasnovski/mini.bracketed", event = "VeryLazy", opts = {} },
+    {
+        "echasnovski/mini.bracketed",
+        event = "VeryLazy",
+        opts = { comment = { suffix = "" } }, -- [c reserved for fugitive
+    },
     { "echasnovski/mini.cursorword", event = "VeryLazy", opts = { delay = 0 } },
     { -- highlight and delete trailing whitespace
         "echasnovski/mini.trailspace",
@@ -149,13 +153,10 @@ require("lazy").setup({
                 end
 
                 nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
-                nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
 
                 nmap("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
                 nmap("gr", vim.lsp.buf.references, "[G]oto [R]eferences")
                 nmap("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
-                nmap("<leader>ds", vim.lsp.buf.document_symbol, "[D]ocument [S]ymbols")
-                nmap("<leader>ws", vim.lsp.buf.workspace_symbol, "[W]orkspace [S]ymbols")
 
                 -- See `:help K` for why this keymap
                 nmap("K", vim.lsp.buf.hover, "Hover Documentation")
@@ -179,6 +180,16 @@ require("lazy").setup({
                 ["<leader>"] = { name = "VISUAL <leader>" },
                 ["<leader>h"] = { "Git [H]unk" },
             }, { mode = "v" })
+
+            local sign_gutter_character = {
+                DiagnosticSignError = "",
+                DiagnosticSignWarn = "",
+                DiagnosticSignHint = "",
+                DiagnosticSignInfo = "",
+            }
+            for sign, char in pairs(sign_gutter_character) do
+                vim.fn.sign_define(sign, { text = char, texthl = sign, linehl = "", numhl = "" })
+            end
 
             local lsp = require("lspconfig")
 
@@ -231,21 +242,22 @@ require("lazy").setup({
             })
 
             lsp.rust_analyzer.setup({
+                on_attach = on_attach,
                 settings = {
                     ["rust-analyzer"] = {
                         checkOnSave = { command = "clippy" },
                         trace = { server = "verbose" },
                     },
                 },
-                on_attach = on_attach,
             })
 
             lsp.clangd.setup({
-                settings = { fallbackFlags = { "-std=c++2a" } },
                 on_attach = on_attach,
+                settings = { fallbackFlags = { "-std=c++2a" } },
             })
 
             lsp.gopls.setup({
+                on_attach = on_attach,
                 settings = {
                     gopls = {
                         analyses = { unusedparams = true },
@@ -253,11 +265,11 @@ require("lazy").setup({
                         gofumpt = true,
                     },
                 },
-                on_attach = on_attach,
             })
 
             -- This setup is intended for neovim plugins
             lsp.lua_ls.setup({
+                on_attach = on_attach,
                 settings = {
                     Lua = {
                         format = { enable = false }, -- I use stylua
@@ -271,34 +283,45 @@ require("lazy").setup({
                         telemetry = { enable = false },
                     },
                 },
-                on_attach = on_attach,
             })
         end,
     },
     {
         "stevearc/conform.nvim",
         event = "VeryLazy",
+        opts = {
+            format_on_save = { timeout_ms = 500, lsp_fallback = true },
+            formatters_by_ft = {
+                lua = { "stylua" },
+                go = { "goimports" },
+                -- everything else uses the LSP formatter.
+            },
+        },
+    },
+    {
+        "folke/trouble.nvim",
+        event = "VeryLazy",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
-            local conform = require("conform")
+            require("trouble").setup({})
 
-            conform.setup({
-                format_on_save = { timeout_ms = 500, lsp_fallback = true },
-                formatters_by_ft = {
-                    lua = { "stylua" },
-                    go = { "goimports" },
-                    -- everything else uses the LSP formatter.
-                },
-            })
+            vim.keymap.set({ "n", "v" }, "<leader>xx", vim.cmd.TroubleToggle, { desc = "Trouble" })
+            vim.keymap.set({ "n", "v" }, "<leader>xq", function()
+                vim.cmd.TroubleToggle("quickfix")
+            end, { desc = "Trouble (quickfix)" })
         end,
     },
+    { "folke/neodev.nvim", opts = {}, priority = 1000 }, -- must come before lsp config
+
     -- Autocomplete
     {
         "hrsh7th/nvim-cmp",
         event = "VeryLazy",
         dependencies = {
+            "hrsh7th/cmp-buffer",
+            "hrsh7th/cmp-emoji",
             "hrsh7th/cmp-nvim-lsp",
             "hrsh7th/cmp-nvim-lua",
-            "hrsh7th/cmp-buffer",
             "hrsh7th/cmp-path",
         },
         config = function()
@@ -310,6 +333,7 @@ require("lazy").setup({
                 sources = cmp.config.sources({
                     { name = "nvim_lsp" },
                     { name = "buffer" },
+                    { name = "emoji" },
                     { name = "nvim_lua" },
                     { name = "path" },
                 }),
@@ -325,6 +349,25 @@ require("lazy").setup({
         event = "VeryLazy",
         config = function()
             local fzf = require("fzf-lua")
+
+            require("which-key").register({
+                ["<leader>f"] = { name = "[F]zf", _ = "which_key_ignore" },
+            })
+
+            vim.api.nvim_create_user_command("Fzf", fzf.resume, {})
+
+            vim.keymap.set({ "n" }, "<leader>fa", function()
+                fzf.lsp_code_actions()
+            end, { desc = "[F]zf: Code [A]ction" })
+            vim.keymap.set({ "n" }, "<leader>fb", function()
+                fzf.lsp_document_symbols()
+            end, { desc = "[F]zf: [B]uffers" })
+            vim.keymap.set({ "n" }, "<leader>fd", function()
+                fzf.lsp_document_symbols()
+            end, { desc = "[F]zf: [D]ocument Symbols" })
+            vim.keymap.set({ "n" }, "<leader>fw", function()
+                fzf.lsp_workspace_symbols()
+            end, { desc = "[F]zf: [W]orkspace Symbols" })
 
             vim.api.nvim_create_user_command("Rg", function(arg)
                 fzf.live_grep_native({ search = arg.args })
