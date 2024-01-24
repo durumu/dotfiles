@@ -135,6 +135,7 @@ require("lazy").setup({
             })
         end,
     },
+    { "microsoft/python-type-stubs" },
     {
         "neovim/nvim-lspconfig",
         config = function()
@@ -204,6 +205,10 @@ require("lazy").setup({
                         },
                     },
                 },
+                before_init = function(_, config)
+                    config.settings.python.analysis.stubPath =
+                        vim.fs.joinpath(vim.fn.stdpath("data"), "lazy", "python-type-stubs")
+                end,
             })
 
             local organize_augroup = "organize_imports"
@@ -284,6 +289,8 @@ require("lazy").setup({
                     },
                 },
             })
+
+            lsp.zls.setup({ on_attach = on_attach })
         end,
     },
     {
@@ -354,7 +361,11 @@ require("lazy").setup({
                 ["<leader>f"] = { name = "[F]zf", _ = "which_key_ignore" },
             })
 
-            vim.api.nvim_create_user_command("Fzf", fzf.resume, {})
+            vim.api.nvim_create_user_command(
+                "Fzf",
+                fzf.resume,
+                { desc = "Resume previous fzf session" }
+            )
 
             vim.keymap.set({ "n" }, "<leader>fa", function()
                 fzf.lsp_code_actions()
@@ -386,12 +397,20 @@ require("lazy").setup({
                 })
             end, { silent = true })
 
-            local function get_hash()
-                -- The get_hash() is utilised to create an independent "store"
-                -- By default `fre --add` adds to global history, in order to restrict this to
-                -- current directory we can create a hash which will keep history separate.
-                local hash = vim.fn.system("pwd | md5")
-                -- for linux, use vim.fn.system("pwd | md5sum | awk '{print $1}'")
+            local function get_store_name()
+                -- We hash the current directory to come up with a store name.
+                local os_result = string.lower(vim.fn.system("uname -s") or "")
+
+                local hash
+
+                if os_result:match("darwin") then
+                    hash = vim.fn.system("pwd | md5")
+                elseif os_result:match("linux") then
+                    hash = vim.fn.system("pwd | md5sum | awk '{print $1}'")
+                else
+                    vim.api.nvim_err_writeln("Unsupported operating system")
+                    return "default" -- fallback to default
+                end
                 vim.print(hash)
                 return hash
             end
@@ -399,7 +418,7 @@ require("lazy").setup({
             local function fzf_mru(opts)
                 opts = fzf.config.normalize_opts(opts, fzf.config.globals.files)
 
-                local fre = "fre --store_name " .. get_hash()
+                local fre = "fre --store_name " .. get_store_name()
                 local no_dups = [[awk '!x[$0]++']] -- remove dups, but keep order
                 -- todo: not sure why i need the zsh call here?
                 opts.cmd = [[zsh -c "cat <(]] .. fre .. [[ --sorted) <(rg --files)" | ]] .. no_dups
@@ -607,35 +626,47 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- Mappings
-local opts = { silent = true }
-
 -- navigation
-vim.keymap.set({ "n", "v" }, "j", [[v:count == 0 ? 'gj' : 'j']], { expr = true })
-vim.keymap.set({ "n", "v" }, "k", [[v:count == 0 ? 'gk' : 'k']], { expr = true })
-vim.keymap.set({ "n", "v" }, "<left>", "<C-w>h", opts)
-vim.keymap.set({ "n", "v" }, "<down>", "<C-w>j", opts)
-vim.keymap.set({ "n", "v" }, "<up>", "<C-w>k", opts)
-vim.keymap.set({ "n", "v" }, "<right>", "<C-w>l", opts)
-vim.keymap.set({ "n", "v" }, "<S-left>", "<C-w>H", opts)
-vim.keymap.set({ "n", "v" }, "<S-down>", "<C-w>J", opts)
-vim.keymap.set({ "n", "v" }, "<S-up>", "<C-w>K", opts)
-vim.keymap.set({ "n", "v" }, "<S-right>", "<C-w>L", opts)
+vim.keymap.set(
+    { "n", "v" },
+    "j",
+    [[v:count == 0 ? 'gj' : 'j']],
+    { expr = true, desc = "Move down by display line" }
+)
+vim.keymap.set(
+    { "n", "v" },
+    "k",
+    [[v:count == 0 ? 'gk' : 'k']],
+    { expr = true, desc = "Move up by display line" }
+)
+vim.keymap.set("n", "<left>", "<C-w>h", { desc = "Move to left window" })
+vim.keymap.set("n", "<down>", "<C-w>j", { desc = "Move to bottom window" })
+vim.keymap.set("n", "<up>", "<C-w>k", { desc = "Move to top window" })
+vim.keymap.set("n", "<right>", "<C-w>l", { desc = "Move to right window" })
+vim.keymap.set("n", "<S-left>", "<C-w>H", { desc = "Move window to the left" })
+vim.keymap.set("n", "<S-down>", "<C-w>J", { desc = "Move window to the bottom" })
+vim.keymap.set("n", "<S-up>", "<C-w>K", { desc = "Move window to the top" })
+vim.keymap.set("n", "<S-right>", "<C-w>L", { desc = "Move window to the right" })
 
-vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', opts)
-vim.keymap.set({ "n", "v" }, "<leader>Y", '"+y$', opts)
+vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { desc = "Yank to clipboard" })
+vim.keymap.set({ "n", "v" }, "<leader>Y", '"+y$', { desc = "Yank to end of line" })
 
--- a" includes whitespace, 2i" does not
 for _, delimiter in ipairs({ "'", "`", '"' }) do
-    vim.keymap.set({ "o", "v" }, "a" .. delimiter, "2i" .. delimiter)
+    vim.keymap.set(
+        { "o", "v" },
+        "a" .. delimiter,
+        "2i" .. delimiter,
+        { desc = "Select inside " .. delimiter .. ", excluding whitespace" }
+    )
 end
 
 -- drop highlight on these, since mini.cursorword already highlights current word
-vim.keymap.set({ "n", "v" }, "*", "*:noh<CR>", opts)
-vim.keymap.set({ "n", "v" }, "#", "#:noh<CR>", opts)
+vim.keymap.set("n", "*", "*:noh<CR>", { desc = "Search backwards for word under cursor" })
+vim.keymap.set("n", "#", "#:noh<CR>", { desc = "Search for word under cursor" })
 
-vim.keymap.set({ "n", "v" }, "<tab>", vim.cmd.bnext, opts)
-vim.keymap.set({ "n", "v" }, "<S-tab>", vim.cmd.bprevious, opts)
+vim.keymap.set("n", "<S-tab>", vim.cmd.bprevious, { desc = "Previous buffer" })
+vim.keymap.set("n", "<tab>", vim.cmd.bnext, { desc = "Next buffer" })
 
-vim.keymap.set({ "n", "v" }, "<enter>", "<C-]>", opts)
+vim.keymap.set("n", "<enter>", "<C-]>", { desc = "Follow links" })
 
-vim.keymap.set({ "n", "v" }, "<leader><leader>", vim.cmd.noh, opts)
+vim.keymap.set("n", "<leader><leader>", vim.cmd.noh, { desc = "Clear search highlight" })
