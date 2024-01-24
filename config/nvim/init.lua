@@ -209,6 +209,7 @@ require("lazy").setup({
     { "tpope/vim-fugitive", event = "VeryLazy" },
     { -- Adds git related signs to the gutter, as well as utilities for managing changes
         "lewis6991/gitsigns.nvim",
+        dependencies = { "folke/which-key.nvim" },
         event = "VeryLazy",
         config = function()
             require("user.gitsigns")
