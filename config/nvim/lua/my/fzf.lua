@@ -38,18 +38,7 @@ end, { silent = true })
 
 local function get_store_name()
     -- We hash the current directory to come up with a store name.
-    local os_result = string.lower(vim.fn.system("uname -s") or "")
-
-    local hash
-
-    if os_result:match("darwin") then
-        hash = vim.fn.system("pwd | md5")
-    elseif os_result:match("linux") then
-        hash = vim.fn.system("pwd | md5sum | awk '{print $1}'")
-    else
-        vim.api.nvim_err_writeln("Unsupported operating system")
-        return "default" -- fallback to default
-    end
+    local hash = vim.fn.system("pwd | md5sum | awk '{print $1}'")
     vim.print(hash)
     return hash
 end

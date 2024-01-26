@@ -2,14 +2,14 @@
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
-vim.g.python3_host_prog = "/Users/presley/tools/venvs/main/bin/python3"
+vim.g.python3_host_prog = "/mys/presley/tools/venvs/main/bin/python3"
 vim.g.python_version = 311
 
 vim.g.mapleader = " " -- before everything else
 
-require("user.options")
-require("user.autocommands")
-require("user.keymaps")
+require("my.options")
+require("my.autocommands")
+require("my.keymaps")
 
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -109,7 +109,7 @@ require("lazy").setup({
         dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
         build = ":TSUpdate",
         config = function()
-            require("user.treesitter")
+            require("my.treesitter")
         end,
     },
     {
@@ -121,7 +121,7 @@ require("lazy").setup({
         },
         config = function()
             require("neodev").setup({})
-            require("user.lsp")
+            require("my.lsp")
         end,
     },
     {
@@ -132,6 +132,7 @@ require("lazy").setup({
             formatters_by_ft = {
                 lua = { "stylua" },
                 go = { "goimports" },
+                json = { "clang_format" },
                 -- everything else uses the LSP formatter.
             },
         },
@@ -185,7 +186,7 @@ require("lazy").setup({
         dependencies = { "nvim-tree/nvim-web-devicons", "folke/which-key.nvim" },
         event = "VeryLazy",
         config = function()
-            require("user.fzf")
+            require("my.fzf")
         end,
     },
     { -- file tree
@@ -212,7 +213,7 @@ require("lazy").setup({
         dependencies = { "folke/which-key.nvim" },
         event = "VeryLazy",
         config = function()
-            require("user.gitsigns")
+            require("my.gitsigns")
         end,
     },
 })

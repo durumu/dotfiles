@@ -101,7 +101,12 @@ lsp.rust_analyzer.setup({
 })
 
 lsp.clangd.setup({
-    on_attach = on_attach,
+    on_attach = function(client, bufnr)
+        on_attach(client, bufnr)
+        vim.api.nvim_buf_create_user_command(bufnr, "A", function()
+            vim.cmd([[ClangdSwitchSourceHeader]])
+        end, { desc = "Switch between source and header" })
+    end,
     settings = { fallbackFlags = { "-std=c++2a" } },
 })
 

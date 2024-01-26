@@ -6,6 +6,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
         vim.highlight.on_yank({ timeout = 200 })
     end,
 })
+
 vim.api.nvim_create_autocmd("FileType", {
     desc = "Add a color column immediately after the max line length",
     pattern = "*",
@@ -21,5 +22,16 @@ vim.api.nvim_create_autocmd("FileType", {
         if line_length then
             vim.wo.colorcolumn = tostring(line_length + 1)
         end
+    end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+    desc = "Override indentation defaults for tab-based languages",
+    pattern = { "go", "make" },
+    callback = function()
+        vim.bo.expandtab = false
+        vim.bo.shiftwidth = 0
+        vim.bo.softtabstop = 0
+        vim.bo.tabstop = 4
     end,
 })
