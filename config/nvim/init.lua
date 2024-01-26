@@ -73,6 +73,7 @@ require("lazy").setup({
                 { v = "~/.dotfiles/config/nvim/init.lua" },
                 { z = "~/.zshrc" },
                 { a = "~/.aliases" },
+                { e = "~/.zshenv" },
             }
         end,
     },

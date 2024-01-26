@@ -1,12 +1,7 @@
+zmodload zsh/zprof
+
 # get brew to work
 eval "$(/opt/homebrew/bin/brew shellenv)"
-
-export LANG=en_US.UTF-8
-export EDITOR=/opt/homebrew/bin/nvim
-export SHELL=/bin/zsh
-
-export PATH="/usr/local/texlive/2023/bin/universal-darwin:$HOME/.local/bin:$HOME/go/bin:$PATH"
-export LIBRARY_PATH="$LIBRARY_PATH:/opt/homebrew/lib"
 
 export OPENAI_API_KEY=$(cat ~/.secret/openai.key)
 export SSH_KEY_PATH="~/.ssh/rsa_id"
@@ -27,9 +22,19 @@ zstyle ':vcs_info:*' unstagedstr '•'
 # %(!.#.>) - # if superuser, > if not
 PROMPT='%B%F{blue}%2~%f ${vcs_info_msg_0_}%F{blue}%(!.#.>)%f %b'
 
+# Autocomplete
+autoload -Uz compinit
+# from https://carlosbecker.com/posts/speeding-up-zsh/
+if [ $(date +'%j') != $(/usr/bin/stat -f '%Sm' -t '%j' ${ZDOTDIR:-$HOME}/.zcompdump) ]; then
+  compinit
+else
+  compinit -C
+fi
+
 # Fzf
 export FZF_CTRL_T_COMMAND='command cat <(fre --sorted) <(fd -t d) <(fd -t d . ~/code) <(fd -t d . ~/tools) <(fd -t d . ~/docs)'
 export FZF_CTRL_T_OPTS='--tiebreak=index'
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # History (unlimited)
 HISTFILE="$HOME/.zsh_history"
@@ -40,5 +45,3 @@ setopt hist_ignore_all_dups
 # Do not record commands that start with a space in history
 setopt hist_ignore_space
 
-[ -f ~/.aliases ] && source ~/.aliases
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

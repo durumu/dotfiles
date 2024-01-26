@@ -14,6 +14,6 @@
       path: config/*
       exclude: [ config/nvim ]
     ~/.zshrc:
-    ~/.aliases:
+    ~/.zshenv:
     ~/.gitconfig:
     ~/.gitignore:
