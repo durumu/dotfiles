@@ -76,7 +76,7 @@ require("lazy").setup({
             }
         end,
     },
-    { "tpope/vim-sleuth", event = "VeryLazy" }, -- autodetect shiftwidth/expandtab etc
+    { "tpope/vim-sleuth" }, -- autodetect shiftwidth/expandtab etc
 
     -- General Editing
     { "tpope/vim-surround", event = "VeryLazy" }, -- cs/ds/ys

@@ -23,7 +23,6 @@ vim.o.ignorecase = true -- Ignore case when searching (use `\C` to force not doi
 vim.o.incsearch = true -- Show search results while typing
 vim.o.infercase = true -- Infer letter cases for a richer built-in keyword completion
 vim.o.smartcase = true -- Don't ignore case when searching if pattern has upper case
-vim.o.smartindent = true -- Make indenting smart
 
 -- Tabs
 vim.o.expandtab = true -- Use spaces instead of tabs
