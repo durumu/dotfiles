@@ -12,8 +12,12 @@
     ~/.config:
       glob: true
       path: config/*
-      exclude: [ config/nvim ]
-    ~/.zshrc:
-    ~/.zshenv:
+      exclude:
+        - config/nvim
+    ~/.aliases:
     ~/.gitconfig:
+    ~/.xinitrc:
+    ~/.gdbinit:
     ~/.gitignore:
+    ~/.zshenv:
+    ~/.zshrc:

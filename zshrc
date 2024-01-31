@@ -1,11 +1,5 @@
 zmodload zsh/zprof
 
-# get brew to work
-eval "$(/opt/homebrew/bin/brew shellenv)"
-
-export OPENAI_API_KEY=$(cat ~/.secret/openai.key)
-export SSH_KEY_PATH="~/.ssh/rsa_id"
-
 # Prompt
 # git (ref https://sampo.website/blog/en/2021/zsh/)
 autoload -Uz vcs_info
@@ -24,17 +18,16 @@ PROMPT='%B%F{blue}%2~%f ${vcs_info_msg_0_}%F{blue}%(!.#.>)%f %b'
 
 # Autocomplete
 autoload -Uz compinit
-# from https://carlosbecker.com/posts/speeding-up-zsh/
-if [ $(date +'%j') != $(/usr/bin/stat -f '%Sm' -t '%j' ${ZDOTDIR:-$HOME}/.zcompdump) ]; then
-  compinit
-else
-  compinit -C
-fi
+compinit -C
 
 # Fzf
 export FZF_CTRL_T_COMMAND='command cat <(fre --sorted) <(fd -t d) <(fd -t d . ~/code) <(fd -t d . ~/tools) <(fd -t d . ~/docs)'
 export FZF_CTRL_T_OPTS='--tiebreak=index'
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ] && source /usr/share/doc/fzf/examples/key-bindings.zsh
+[ -f /usr/share/doc/fzf/examples/completion.zsh ] && source /usr/share/doc/fzf/examples/completion.zsh
+
 
 # History (unlimited)
 HISTFILE="$HOME/.zsh_history"
@@ -45,3 +38,4 @@ setopt hist_ignore_all_dups
 # Do not record commands that start with a space in history
 setopt hist_ignore_space
 
+source ~/.aliases
