@@ -2,7 +2,7 @@
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
-vim.g.python3_host_prog = "/mys/presley/tools/venvs/main/bin/python3"
+vim.g.python3_host_prog = vim.fs.joinpath(vim.uv.os_homedir(), "tools/venvs/main/bin/python3")
 vim.g.python_version = 311
 
 vim.g.mapleader = " " -- before everything else
@@ -73,11 +73,22 @@ require("lazy").setup({
                 { v = "~/.dotfiles/config/nvim/init.lua" },
                 { z = "~/.zshrc" },
                 { a = "~/.aliases" },
-                { e = "~/.zshenv" },
             }
         end,
     },
     { "tpope/vim-sleuth" }, -- autodetect shiftwidth/expandtab etc
+    {
+        "neovim/nvim-lspconfig",
+        dependencies = {
+            "microsoft/python-type-stubs",
+            "folke/neodev.nvim",
+            "folke/which-key.nvim",
+        },
+        config = function()
+            require("neodev").setup({}) -- has to occur before configuring lsp.
+            require("my.lsp")
+        end,
+    },
 
     -- General Editing
     { "tpope/vim-surround", event = "VeryLazy" }, -- cs/ds/ys
@@ -101,7 +112,6 @@ require("lazy").setup({
             )
         end,
     },
-    { "folke/which-key.nvim", event = "VeryLazy", opts = {} }, -- show pending keybinds.
 
     -- Code
     {
@@ -111,18 +121,6 @@ require("lazy").setup({
         build = ":TSUpdate",
         config = function()
             require("my.treesitter")
-        end,
-    },
-    {
-        "neovim/nvim-lspconfig",
-        dependencies = {
-            "microsoft/python-type-stubs",
-            "folke/neodev.nvim",
-            "folke/which-key.nvim",
-        },
-        config = function()
-            require("neodev").setup({})
-            require("my.lsp")
         end,
     },
     {
@@ -141,7 +139,7 @@ require("lazy").setup({
     {
         "folke/trouble.nvim",
         event = "VeryLazy",
-        dependencies = { "nvim-tree/nvim-web-devicons" },
+        dependencies = { "nvim-tree/nvim-web-devicons", "folke/which-key.nvim" },
         config = function()
             require("trouble").setup({})
 
@@ -149,6 +147,10 @@ require("lazy").setup({
             vim.keymap.set({ "n", "v" }, "<leader>xq", function()
                 vim.cmd.TroubleToggle("quickfix")
             end, { desc = "Trouble (quickfix)" })
+
+            require("which-key").register({
+                ["<leader>x"] = { name = "Trouble", _ = "which_key_ignore" },
+            })
         end,
     },
 
@@ -179,7 +181,7 @@ require("lazy").setup({
             })
         end,
     },
-    { "github/copilot.vim", event = "VeryLazy" },
+    -- { "github/copilot.vim", event = "VeryLazy" },
 
     -- Project Navigation
     {
