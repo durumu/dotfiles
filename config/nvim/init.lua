@@ -104,7 +104,29 @@ require("lazy").setup({
         dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
         build = ":TSUpdate",
         config = function()
-            require("my.treesitter")
+            require("nvim-treesitter.configs").setup({
+                ensure_installed = "all",
+                auto_install = true,
+                highlight = { enable = true },
+                indent = { enable = true },
+                textobjects = {
+                    select = {
+                        enable = true,
+                        keymaps = {
+                            ["i,"] = "@parameter.inner",
+                            ["a,"] = "@parameter.outer",
+                            ["ic"] = "@comment.inner",
+                            ["ac"] = "@comment.outer",
+                            ["if"] = "@function.inner",
+                            ["af"] = "@function.outer",
+                            ["il"] = "@class.inner",
+                            ["al"] = "@class.outer",
+                            ["ix"] = "@call.inner",
+                            ["ax"] = "@call.outer",
+                        },
+                    },
+                },
+            })
         end,
     },
     {

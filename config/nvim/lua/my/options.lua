@@ -1,9 +1,6 @@
 -- General
 vim.o.undofile = true -- Enable persistent undo (see also `:h undodir`)
 
-vim.o.backup = false -- Don't store backup while overwriting the file
-vim.o.writebackup = false -- Don't store backup while overwriting the file
-
 -- Appearance
 vim.o.cursorline = true -- Highlight current line
 vim.o.linebreak = true -- Wrap long lines at 'breakat' (if 'wrap' is set)
