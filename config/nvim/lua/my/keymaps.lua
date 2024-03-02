@@ -45,6 +45,13 @@ vim.keymap.set("n", "#", "#:noh<CR>", { desc = "Search for word under cursor" })
 
 vim.keymap.set("n", "<leader><leader>", vim.cmd.noh, { desc = "Clear search highlight" })
 
+-- diagnostic
 vim.keymap.set("n", "gl", vim.diagnostic.open_float, { desc = "Show full text in hover" })
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+
+-- quickfix ([Q, [q and ]q added by vim-unimpaired)
+vim.keymap.set("n", "<leader>qq", vim.cmd.cwindow, { desc = "Toggle quickfix window" })
+vim.keymap.set("n", "<leader>qo", vim.cmd.copen, { desc = "Open quickfix window" })
+vim.keymap.set("n", "<leader>qc", vim.cmd.cclose, { desc = "Close quickfix window" })
+vim.keymap.set("n", "<leader>qn", vim.cmd.cnfile, { desc = "Quickfix next file" })

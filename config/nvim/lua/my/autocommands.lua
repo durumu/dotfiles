@@ -55,7 +55,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 })
 
 vim.api.nvim_set_hl(0, "HighlightTrailingWhitespace", { bg = "#e06c75", fg = "none" })
-local match_id = 4435
+local match_id = 44357
 
 vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave" }, {
     desc = "Highlight trailing whitespace",
@@ -65,7 +65,8 @@ vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave" }, {
         if vim.bo[buf].readonly then
             return
         end
-        vim.fn.matchadd("HighlightTrailingWhitespace", [[\s\+$]], 0, match_id)
+        pcall(vim.fn.matchdelete, match_id)
+        vim.fn.matchadd("HighlightTrailingWhitespace", [[\s\+$]], 10, match_id)
     end,
 })
 
