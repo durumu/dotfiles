@@ -18,7 +18,6 @@ local on_attach = function(_, bufnr)
     nmap("gr", vim.lsp.buf.references, "[G]oto [R]eferences")
     nmap("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
 
-    -- See `:help K` for why this keymap
     nmap("K", vim.lsp.buf.hover, "Hover Documentation")
     nmap("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
 end
@@ -49,7 +48,11 @@ lsp.pyright.setup({
             pythonPath = vim.g.python3_host_prog,
             analysis = {
                 diagnosticMode = "openFilesOnly",
-                stubPath = vim.fs.joinpath(vim.fn.stdpath("data"), "lazy", "python-type-stubs"),
+                stubPath = vim.fs.joinpath(
+                    tostring(vim.fn.stdpath("data")),
+                    "lazy",
+                    "python-type-stubs"
+                ),
             },
         },
     },

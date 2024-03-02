@@ -44,3 +44,7 @@ vim.keymap.set("n", "*", "*:noh<CR>", { desc = "Search backwards for word under 
 vim.keymap.set("n", "#", "#:noh<CR>", { desc = "Search for word under cursor" })
 
 vim.keymap.set("n", "<leader><leader>", vim.cmd.noh, { desc = "Clear search highlight" })
+
+vim.keymap.set("n", "gl", vim.diagnostic.open_float, { desc = "Show full text in hover" })
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })

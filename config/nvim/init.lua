@@ -94,24 +94,8 @@ require("lazy").setup({
     { "tpope/vim-surround", event = "VeryLazy" }, -- cs/ds/ys
     { "tpope/vim-commentary", event = "VeryLazy" }, -- gc
     { "tpope/vim-repeat", event = "VeryLazy" }, -- .
-    {
-        "echasnovski/mini.bracketed",
-        event = "VeryLazy",
-        opts = { comment = { suffix = "" } }, -- [c reserved for fugitive
-    },
+    { "tpope/vim-unimpaired", event = "VeryLazy" }, -- []
     { "echasnovski/mini.cursorword", event = "VeryLazy", opts = { delay = 0 } },
-    { -- highlight and delete trailing whitespace
-        "echasnovski/mini.trailspace",
-        config = function()
-            local trailspace = require("mini.trailspace")
-            trailspace.setup()
-
-            vim.api.nvim_create_autocmd(
-                "BufWritePre",
-                { desc = "Delete trailing whitespace on save", callback = trailspace.trim }
-            )
-        end,
-    },
 
     -- Code
     {
@@ -135,23 +119,6 @@ require("lazy").setup({
                 -- everything else uses the LSP formatter.
             },
         },
-    },
-    {
-        "folke/trouble.nvim",
-        event = "VeryLazy",
-        dependencies = { "nvim-tree/nvim-web-devicons", "folke/which-key.nvim" },
-        config = function()
-            require("trouble").setup({})
-
-            vim.keymap.set({ "n", "v" }, "<leader>xx", vim.cmd.TroubleToggle, { desc = "Trouble" })
-            vim.keymap.set({ "n", "v" }, "<leader>xq", function()
-                vim.cmd.TroubleToggle("quickfix")
-            end, { desc = "Trouble (quickfix)" })
-
-            require("which-key").register({
-                ["<leader>x"] = { name = "Trouble", _ = "which_key_ignore" },
-            })
-        end,
     },
 
     -- Autocomplete
