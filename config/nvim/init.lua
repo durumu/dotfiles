@@ -1,3 +1,5 @@
+vim.loader.enable() -- experimental bytecode compiler
+
 -- disable netrw (we use nvim-tree instead)
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
