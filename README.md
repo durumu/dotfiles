@@ -1,6 +1,6 @@
 # ~
 
-My dotfiles repo. Uses [Dotbot](https://github.com/anishathalye/dotbot). 
+My dotfiles repo. Uses [Dotbot](https://github.com/anishathalye/dotbot).
 
 ## Setup
 
