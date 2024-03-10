@@ -28,9 +28,7 @@ require("gitsigns").setup({
             if vim.wo.diff then
                 return "]g"
             end
-            vim.schedule(function()
-                gs.next_hunk()
-            end)
+            vim.schedule(function() gs.next_hunk() end)
             return "<Ignore>"
         end, { expr = true, desc = "Jump to next hunk" })
 
@@ -38,20 +36,24 @@ require("gitsigns").setup({
             if vim.wo.diff then
                 return "[g"
             end
-            vim.schedule(function()
-                gs.prev_hunk()
-            end)
+            vim.schedule(function() gs.prev_hunk() end)
             return "<Ignore>"
         end, { expr = true, desc = "Jump to previous hunk" })
 
         -- Hunk Actions
         -- visual mode
-        map("v", "<leader>hs", function()
-            gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
-        end, { desc = "stage git hunk" })
-        map("v", "<leader>hr", function()
-            gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
-        end, { desc = "reset git hunk" })
+        map(
+            "v",
+            "<leader>hs",
+            function() gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") }) end,
+            { desc = "stage git hunk" }
+        )
+        map(
+            "v",
+            "<leader>hr",
+            function() gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") }) end,
+            { desc = "reset git hunk" }
+        )
         -- normal mode
         map("n", "<leader>hs", gs.stage_hunk, { desc = "git stage hunk" })
         map("n", "<leader>hr", gs.reset_hunk, { desc = "git reset hunk" })
@@ -61,12 +63,18 @@ require("gitsigns").setup({
 
         -- Git Actions
         map("n", "<leader>gd", gs.diffthis, { desc = "git diff against index" })
-        map("n", "<leader>gD", function()
-            gs.diffthis("~")
-        end, { desc = "git Diff against last commit" })
-        map("n", "<leader>gm", function()
-            gs.blame_line({ full = false })
-        end, { desc = "git blame line" })
+        map(
+            "n",
+            "<leader>gD",
+            function() gs.diffthis("~") end,
+            { desc = "git Diff against last commit" }
+        )
+        map(
+            "n",
+            "<leader>gm",
+            function() gs.blame_line({ full = false }) end,
+            { desc = "git blame line" }
+        )
         map("n", "<leader>gR", gs.reset_buffer, { desc = "git Reset buffer" })
 
         -- Toggles
@@ -75,11 +83,17 @@ require("gitsigns").setup({
         map("n", "<leader>tw", gs.toggle_word_diff, { desc = "toggle word diff " })
 
         -- Text object
-        map({ "o", "x" }, "ih", function()
-            vim.cmd.Gitsigns("select hunk")
-        end, { desc = "select git hunk" })
-        map({ "o", "x" }, "ah", function()
-            vim.cmd.Gitsigns("select hunk")
-        end, { desc = "select git hunk" })
+        map(
+            { "o", "x" },
+            "ih",
+            function() vim.cmd.Gitsigns("select hunk") end,
+            { desc = "select git hunk" }
+        )
+        map(
+            { "o", "x" },
+            "ah",
+            function() vim.cmd.Gitsigns("select hunk") end,
+            { desc = "select git hunk" }
+        )
     end,
 })

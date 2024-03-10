@@ -6,18 +6,30 @@ require("which-key").register({
 
 vim.api.nvim_create_user_command("Fzf", fzf.resume, { desc = "Resume previous fzf session" })
 
-vim.keymap.set({ "n" }, "<leader>fa", function()
-    fzf.lsp_code_actions()
-end, { desc = "[F]zf: Code [A]ction" })
-vim.keymap.set({ "n" }, "<leader>fb", function()
-    fzf.lsp_document_symbols()
-end, { desc = "[F]zf: [B]uffers" })
-vim.keymap.set({ "n" }, "<leader>fd", function()
-    fzf.lsp_document_symbols()
-end, { desc = "[F]zf: [D]ocument Symbols" })
-vim.keymap.set({ "n" }, "<leader>fw", function()
-    fzf.lsp_workspace_symbols()
-end, { desc = "[F]zf: [W]orkspace Symbols" })
+vim.keymap.set(
+    { "n" },
+    "<leader>fa",
+    function() fzf.lsp_code_actions() end,
+    { desc = "[F]zf: Code [A]ction" }
+)
+vim.keymap.set(
+    { "n" },
+    "<leader>fb",
+    function() fzf.lsp_document_symbols() end,
+    { desc = "[F]zf: [B]uffers" }
+)
+vim.keymap.set(
+    { "n" },
+    "<leader>fd",
+    function() fzf.lsp_document_symbols() end,
+    { desc = "[F]zf: [D]ocument Symbols" }
+)
+vim.keymap.set(
+    { "n" },
+    "<leader>fw",
+    function() fzf.lsp_workspace_symbols() end,
+    { desc = "[F]zf: [W]orkspace Symbols" }
+)
 
 vim.keymap.set(
     { "n" },
@@ -27,15 +39,18 @@ vim.keymap.set(
 )
 
 -- like s.strip() in python
-local function strip(s)
-    return (s:gsub("^%s*(.-)%s*$", "%1"))
-end
+local function strip(s) return (s:gsub("^%s*(.-)%s*$", "%1")) end
 
-vim.keymap.set({ "v" }, "<leader>rg", function()
-    fzf.live_grep_native({
-        search = strip(fzf.utils.get_visual_selection()),
-    })
-end, { silent = true })
+vim.keymap.set(
+    { "v" },
+    "<leader>rg",
+    function()
+        fzf.live_grep_native({
+            search = strip(fzf.utils.get_visual_selection()),
+        })
+    end,
+    { silent = true }
+)
 
 local function get_store_name()
     -- We hash the current directory to come up with a store name.

@@ -176,9 +176,7 @@ require("lazy").setup({
         "ibhagwan/fzf-lua",
         dependencies = { "nvim-tree/nvim-web-devicons", "folke/which-key.nvim" },
         event = "VeryLazy",
-        config = function()
-            require("my.fzf")
-        end,
+        config = function() require("my.fzf") end,
     },
     { -- file tree
         "nvim-tree/nvim-tree.lua",
@@ -204,8 +202,6 @@ require("lazy").setup({
         "lewis6991/gitsigns.nvim",
         dependencies = { "folke/which-key.nvim" },
         event = "VeryLazy",
-        config = function()
-            require("my.gitsigns")
-        end,
+        config = function() require("my.gitsigns") end,
     },
 })

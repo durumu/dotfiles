@@ -71,9 +71,7 @@ lsp.ruff_lsp.setup({
 
         local perform_code_action_titled = function(title)
             vim.lsp.buf.code_action({
-                filter = function(code_action)
-                    return code_action.title == title
-                end,
+                filter = function(code_action) return code_action.title == title end,
                 apply = true,
             })
         end
@@ -82,14 +80,15 @@ lsp.ruff_lsp.setup({
             desc = "Automatically organize imports on save",
             group = organize_augroup,
             buffer = bufnr,
-            callback = function()
-                perform_code_action_titled("Ruff: Organize Imports")
-            end,
+            callback = function() perform_code_action_titled("Ruff: Organize Imports") end,
         })
 
-        vim.api.nvim_buf_create_user_command(bufnr, "T", function()
-            perform_code_action_titled("Ruff: Fix All")
-        end, { desc = "Fix all" })
+        vim.api.nvim_buf_create_user_command(
+            bufnr,
+            "T",
+            function() perform_code_action_titled("Ruff: Fix All") end,
+            { desc = "Fix all" }
+        )
     end,
 })
 
@@ -106,9 +105,12 @@ lsp.rust_analyzer.setup({
 lsp.clangd.setup({
     on_attach = function(client, bufnr)
         on_attach(client, bufnr)
-        vim.api.nvim_buf_create_user_command(bufnr, "A", function()
-            vim.cmd([[ClangdSwitchSourceHeader]])
-        end, { desc = "Switch between source and header" })
+        vim.api.nvim_buf_create_user_command(
+            bufnr,
+            "A",
+            function() vim.cmd([[ClangdSwitchSourceHeader]]) end,
+            { desc = "Switch between source and header" }
+        )
     end,
     settings = { clangd = { fallbackFlags = { "-std=c++2a" } } },
 })

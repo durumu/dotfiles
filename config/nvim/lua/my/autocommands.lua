@@ -2,9 +2,7 @@
 vim.api.nvim_create_autocmd("TextYankPost", {
     desc = "Highlight yanked text",
     pattern = "*",
-    callback = function()
-        vim.highlight.on_yank({ timeout = 200 })
-    end,
+    callback = function() vim.highlight.on_yank({ timeout = 200 }) end,
 })
 
 vim.api.nvim_create_autocmd("FileType", {
@@ -39,7 +37,5 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.api.nvim_create_autocmd("FileType", {
     desc = "Allow :make to run cargo commands for rust projects, e.g. :make build",
     pattern = { "rust" },
-    callback = function()
-        vim.cmd.compiler("cargo")
-    end,
+    callback = function() vim.cmd.compiler("cargo") end,
 })

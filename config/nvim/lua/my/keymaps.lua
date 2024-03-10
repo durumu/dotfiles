@@ -40,8 +40,18 @@ vim.keymap.set({ "n", "v" }, "<leader>Y", '"+y$', { desc = "Yank to end of line"
 
 -- search
 -- drop highlight on these, since mini.cursorword already highlights current word
-vim.keymap.set("n", "*", "*:noh<CR>", { desc = "Search backwards for word under cursor" })
-vim.keymap.set("n", "#", "#:noh<CR>", { desc = "Search for word under cursor" })
+vim.keymap.set(
+    "n",
+    "*",
+    "*:noh<CR>",
+    { desc = "Search backwards for word under cursor", silent = true }
+)
+vim.keymap.set(
+    "n",
+    "#",
+    "#:noh<CR>",
+    { desc = "Search forwards for word under cursor", silent = true }
+)
 
 vim.keymap.set("n", "<leader><leader>", vim.cmd.noh, { desc = "Clear search highlight" })
 
