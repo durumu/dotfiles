@@ -19,11 +19,12 @@ vim.keymap.set({ "n" }, "<leader>fw", function()
     fzf.lsp_workspace_symbols()
 end, { desc = "[F]zf: [W]orkspace Symbols" })
 
-vim.api.nvim_create_user_command("Rg", function(arg)
-    fzf.live_grep_native({ search = arg.args })
-end, { nargs = "*" })
-
-vim.keymap.set({ "n" }, "<leader>rg", fzf.live_grep_native, { silent = true })
+vim.keymap.set(
+    { "n" },
+    "<leader>rg",
+    fzf.live_grep_native,
+    { desc = "[R]ip[g]rep codebase", silent = true }
+)
 
 -- like s.strip() in python
 local function strip(s)
@@ -38,9 +39,7 @@ end, { silent = true })
 
 local function get_store_name()
     -- We hash the current directory to come up with a store name.
-    local hash = vim.fn.system("pwd | md5sum | awk '{print $1}'")
-    vim.print(hash)
-    return hash
+    return vim.fn.system("pwd | md5sum | awk '{print $1}'")
 end
 
 local function fzf_mru(opts)
@@ -77,7 +76,6 @@ local function fzf_mru(opts)
     end)()
 end
 
-vim.api.nvim_create_user_command("FzfMru", fzf_mru, {})
 vim.keymap.set("n", "<C-p>", fzf_mru, { desc = "Open Files" })
 
 -- also, need to install: rg, fre, fzf, fd

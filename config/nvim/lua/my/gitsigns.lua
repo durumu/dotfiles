@@ -14,13 +14,6 @@ require("which-key").register({
 
 require("gitsigns").setup({
     -- See `:help gitsigns.txt`
-    signs = {
-        add = { text = "+" },
-        change = { text = "~" },
-        delete = { text = "_" },
-        topdelete = { text = "‾" },
-        changedelete = { text = "≃" },
-    },
     on_attach = function(bufnr)
         local gs = require("gitsigns")
 
@@ -79,9 +72,13 @@ require("gitsigns").setup({
         -- Toggles
         map("n", "<leader>tb", gs.toggle_current_line_blame, { desc = "toggle git blame line" })
         map("n", "<leader>td", gs.toggle_deleted, { desc = "toggle git show deleted" })
+        map("n", "<leader>tw", gs.toggle_word_diff, { desc = "toggle word diff " })
 
         -- Text object
         map({ "o", "x" }, "ih", function()
+            vim.cmd.Gitsigns("select hunk")
+        end, { desc = "select git hunk" })
+        map({ "o", "x" }, "ah", function()
             vim.cmd.Gitsigns("select hunk")
         end, { desc = "select git hunk" })
     end,

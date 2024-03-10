@@ -29,21 +29,21 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     -- Essential (non-lazy)
-    { --colorscheme
+    { -- colorscheme
         "folke/tokyonight.nvim",
         priority = 1000, -- load before other plugins
-        config = function()
-            require("tokyonight").setup({
-                style = "moon", -- bg=dark
-                light_style = "day", -- bg=light
-                styles = {
-                    -- Style to be applied to different syntax groups
-                    -- Value is any valid attr-list value for `:help nvim_set_hl`
-                    keywords = { italic = false },
-                },
-                sidebars = { "qf", "help", "terminal" }, -- darker background on sidebars
-                lualine_bold = true, -- bold tab headers in the lualine theme
-            })
+        opts = {
+            style = "moon",
+            styles = {
+                -- Style to be applied to different syntax groups
+                -- Value is any valid attr-list value for `:help nvim_set_hl`
+                keywords = { italic = false },
+            },
+            sidebars = { "qf", "help", "terminal" }, -- darker background on sidebars
+            lualine_bold = true, -- bold tab headers in the lualine theme
+        },
+        config = function(_, opts)
+            require("tokyonight").setup(opts)
             vim.cmd.colorscheme("tokyonight")
         end,
     },
@@ -105,31 +105,29 @@ require("lazy").setup({
         event = "VeryLazy",
         dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
         build = ":TSUpdate",
-        config = function()
-            require("nvim-treesitter.configs").setup({
-                ensure_installed = "all",
-                auto_install = true,
-                highlight = { enable = true },
-                indent = { enable = true },
-                textobjects = {
-                    select = {
-                        enable = true,
-                        keymaps = {
-                            ["i,"] = "@parameter.inner",
-                            ["a,"] = "@parameter.outer",
-                            ["ic"] = "@comment.inner",
-                            ["ac"] = "@comment.outer",
-                            ["if"] = "@function.inner",
-                            ["af"] = "@function.outer",
-                            ["il"] = "@class.inner",
-                            ["al"] = "@class.outer",
-                            ["ix"] = "@call.inner",
-                            ["ax"] = "@call.outer",
-                        },
+        opts = {
+            ensure_installed = "all",
+            auto_install = true,
+            highlight = { enable = true },
+            indent = { enable = true },
+            textobjects = {
+                select = {
+                    enable = true,
+                    keymaps = {
+                        ["i,"] = "@parameter.inner",
+                        ["a,"] = "@parameter.outer",
+                        ["ic"] = "@comment.inner",
+                        ["ac"] = "@comment.outer",
+                        ["if"] = "@function.inner",
+                        ["af"] = "@function.outer",
+                        ["il"] = "@class.inner",
+                        ["al"] = "@class.outer",
+                        ["ix"] = "@call.inner",
+                        ["ax"] = "@call.outer",
                     },
                 },
-            })
-        end,
+            },
+        },
     },
     {
         "stevearc/conform.nvim",
@@ -172,7 +170,6 @@ require("lazy").setup({
             })
         end,
     },
-    -- { "github/copilot.vim", event = "VeryLazy" },
 
     -- Project Navigation
     {
@@ -187,14 +184,15 @@ require("lazy").setup({
         "nvim-tree/nvim-tree.lua",
         event = "VeryLazy",
         dependencies = { "nvim-tree/nvim-web-devicons" },
-        config = function()
-            require("nvim-tree").setup({
-                sort_by = "case_sensitive",
-                view = { width = 30 },
-                filters = { dotfiles = false },
-                actions = { open_file = { quit_on_open = true } },
-                update_focused_file = { enable = true },
-            })
+        opts = {
+            sort_by = "case_sensitive",
+            view = { width = 30 },
+            filters = { dotfiles = false },
+            actions = { open_file = { quit_on_open = true } },
+            update_focused_file = { enable = true },
+        },
+        config = function(_, opts)
+            require("nvim-tree").setup(opts)
             vim.keymap.set({ "n", "v" }, "<C-f>", vim.cmd.NvimTreeToggle, { desc = "NvimTree" })
         end,
     },

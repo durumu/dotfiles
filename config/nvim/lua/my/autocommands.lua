@@ -43,37 +43,3 @@ vim.api.nvim_create_autocmd("FileType", {
         vim.cmd.compiler("cargo")
     end,
 })
-
-vim.api.nvim_create_autocmd("BufWritePre", {
-    desc = "Delete trailing whitespace on save",
-    pattern = "*",
-    callback = function()
-        local curpos = vim.api.nvim_win_get_cursor(0)
-        vim.cmd([[keeppatterns %s/\s\+$//e]])
-        vim.api.nvim_win_set_cursor(0, curpos)
-    end,
-})
-
-vim.api.nvim_set_hl(0, "HighlightTrailingWhitespace", { bg = "#e06c75", fg = "none" })
-local match_id = 44357
-
-vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave" }, {
-    desc = "Highlight trailing whitespace",
-    pattern = "*",
-    callback = function()
-        local buf = vim.api.nvim_win_get_buf(0)
-        if vim.bo[buf].readonly then
-            return
-        end
-        pcall(vim.fn.matchdelete, match_id)
-        vim.fn.matchadd("HighlightTrailingWhitespace", [[\s\+$]], 10, match_id)
-    end,
-})
-
-vim.api.nvim_create_autocmd({ "BufLeave", "InsertEnter" }, {
-    desc = "Un-highlight trailing whitespace",
-    pattern = "*",
-    callback = function()
-        pcall(vim.fn.matchdelete, match_id)
-    end,
-})

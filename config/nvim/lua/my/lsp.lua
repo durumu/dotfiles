@@ -110,7 +110,7 @@ lsp.clangd.setup({
             vim.cmd([[ClangdSwitchSourceHeader]])
         end, { desc = "Switch between source and header" })
     end,
-    settings = { fallbackFlags = { "-std=c++2a" } },
+    settings = { clangd = { fallbackFlags = { "-std=c++2a" } } },
 })
 
 lsp.gopls.setup({
