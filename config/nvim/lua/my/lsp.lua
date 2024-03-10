@@ -1,32 +1,35 @@
--- [[ Configure LSP ]]
--- from https://github.com/nvim-lua/kickstart.nvim/blob/master/init.lua
 --  This function gets run when an LSP connects to a particular buffer.
-local on_attach = function(_, bufnr)
-    -- Function that lets us more easily define mappings specific
-    -- for LSP related items. It sets the mode, buffer and description for us each time.
-    local nmap = function(keys, func, desc)
-        if desc then
-            desc = "LSP: " .. desc
+local on_attach = function(client, bufnr)
+    local function map(mode, l, r, opts)
+        opts = opts or {}
+        opts.buffer = bufnr
+        if opts.desc then
+            opts.desc = "LSP: " .. opts.desc
         end
-
-        vim.keymap.set("n", keys, func, { buffer = bufnr, desc = desc })
+        vim.keymap.set(mode, l, r, opts)
     end
 
-    nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
+    map("n", "<leader>rn", vim.lsp.buf.rename, { desc = "[R]e[n]ame" })
 
-    nmap("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
-    nmap("gr", vim.lsp.buf.references, "[G]oto [R]eferences")
-    nmap("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
+    map("n", "gd", vim.lsp.buf.definition, { desc = "[G]oto [D]efinition" })
+    map("n", "gr", vim.lsp.buf.references, { desc = "[G]oto [R]eferences" })
+    map("n", "gI", vim.lsp.buf.implementation, { desc = "[G]oto [I]mplementation" })
 
-    nmap("K", vim.lsp.buf.hover, "Hover Documentation")
-    nmap("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
+    map("n", "K", vim.lsp.buf.hover, { desc = "Hover Documentation" })
+    map("n", "<C-k>", vim.lsp.buf.signature_help, { desc = "Signature Documentation" })
+
+    vim.api.nvim_buf_create_user_command(
+        bufnr,
+        "T",
+        function()
+            vim.lsp.buf.code_action({
+                context = { only = { "source.fixAll" } },
+                apply = true,
+            })
+        end,
+        { desc = "Fix all" }
+    )
 end
-
--- document existing key chains
-require("which-key").register({
-    ["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
-    ["<leader>w"] = { name = "[W]orkspace", _ = "which_key_ignore" },
-})
 
 local sign_gutter_character = {
     DiagnosticSignError = "",
@@ -40,55 +43,44 @@ end
 
 local lsp = require("lspconfig")
 
+-- python is installed at venv_root .. "/bin/python3"
+local venv_root = vim.fs.dirname(vim.fs.dirname(vim.g.python3_host_prog))
+
 lsp.pyright.setup({
-    cmd = { "/Users/presley/tools/venvs/main/bin/pyright-langserver", "--stdio" },
+    cmd = { vim.fs.joinpath(venv_root, "bin", "pyright-langserver"), "--stdio" },
     on_attach = on_attach,
     settings = {
         python = {
             pythonPath = vim.g.python3_host_prog,
             analysis = {
                 diagnosticMode = "openFilesOnly",
-                stubPath = vim.fs.joinpath(
-                    tostring(vim.fn.stdpath("data")),
-                    "lazy",
-                    "python-type-stubs"
-                ),
+                stubPath = vim.fs.joinpath(vim.fn.stdpath("data"), "lazy", "python-type-stubs"),
             },
         },
     },
 })
 
-local organize_augroup = "organize_imports"
 lsp.ruff_lsp.setup({
-    cmd = { "/Users/presley/tools/venvs/main/bin/ruff-lsp" },
+    cmd = { vim.fs.joinpath(venv_root, "bin", "ruff-lsp") },
     on_attach = function(client, bufnr)
         -- Disable hover in favor of Pyright
         client.server_capabilities.hoverProvider = false
 
-        vim.api.nvim_clear_autocmds({ group = organize_augroup, buffer = bufnr })
+        local organize_augroup = vim.api.nvim_create_augroup("organize_imports", { clear = true })
 
         on_attach(client, bufnr)
 
-        local perform_code_action_titled = function(title)
-            vim.lsp.buf.code_action({
-                filter = function(code_action) return code_action.title == title end,
-                apply = true,
-            })
-        end
-
         vim.api.nvim_create_autocmd("BufWritePre", {
-            desc = "Automatically organize imports on save",
-            group = organize_augroup,
             buffer = bufnr,
-            callback = function() perform_code_action_titled("Ruff: Organize Imports") end,
+            group = organize_augroup,
+            callback = function()
+                vim.lsp.buf.code_action({
+                    context = { only = { "source.organizeImports" } },
+                    apply = true,
+                })
+            end,
+            desc = "Automatically organize imports on save",
         })
-
-        vim.api.nvim_buf_create_user_command(
-            bufnr,
-            "T",
-            function() perform_code_action_titled("Ruff: Fix All") end,
-            { desc = "Fix all" }
-        )
     end,
 })
 
