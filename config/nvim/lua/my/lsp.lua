@@ -1,5 +1,5 @@
 --  This function gets run when an LSP connects to a particular buffer.
-local on_attach = function(client, bufnr)
+local on_attach = function(_, bufnr)
     local function map(mode, l, r, opts)
         opts = opts or {}
         opts.buffer = bufnr

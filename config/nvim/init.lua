@@ -51,12 +51,15 @@ require("lazy").setup({
         "nvim-lualine/lualine.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         opts = {
-            theme = "tokyonight",
             options = {
                 component_separators = { left = "│", right = "│" }, -- \u2502
                 section_separators = { left = "", right = "" },
             },
-            sections = { lualine_c = { { "filename", path = 1 } } },
+            sections = {
+                lualine_c = { { "filename", path = 1 } },
+                lualine_x = {},
+                lualine_y = { "filetype" },
+            },
             inactive_sections = { lualine_c = { { "filename", path = 1 } } },
             tabline = { lualine_a = { "buffers" } },
             extensions = { "lazy" },
@@ -73,8 +76,8 @@ require("lazy").setup({
             vim.g.startify_fortune_use_unicode = 1
             vim.g.startify_bookmarks = {
                 { v = "~/.dotfiles/config/nvim/init.lua" },
-                { z = "~/.zshrc" },
-                { a = "~/.aliases" },
+                { z = "~/.dotfiles/zshrc" },
+                { a = "~/.dotfiles/aliases" },
             }
         end,
     },
