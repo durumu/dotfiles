@@ -30,28 +30,19 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
     -- Essential (non-lazy)
     { -- colorscheme
-        "folke/tokyonight.nvim",
+        "navarasu/onedark.nvim",
         priority = 1000, -- load before other plugins
-        opts = {
-            style = "moon",
-            styles = {
-                -- Style to be applied to different syntax groups
-                -- Value is any valid attr-list value for `:help nvim_set_hl`
-                keywords = { italic = false },
-            },
-            sidebars = { "qf", "help", "terminal" }, -- darker background on sidebars
-            lualine_bold = true, -- bold tab headers in the lualine theme
-        },
+        opts = {},
         config = function(_, opts)
-            require("tokyonight").setup(opts)
-            vim.cmd.colorscheme("tokyonight")
+            require("onedark").setup(opts)
+            require("onedark").load()
         end,
     },
     { -- powerline
         "nvim-lualine/lualine.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         opts = {
-            theme = "tokyonight",
+            theme = "onedark",
             options = {
                 component_separators = { left = "│", right = "│" }, -- \u2502
                 section_separators = { left = "", right = "" },
