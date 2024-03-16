@@ -1,13 +1,11 @@
 -- Autocommands
 vim.api.nvim_create_autocmd("TextYankPost", {
     desc = "Highlight yanked text",
-    pattern = "*",
     callback = function() vim.highlight.on_yank({ timeout = 200 }) end,
 })
 
 vim.api.nvim_create_autocmd("FileType", {
     desc = "Add a color column immediately after the max line length",
-    pattern = "*",
     callback = function()
         local max_line_length = {
             lua = 100, -- stylua
