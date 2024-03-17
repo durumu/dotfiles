@@ -87,31 +87,67 @@ require("lazy").setup({
             require("my.lsp")
         end,
     },
-
-    -- General Editing
-    { "tpope/vim-surround", event = "VeryLazy" }, -- cs/ds/ys
-    { "tpope/vim-commentary", event = "VeryLazy" }, -- gc
-    { "tpope/vim-repeat", event = "VeryLazy" }, -- .
-    { "tpope/vim-unimpaired", event = "VeryLazy" }, -- []
-    { "echasnovski/mini.cursorword", event = "VeryLazy", opts = { delay = 0 } },
-
-    -- Code
     {
         "nvim-treesitter/nvim-treesitter",
-        event = "VeryLazy",
         dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
         build = ":TSUpdate",
         opts = {
-            ensure_installed = "all",
+            ensure_installed = {
+                "asm",
+                "comment",
+                "commonlisp",
+                "cpp",
+                "css",
+                "csv",
+                "diff",
+                "dockerfile",
+                "git_config",
+                "git_rebase",
+                "gitattributes",
+                "gitcommit",
+                "gitignore",
+                "go",
+                "gomod",
+                "haskell",
+                "html",
+                "http",
+                "hurl",
+                "ini",
+                "java",
+                "jq",
+                "json",
+                "julia",
+                "latex",
+                "make",
+                "printf",
+                "proto",
+                "regex",
+                "ron",
+                "rust",
+                "scala",
+                "sql",
+                "textproto",
+                "toml",
+                "xml",
+                "yaml",
+                "zig",
+            },
             auto_install = true,
             highlight = { enable = true },
             indent = { enable = true },
             textobjects = {
                 select = {
                     enable = true,
+                    lookahead = true,
                     keymaps = {
+                        ["i="] = "@assignment.inner",
+                        ["a="] = "@assignment.outer",
                         ["i,"] = "@parameter.inner",
                         ["a,"] = "@parameter.outer",
+                        ["i;"] = "@statement.outer",
+                        ["a;"] = "@statement.outer",
+                        ["ia"] = "@attribute.inner",
+                        ["aa"] = "@attribute.outer",
                         ["ic"] = "@comment.inner",
                         ["ac"] = "@comment.outer",
                         ["if"] = "@function.inner",
@@ -124,7 +160,17 @@ require("lazy").setup({
                 },
             },
         },
+        config = function(_, opts) require("nvim-treesitter.configs").setup(opts) end,
     },
+
+    -- General Editing
+    { "tpope/vim-surround", event = "VeryLazy" }, -- cs/ds/ys
+    { "tpope/vim-commentary", event = "VeryLazy" }, -- gc
+    { "tpope/vim-repeat", event = "VeryLazy" }, -- .
+    { "tpope/vim-unimpaired", event = "VeryLazy" }, -- []
+    { "echasnovski/mini.cursorword", event = "VeryLazy", opts = { delay = 0 } },
+
+    -- Code
     {
         "stevearc/conform.nvim",
         event = "VeryLazy",
