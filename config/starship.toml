@@ -1,3 +1,7 @@
+[git_status]
+stashed = ''  # I don't care about having stuff stashed.
+
+
 # nerd font - https://starship.rs/presets/nerd-font.html
 [aws]
 symbol = "  "
