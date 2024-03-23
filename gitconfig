@@ -1,20 +1,23 @@
 [user]
-name = Presley Graham
-email = presley.graham@protonmail.com
+	name = Presley Graham
+	email = jpresleygraham@gmail.com
 
 [color]
-ui = auto
+	ui = auto
 
 [pull]
-rebase = true
+	rebase = true
 
 [merge]
-tool = nvimdiff
-conflictstyle = diff3
-stat = true
-
-[diff]
-tool = nvimdiff
+	tool = nvimdiff
+	conflictstyle = diff3
+	stat = true
 
 [mergetool "nvimdiff"]
-path = nvim
+	path = nvim
+
+[diff]
+	tool = nvimdiff
+
+[difftool]
+	prompt = false
