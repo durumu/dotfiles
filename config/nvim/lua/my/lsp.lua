@@ -126,8 +126,10 @@ lsp.lua_ls.setup({
             format = { enable = false }, -- I use stylua
             runtime = { version = "LuaJIT" }, -- Neovim uses LuaJIT
             workspace = {
-                -- Make the server aware of Neovim runtime files
-                library = vim.api.nvim_get_runtime_file("", true),
+                library = {
+                    "${3rd}/love2d/library", -- LÖVE
+                    vim.api.nvim_get_runtime_file("", true), -- Neovim runtime files
+                },
                 checkThirdParty = false,
             },
             diagnostics = { globals = { "vim" } },
