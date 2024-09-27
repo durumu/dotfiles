@@ -1,9 +1,5 @@
 local fzf = require("fzf-lua")
 
-require("which-key").register({
-    ["<leader>f"] = { name = "[F]zf", _ = "which_key_ignore" },
-})
-
 vim.api.nvim_create_user_command("Fzf", fzf.resume, { desc = "Resume previous fzf session" })
 
 vim.keymap.set(

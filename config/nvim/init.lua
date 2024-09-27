@@ -80,7 +80,6 @@ require("lazy").setup({
         dependencies = {
             "microsoft/python-type-stubs",
             "folke/neodev.nvim",
-            "folke/which-key.nvim",
         },
         config = function()
             require("neodev").setup({}) -- has to occur before configuring lsp.
@@ -216,7 +215,7 @@ require("lazy").setup({
     -- Project Navigation
     {
         "ibhagwan/fzf-lua",
-        dependencies = { "nvim-tree/nvim-web-devicons", "folke/which-key.nvim" },
+        dependencies = { "nvim-tree/nvim-web-devicons" },
         event = "VeryLazy",
         config = function() require("my.fzf") end,
     },
@@ -242,7 +241,6 @@ require("lazy").setup({
     { "tpope/vim-fugitive", event = "VeryLazy" },
     { -- Adds git related signs to the gutter, as well as utilities for managing changes
         "lewis6991/gitsigns.nvim",
-        dependencies = { "folke/which-key.nvim" },
         event = "VeryLazy",
         config = function() require("my.gitsigns") end,
     },
