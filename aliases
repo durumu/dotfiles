@@ -16,8 +16,7 @@ function cargo_list() {
 # Git - inspired by https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/git
 alias g="git"
 
-alias ga="git add"
-alias gaa="git add --all"
+alias ga="git add --all"
 
 alias gc="git commit"
 alias gcm="git commit -m"

@@ -78,13 +78,14 @@ local function fzf_mru(opts)
         },
     })
 
+    -- this returns a coroutine, not sure what to do with it
     fzf.core.fzf_wrap(opts, opts.cmd, function(selected)
         if not selected or #selected < 2 then
             return
         end
         vim.fn.system(fre .. " --add " .. selected[2])
         fzf.actions.act(opts.actions, selected, opts)
-    end)()
+    end)
 end
 
 vim.keymap.set("n", "<C-p>", fzf_mru, { desc = "Open Files" })
