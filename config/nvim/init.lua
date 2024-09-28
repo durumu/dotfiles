@@ -190,7 +190,6 @@ require("lazy").setup({
         event = "VeryLazy",
         dependencies = {
             "hrsh7th/cmp-buffer",
-            -- "hrsh7th/cmp-emoji",
             "hrsh7th/cmp-nvim-lsp",
             "hrsh7th/cmp-nvim-lua",
             "hrsh7th/cmp-path",
@@ -204,7 +203,6 @@ require("lazy").setup({
                 sources = cmp.config.sources({
                     { name = "nvim_lsp" },
                     { name = "buffer" },
-                    -- { name = "emoji" },
                     { name = "nvim_lua" },
                     { name = "path" },
                 }),
