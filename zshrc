@@ -10,7 +10,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 export EDITOR=$(which nvim)
 bindkey -e # Even though I use vim, I prefer emacs keybinds for the terminal.
 
-export OPENAI_API_KEY=$(cat ~/.secret/openai.key)
+export ANTHROPIC_API_KEY=$(cat < ~/secret/anthropic.key)
 export SSH_KEY_PATH="$HOME/.ssh/rsa_id"
 
 # Fzf
