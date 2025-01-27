@@ -60,7 +60,7 @@ lsp.pyright.setup({
     },
 })
 
-lsp.ruff_lsp.setup({
+lsp.ruff.setup({
     cmd = { vim.fs.joinpath(venv_root, "bin", "ruff"), "server", "--preview" },
     on_attach = function(client, bufnr)
         -- Disable hover in favor of Pyright
