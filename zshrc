@@ -10,11 +10,11 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 export EDITOR=$(which nvim)
 bindkey -e # Even though I use vim, I prefer emacs keybinds for the terminal.
 
-export ANTHROPIC_API_KEY=$(cat < ~/secret/anthropic.key)
+export ANTHROPIC_API_KEY=$(cat < ~/.secret/anthropic.key)
 export SSH_KEY_PATH="$HOME/.ssh/rsa_id"
 
 # Fzf
-export FZF_CTRL_T_COMMAND="command cat <(fre --sorted) <(fd -t d) <(fd -t d . $HOME/code) <(fd -t d . $HOME/tools) <(fd -t d . $HOME/docs)"
+export FZF_CTRL_T_COMMAND="command cat <(fre --sorted) <(fd) <(fd . $HOME/code) <(fd . $HOME/tools) <(fd . $HOME/docs)"
 export FZF_CTRL_T_OPTS='--tiebreak=index'
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
@@ -34,3 +34,9 @@ source "$HOME/.aliases"
 
 # Starship
 eval "$(starship init zsh)"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/presley/.lmstudio/bin"
+
+# Added by Windsurf
+export PATH="/Users/presley/.codeium/windsurf/bin:$PATH"

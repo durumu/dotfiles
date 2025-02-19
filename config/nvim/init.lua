@@ -249,4 +249,12 @@ require("lazy").setup({
         event = "VeryLazy",
         config = function() require("my.gitsigns") end,
     },
+
+    -- My stuff!
+    {
+        "durumu/inline-assist.nvim",
+        lazy = false,
+        build = ":UpdateRemotePlugins",
+        config = function() vim.keymap.set({ "n", "v" }, "<M-CR>", ":InlineAssist ") end,
+    },
 })

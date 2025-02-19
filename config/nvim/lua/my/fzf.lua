@@ -84,7 +84,7 @@ local function fzf_mru(opts)
             return
         end
         vim.fn.system(fre .. " --add " .. selected[2])
-        fzf.actions.act(opts.actions, selected, opts)
+        fzf.actions.act(selected, opts)
     end)
 end
 
