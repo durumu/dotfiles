@@ -209,14 +209,6 @@ require("lazy").setup({
             })
         end,
     },
-
-    {
-        "dlants/magenta.nvim",
-        lazy = false, -- could also bind to <leader>mt
-        build = "npm install --frozen-lockfile",
-        opts = {},
-    },
-
     -- Project Navigation
     {
         "ibhagwan/fzf-lua",
