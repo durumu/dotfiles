@@ -119,6 +119,7 @@ lsp.gopls.setup({
 })
 
 -- This setup is intended for neovim plugins
+-- It also sort of works for playdate
 lsp.lua_ls.setup({
     on_attach = on_attach,
     settings = {
@@ -127,12 +128,18 @@ lsp.lua_ls.setup({
             runtime = { version = "LuaJIT" }, -- Neovim uses LuaJIT
             workspace = {
                 library = {
-                    "${3rd}/love2d/library", -- LÖVE
+                    "/Users/presley/Developer/PlaydateSDK/CoreLibs", -- playdate
                     vim.api.nvim_get_runtime_file("", true), -- Neovim runtime files
                 },
                 checkThirdParty = false,
             },
-            diagnostics = { globals = { "vim" } },
+            diagnostics = {
+                globals = {
+                    "playdate", -- PlaydateSDK
+                    "import", -- PlaydateSDK
+                    "vim", -- Neovim
+                },
+            },
             telemetry = { enable = false },
         },
     },

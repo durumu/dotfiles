@@ -40,3 +40,5 @@ export PATH="$PATH:/Users/presley/.lmstudio/bin"
 
 # Added by Windsurf
 export PATH="/Users/presley/.codeium/windsurf/bin:$PATH"
+
+export PLAYDATE_SDK_PATH="/Users/presley/Developer/PlaydateSDK"
