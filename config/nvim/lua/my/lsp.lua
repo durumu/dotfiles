@@ -43,15 +43,23 @@ end
 
 local lsp = require("lspconfig")
 
--- python is installed at venv_root .. "/bin/python3"
+-- Determine python path: use .venv at git root if it exists, otherwise use python3_host_prog
 local venv_root = vim.fs.dirname(vim.fs.dirname(vim.g.python3_host_prog))
+local git_root = vim.fn.system("git rev-parse --show-toplevel"):gsub("\n", "")
+local git_venv_path = git_root .. "/.venv"
+
+local python_path = vim.g.python3_host_prog
+if vim.fn.isdirectory(git_venv_path) == 1 then
+    venv_root = git_venv_path
+    python_path = vim.fs.joinpath(git_venv_path, "bin", "python3")
+end
 
 lsp.pyright.setup({
     cmd = { vim.fs.joinpath(venv_root, "bin", "pyright-langserver"), "--stdio" },
     on_attach = on_attach,
     settings = {
         python = {
-            pythonPath = vim.g.python3_host_prog,
+            pythonPath = python_path,
             analysis = {
                 diagnosticMode = "openFilesOnly",
                 stubPath = vim.fs.joinpath(vim.fn.stdpath("data"), "lazy", "python-type-stubs"),
@@ -125,7 +133,10 @@ lsp.lua_ls.setup({
     settings = {
         Lua = {
             format = { enable = false }, -- I use stylua
-            runtime = { version = "LuaJIT" }, -- Neovim uses LuaJIT
+            runtime = {
+                version = "LuaJIT", -- Neovim uses LuaJIT
+                nonstandardSymbol = { "+=", "-=", "*=", "/=" },
+            },
             workspace = {
                 library = {
                     "/Users/presley/Developer/PlaydateSDK/CoreLibs", -- playdate

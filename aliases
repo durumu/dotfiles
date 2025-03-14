@@ -5,7 +5,7 @@ alias la="ls -fHalo --color=auto"
 alias ls="ls --color=auto"
 alias py="$HOME/tools/venvs/main/bin/python3"
 alias venv="source $HOME/tools/venvs/main/bin/activate"
-alias uvp="uv pip"
+alias pyt="uv run pytest"
 alias wdiff="git diff --color-words --no-index"
 alias szr="source ~/.zshrc"
 
@@ -41,3 +41,5 @@ alias grbi="git rebase --interactive"
 
 alias gs="git status --short"
 alias gss="git status"
+
+alias cdp="cd ~/code/playdate"
