@@ -1,4 +1,8 @@
 require("gitsigns").setup({
+    current_line_blame = true,
+    current_line_blame_opts = {
+        delay = 1, --ms
+    },
     -- See `:help gitsigns.txt`
     on_attach = function(bufnr)
         local gs = require("gitsigns")
