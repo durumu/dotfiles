@@ -112,7 +112,6 @@ lsp.clangd.setup({
             { desc = "Switch between source and header" }
         )
     end,
-    settings = { clangd = { fallbackFlags = { "-std=c++2a" } } },
 })
 
 lsp.gopls.setup({
@@ -157,3 +156,5 @@ lsp.lua_ls.setup({
 })
 
 lsp.zls.setup({ on_attach = on_attach })
+
+lsp.vtsls.setup({})
