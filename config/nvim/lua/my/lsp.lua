@@ -52,17 +52,13 @@ if vim.fn.isdirectory(git_venv_path) == 1 then
     python_path = vim.fs.joinpath(git_venv_path, "bin", "python3")
 end
 
-vim.lsp.config("pyright", {
-    cmd = { vim.fs.joinpath(venv_root, "bin", "pyright-langserver"), "--stdio" },
+vim.lsp.config("ty", {
+    cmd = { vim.fs.joinpath(venv_root, "bin", "ty"), "server" },
     root_markers = { "pyproject.toml", "setup.py", "requirements.txt", ".git" },
     on_attach = on_attach,
     settings = {
-        python = {
-            pythonPath = python_path,
-            analysis = {
-                diagnosticMode = "openFilesOnly",
-                stubPath = vim.fs.joinpath(vim.fn.stdpath("data"), "lazy", "python-type-stubs"),
-            },
+        ty = {
+            -- ty settings can go here if needed
         },
     },
 })
@@ -175,7 +171,7 @@ vim.lsp.config("vtsls", {
 })
 
 -- Enable LSP servers for their respective filetypes
-vim.lsp.enable("pyright")
+vim.lsp.enable("ty")
 vim.lsp.enable("ruff")
 vim.lsp.enable("rust_analyzer")
 vim.lsp.enable("clangd")
