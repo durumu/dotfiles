@@ -11,7 +11,7 @@ vim.keymap.set(
 vim.keymap.set(
     { "n" },
     "<leader>fb",
-    function() fzf.lsp_document_symbols() end,
+    function() fzf.buffers() end,
     { desc = "[F]zf: [B]uffers" }
 )
 vim.keymap.set(
@@ -50,7 +50,8 @@ vim.keymap.set(
 
 local function get_store_name()
     -- We hash the current directory to come up with a store name.
-    return vim.fn.system("pwd | md5sum | awk '{print $1}'")
+    local cwd = vim.fn.getcwd()
+    return vim.fn.sha256(cwd):sub(1, 32)
 end
 
 local function fzf_mru(opts)

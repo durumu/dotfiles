@@ -68,6 +68,6 @@ vim.keymap.set("n", "<leader>qn", vim.cmd.cnfile, { desc = "Quickfix next file" 
 
 vim.api.nvim_create_user_command("Love", function()
     local current_dir = vim.fn.expand("%:p:h")
-    local git_dir = require("lspconfig").util.find_git_ancestor(current_dir)
+    local git_dir = vim.fs.root(current_dir, ".git")
     vim.cmd("!love " .. git_dir)
 end, { desc = "Run love command" })
