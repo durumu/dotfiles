@@ -41,8 +41,6 @@ for sign, char in pairs(sign_gutter_character) do
     vim.fn.sign_define(sign, { text = char, texthl = sign, linehl = "", numhl = "" })
 end
 
-local lsp = require("lspconfig")
-
 -- Determine python path: use .venv at git root if it exists, otherwise use python3_host_prog
 local venv_root = vim.fs.dirname(vim.fs.dirname(vim.g.python3_host_prog))
 local git_root = vim.fn.system("git rev-parse --show-toplevel"):gsub("\n", "")
@@ -54,8 +52,9 @@ if vim.fn.isdirectory(git_venv_path) == 1 then
     python_path = vim.fs.joinpath(git_venv_path, "bin", "python3")
 end
 
-lsp.pyright.setup({
+vim.lsp.config("pyright", {
     cmd = { vim.fs.joinpath(venv_root, "bin", "pyright-langserver"), "--stdio" },
+    root_markers = { "pyproject.toml", "setup.py", "requirements.txt", ".git" },
     on_attach = on_attach,
     settings = {
         python = {
@@ -68,8 +67,9 @@ lsp.pyright.setup({
     },
 })
 
-lsp.ruff.setup({
+vim.lsp.config("ruff", {
     cmd = { vim.fs.joinpath(venv_root, "bin", "ruff"), "server", "--preview" },
+    root_markers = { "pyproject.toml", "setup.py", "requirements.txt", ".git" },
     on_attach = function(client, bufnr)
         -- Disable hover in favor of Pyright
         client.server_capabilities.hoverProvider = false
@@ -92,7 +92,9 @@ lsp.ruff.setup({
     end,
 })
 
-lsp.rust_analyzer.setup({
+vim.lsp.config("rust_analyzer", {
+    cmd = { "rust-analyzer" },
+    root_markers = { "Cargo.toml" },
     on_attach = on_attach,
     settings = {
         ["rust-analyzer"] = {
@@ -102,7 +104,9 @@ lsp.rust_analyzer.setup({
     },
 })
 
-lsp.clangd.setup({
+vim.lsp.config("clangd", {
+    cmd = { "clangd" },
+    root_markers = { "compile_commands.json", ".git" },
     on_attach = function(client, bufnr)
         on_attach(client, bufnr)
         vim.api.nvim_buf_create_user_command(
@@ -114,7 +118,9 @@ lsp.clangd.setup({
     end,
 })
 
-lsp.gopls.setup({
+vim.lsp.config("gopls", {
+    cmd = { "gopls" },
+    root_markers = { "go.mod", ".git" },
     on_attach = on_attach,
     settings = {
         gopls = {
@@ -127,7 +133,9 @@ lsp.gopls.setup({
 
 -- This setup is intended for neovim plugins
 -- It also sort of works for playdate
-lsp.lua_ls.setup({
+vim.lsp.config("lua_ls", {
+    cmd = { "lua-language-server" },
+    root_markers = { ".luarc.json", ".git" },
     on_attach = on_attach,
     settings = {
         Lua = {
@@ -155,6 +163,23 @@ lsp.lua_ls.setup({
     },
 })
 
-lsp.zls.setup({ on_attach = on_attach })
+vim.lsp.config("zls", {
+    cmd = { "zls" },
+    root_markers = { "zls.json", "build.zig", ".git" },
+    on_attach = on_attach,
+})
 
-lsp.vtsls.setup({})
+vim.lsp.config("vtsls", {
+    cmd = { "vtsls", "--stdio" },
+    root_markers = { "package.json", "tsconfig.json", ".git" },
+})
+
+-- Enable LSP servers for their respective filetypes
+vim.lsp.enable("pyright")
+vim.lsp.enable("ruff")
+vim.lsp.enable("rust_analyzer")
+vim.lsp.enable("clangd")
+vim.lsp.enable("gopls")
+vim.lsp.enable("lua_ls")
+vim.lsp.enable("zls")
+vim.lsp.enable("vtsls")
