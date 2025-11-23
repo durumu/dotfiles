@@ -5,7 +5,7 @@ vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 vim.g.python3_host_prog = vim.fs.joinpath(vim.uv.os_homedir(), "tools/venvs/main/bin/python3")
-vim.g.python_version = 311
+vim.g.python_version = 314
 
 vim.g.mapleader = " " -- before everything else
 
